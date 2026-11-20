@@ -3,14 +3,17 @@ package com.example.sgrms.data.firebase
 import com.example.sgrms.data.model.StudentModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.example.sgrms.data.repository.StudentProfileUpdate
+import com.example.sgrms.data.repository.profileImageFields
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StudentFirebaseService(
-    private val accountFunctions: AccountFunctionsService = AccountFunctionsService()
+@Singleton
+class StudentFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val accountFunctions: AccountFunctionsService
 ) {
-
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-
     private val studentsCollection = firestore.collection("students")
     private val usersCollection = firestore.collection("users")
 
@@ -97,5 +100,47 @@ class StudentFirebaseService(
         studentId: String
     ) {
         accountFunctions.deleteAccount(studentId = studentId)
+    }
+
+    suspend fun updateOwnProfile(
+        studentId: String,
+        update: StudentProfileUpdate
+    ) {
+        studentsCollection
+            .document(studentId)
+            .update(
+                mapOf(
+                    "phoneNumber" to update.phoneNumber,
+                    "dateOfBirth" to update.dateOfBirth,
+                    "address" to update.address,
+                    "guardianName" to update.guardianName,
+                    "guardianPhone" to update.guardianPhone,
+                    "emergencyContact" to update.emergencyContact,
+                    "profileNote" to update.profileNote,
+                    "updatedAt" to System.currentTimeMillis()
+                )
+            )
+            .await()
+    }
+
+    /** Pass an empty [imageUrl] to remove the photo. */
+    suspend fun updateProfileImage(
+        studentId: String,
+        imageUrl: String
+    ) {
+        studentsCollection
+            .document(studentId)
+            .update(profileImageFields(imageUrl))
+            .await()
+    }
+
+    suspend fun saveFcmToken(
+        studentId: String,
+        token: String
+    ) {
+        studentsCollection
+            .document(studentId)
+            .update("fcmToken", token)
+            .await()
     }
 }

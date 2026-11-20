@@ -21,20 +21,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
-import com.example.sgrms.data.repository.GradeFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsFormCard
@@ -43,15 +35,11 @@ import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
-import com.example.sgrms.viewmodel.GradeFirebaseViewModelFactory
+import com.example.sgrms.viewmodel.ReportRemarksViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import com.example.sgrms.utils.GradeCalculator
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun UpdateReportScreen(
@@ -59,42 +47,33 @@ fun UpdateReportScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseService = remember { StudentFirebaseService() }
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
-    val gradeFirebaseService = remember { GradeFirebaseService() }
-    val gradeFirebaseRepository = remember {
-        GradeFirebaseRepository(gradeFirebaseService)
-    }
-    val gradeViewModel: GradeFirebaseViewModel = viewModel(
-        factory = GradeFirebaseViewModelFactory(gradeFirebaseRepository)
-    )
-
-    val subjectFirebaseService = remember { SubjectFirebaseService() }
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val gradeUiState by gradeViewModel.uiState.collectAsState()
     val subjectUiState by subjectViewModel.uiState.collectAsState()
 
+    val remarksViewModel: ReportRemarksViewModel = hiltViewModel()
+    val remarksUiState by remarksViewModel.uiState.collectAsState()
+
     var remarks by remember { mutableStateOf("") }
     var remarksError by remember { mutableStateOf(false) }
-    var localMessage by remember { mutableStateOf("") }
-    var localErrorMessage by remember { mutableStateOf("") }
-    var isSaving by remember { mutableStateOf(false) }
+    val localMessage = remarksUiState.successMessage
+    val localErrorMessage = remarksUiState.errorMessage
+    val isSaving = remarksUiState.isSaving
+
+    // Fill the field once the saved remarks have loaded.
+    LaunchedEffect(remarksUiState.remarks) {
+        if (remarks.isBlank()) remarks = remarksUiState.remarks
+    }
+
+    LaunchedEffect(remarksUiState.saved) {
+        if (remarksUiState.saved) onSaveClick()
+    }
 
     LaunchedEffect(reportId) {
         if (reportId.isNotBlank()) {
@@ -102,17 +81,7 @@ fun UpdateReportScreen(
             gradeViewModel.loadGradesByStudentId(reportId)
             subjectViewModel.loadSubjects()
 
-            try {
-                val remarkDocument = firestore
-                    .collection("reportRemarks")
-                    .document(reportId)
-                    .get()
-                    .await()
-
-                remarks = remarkDocument.getString("remarks").orEmpty()
-            } catch (e: Exception) {
-                localErrorMessage = e.message ?: "Failed to load report remarks"
-            }
+            remarksViewModel.loadRemarks(reportId)
         }
     }
 
@@ -155,8 +124,7 @@ fun UpdateReportScreen(
 
     fun clearMessages() {
         remarksError = false
-        localMessage = ""
-        localErrorMessage = ""
+        remarksViewModel.clearMessages()
         studentViewModel.clearMessage()
         gradeViewModel.clearMessage()
         subjectViewModel.clearMessage()
@@ -326,33 +294,10 @@ fun UpdateReportScreen(
                                 remarksError = remarks.isBlank()
 
                                 if (!remarksError) {
-                                    coroutineScope.launch {
-                                        try {
-                                            isSaving = true
-                                            localErrorMessage = ""
-                                            localMessage = ""
-
-                                            val remarkData = hashMapOf(
-                                                "studentId" to reportId,
-                                                "remarks" to remarks.trim(),
-                                                "updatedAt" to System.currentTimeMillis()
-                                            )
-
-                                            firestore
-                                                .collection("reportRemarks")
-                                                .document(reportId)
-                                                .set(remarkData)
-                                                .await()
-
-                                            isSaving = false
-                                            localMessage = "Report remarks updated successfully"
-                                            onSaveClick()
-                                        } catch (e: Exception) {
-                                            isSaving = false
-                                            localErrorMessage =
-                                                e.message ?: "Failed to update report remarks"
-                                        }
-                                    }
+                                    remarksViewModel.saveRemarks(
+                                        studentId = reportId,
+                                        remarks = remarks
+                                    )
                                 }
                             }
                         )

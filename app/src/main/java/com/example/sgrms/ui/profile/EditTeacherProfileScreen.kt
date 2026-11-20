@@ -35,7 +35,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.model.TeacherModel
 import com.example.sgrms.ui.components.ProfileImagePicker
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
@@ -52,30 +50,25 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.utils.convertImageUriToBase64
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.TeacherProfileViewModel
+import com.example.sgrms.data.repository.TeacherProfileUpdate
 
 @Composable
 fun EditTeacherProfileScreen(
-    teacherId: Int = 0,
-    firebaseTeacherId: String = "",
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: TeacherProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
+    val teacher = uiState.profile
 
-    var teacher by remember { mutableStateOf<TeacherModel?>(null) }
-    var resolvedTeacherId by remember { mutableStateOf("") }
-
-    var profileImageBase64 by remember { mutableStateOf("") }
+    val profileImageUrl = uiState.profile?.profileImageUrl.orEmpty()
+    val legacyImageBase64 = uiState.profile?.profileImageBase64.orEmpty()
 
     var phoneNumber by remember { mutableStateOf("") }
     var department by remember { mutableStateOf("") }
@@ -90,9 +83,9 @@ fun EditTeacherProfileScreen(
     var departmentError by remember { mutableStateOf("") }
     var positionError by remember { mutableStateOf("") }
 
-    var isLoading by remember { mutableStateOf(true) }
-    var isSaving by remember { mutableStateOf(false) }
-    var isUploadingImage by remember { mutableStateOf(false) }
+    val isLoading = uiState.isLoading
+    val isSaving = uiState.isSaving
+    val isUploadingImage = uiState.isUploadingImage
     var generalError by remember { mutableStateOf("") }
 
     fun clearErrors() {
@@ -132,113 +125,39 @@ fun EditTeacherProfileScreen(
     }
 
     fun removeProfilePicture() {
-        if (resolvedTeacherId.isBlank()) {
-            generalError = "Teacher profile not found."
-            return
-        }
+        viewModel.removeImage()
+    }
 
-        coroutineScope.launch {
-            try {
-                isUploadingImage = true
-                generalError = ""
+    var formFilled by remember { mutableStateOf(false) }
 
-                firestore
-                    .collection("teachers")
-                    .document(resolvedTeacherId)
-                    .update(
-                        mapOf(
-                            "profileImageBase64" to "",
-                            "updatedAt" to System.currentTimeMillis()
-                        )
-                    )
-                    .await()
-
-                profileImageBase64 = ""
-
-                snackbarHostState.showSnackbar(
-                    message = "Profile picture removed successfully"
-                )
-            } catch (e: Exception) {
-                generalError = e.message ?: "Failed to remove profile picture."
-            } finally {
-                isUploadingImage = false
-            }
+    LaunchedEffect(uiState.profile) {
+        val loaded = uiState.profile
+        if (loaded != null && !formFilled) {
+            phoneNumber = loaded.phoneNumber
+            department = loaded.department
+            position = loaded.position.ifBlank { "Teacher" }
+            officeLocation = loaded.officeLocation
+            qualification = loaded.qualification
+            specialization = loaded.specialization
+            address = loaded.address
+            profileNote = loaded.profileNote
+            formFilled = true
         }
     }
 
-    LaunchedEffect(firebaseTeacherId, teacherId) {
-        try {
-            isLoading = true
-            generalError = ""
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage.isNotBlank()) generalError = uiState.errorMessage
+    }
 
-            val firebaseUser = firebaseAuth.currentUser
-
-            if (firebaseUser == null) {
-                generalError = "User session not found. Please log in again."
-                return@LaunchedEffect
-            }
-
-            val userDocument = firestore
-                .collection("users")
-                .document(firebaseUser.uid)
-                .get()
-                .await()
-
-            val teacherDocumentId = firebaseTeacherId.ifBlank {
-                userDocument.getString("teacherId").orEmpty()
-            }.ifBlank {
-                if (teacherId != 0) teacherId.toString() else ""
-            }
-
-            val loadedTeacher = if (teacherDocumentId.isNotBlank()) {
-                val teacherDocument = firestore
-                    .collection("teachers")
-                    .document(teacherDocumentId)
-                    .get()
-                    .await()
-
-                resolvedTeacherId = teacherDocument.id
-
-                teacherDocument.toObject(TeacherModel::class.java)?.copy(
-                    teacherId = teacherDocument.id
-                )
-            } else {
-                val teacherQuery = firestore
-                    .collection("teachers")
-                    .whereEqualTo("userId", firebaseUser.uid)
-                    .limit(1)
-                    .get()
-                    .await()
-
-                val document = teacherQuery.documents.firstOrNull()
-                resolvedTeacherId = document?.id.orEmpty()
-
-                document?.toObject(TeacherModel::class.java)?.copy(
-                    teacherId = document.id
-                )
-            }
-
-            teacher = loadedTeacher
-
-            if (loadedTeacher == null || resolvedTeacherId.isBlank()) {
-                generalError = "Teacher profile not found."
-                return@LaunchedEffect
-            }
-
-            profileImageBase64 = loadedTeacher.profileImageBase64
-            phoneNumber = loadedTeacher.phoneNumber
-            department = loadedTeacher.department
-            position = loadedTeacher.position.ifBlank { "Teacher" }
-            officeLocation = loadedTeacher.officeLocation
-            qualification = loadedTeacher.qualification
-            specialization = loadedTeacher.specialization
-            address = loadedTeacher.address
-            profileNote = loadedTeacher.profileNote
-        } catch (e: Exception) {
-            generalError = e.message ?: "Failed to load teacher profile."
-        } finally {
-            isLoading = false
+    LaunchedEffect(uiState.message) {
+        if (uiState.message.isNotBlank()) {
+            snackbarHostState.showSnackbar(message = uiState.message)
+            viewModel.clearMessage()
         }
+    }
+
+    LaunchedEffect(uiState.saved) {
+        if (uiState.saved) onSaveSuccess()
     }
 
     Column(
@@ -303,47 +222,12 @@ fun EditTeacherProfileScreen(
                         )
                     } else {
                         ProfileImagePicker(
-                            imageBase64 = profileImageBase64,
+                            imageUrl = profileImageUrl,
+                            legacyImageBase64 = legacyImageBase64,
                             isUploading = isUploadingImage,
                             enabled = !isSaving,
                             onImageSelected = { imageUri ->
-                                if (resolvedTeacherId.isBlank()) {
-                                    generalError = "Teacher profile not found."
-                                    return@ProfileImagePicker
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isUploadingImage = true
-                                        generalError = ""
-
-                                        val convertedImageBase64 = convertImageUriToBase64(
-                                            context = context,
-                                            imageUri = imageUri
-                                        )
-
-                                        firestore
-                                            .collection("teachers")
-                                            .document(resolvedTeacherId)
-                                            .update(
-                                                mapOf(
-                                                    "profileImageBase64" to convertedImageBase64,
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        profileImageBase64 = convertedImageBase64
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile picture updated successfully"
-                                        )
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to save profile picture."
-                                    } finally {
-                                        isUploadingImage = false
-                                    }
-                                }
+                                viewModel.onImageSelected(imageUri)
                             }
                         )
 
@@ -353,7 +237,7 @@ fun EditTeacherProfileScreen(
                             onClick = {
                                 removeProfilePicture()
                             },
-                            enabled = profileImageBase64.isNotBlank() &&
+                            enabled = (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) &&
                                     !isSaving &&
                                     !isUploadingImage,
                             modifier = Modifier.fillMaxWidth(),
@@ -551,45 +435,18 @@ fun EditTeacherProfileScreen(
                             onClick = {
                                 if (!validateForm()) return@Button
 
-                                if (resolvedTeacherId.isBlank()) {
-                                    generalError = "Teacher profile not found."
-                                    return@Button
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isSaving = true
-                                        generalError = ""
-
-                                        firestore
-                                            .collection("teachers")
-                                            .document(resolvedTeacherId)
-                                            .update(
-                                                mapOf(
-                                                    "phoneNumber" to phoneNumber.trim(),
-                                                    "department" to department.trim(),
-                                                    "position" to position.trim(),
-                                                    "officeLocation" to officeLocation.trim(),
-                                                    "qualification" to qualification.trim(),
-                                                    "specialization" to specialization.trim(),
-                                                    "address" to address.trim(),
-                                                    "profileNote" to profileNote.trim(),
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile updated successfully"
-                                        )
-
-                                        onSaveSuccess()
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to update profile."
-                                    } finally {
-                                        isSaving = false
-                                    }
-                                }
+                                viewModel.saveProfile(
+                                    TeacherProfileUpdate(
+                                        phoneNumber = phoneNumber.trim(),
+                                        department = department.trim(),
+                                        position = position.trim(),
+                                        officeLocation = officeLocation.trim(),
+                                        qualification = qualification.trim(),
+                                        specialization = specialization.trim(),
+                                        address = address.trim(),
+                                        profileNote = profileNote.trim()
+                                    )
+                                )
                             },
                             enabled = !isSaving && !isLoading && !isUploadingImage,
                             modifier = Modifier

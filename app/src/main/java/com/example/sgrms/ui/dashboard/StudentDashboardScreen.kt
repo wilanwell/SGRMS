@@ -38,13 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
-import com.example.sgrms.data.repository.GradeFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsProgressItem
 import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
@@ -54,12 +47,10 @@ import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
-import com.example.sgrms.viewmodel.GradeFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import com.example.sgrms.utils.GradeCalculator
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 data class StudentDashboardGradeItem(
     val gradeId: String,
@@ -71,54 +62,17 @@ data class StudentDashboardGradeItem(
 
 @Composable
 fun StudentDashboardScreen(
-    studentId: Int = 0,
-    firebaseStudentId: String = "",
+    studentId: String,
     onProfileClick: () -> Unit = {},
     onReportClick: () -> Unit = {}
 ) {
-    val currentStudentId = firebaseStudentId.ifBlank {
-        if (studentId != 0) {
-            studentId.toString()
-        } else {
-            ""
-        }
-    }
+    val currentStudentId = studentId
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
-
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    val gradeFirebaseRepository = remember {
-        GradeFirebaseRepository(gradeFirebaseService)
-    }
-
-    val gradeViewModel: GradeFirebaseViewModel = viewModel(
-        factory = GradeFirebaseViewModelFactory(gradeFirebaseRepository)
-    )
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val gradeUiState by gradeViewModel.uiState.collectAsState()

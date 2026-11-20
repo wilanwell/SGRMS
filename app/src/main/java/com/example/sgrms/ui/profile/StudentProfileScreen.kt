@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,107 +41,37 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.model.GradeModel
-import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import com.example.sgrms.utils.GradeCalculator
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.StudentProfileViewModel
+import com.example.sgrms.data.model.UserRole
 
 @Composable
 fun StudentProfileScreen(
-    studentId: Int = 0,
-    firebaseStudentId: String = "",
     onBackClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
-    val currentStudentId = firebaseStudentId.ifBlank {
-        if (studentId != 0) {
-            studentId.toString()
-        } else {
-            ""
-        }
-    }
+    val viewModel: StudentProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
+    val extras by viewModel.extras.collectAsState()
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val student = uiState.profile
+    val grades = extras.grades
+    val account = extras.account
 
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    val firestore = remember {
-        FirebaseFirestore.getInstance()
-    }
-
-    var student by remember {
-        mutableStateOf<StudentModel?>(null)
-    }
-
-    var grades by remember {
-        mutableStateOf<List<GradeModel>>(emptyList())
-    }
-
-    var userFullName by remember {
-        mutableStateOf("")
-    }
-
-    var userEmail by remember {
-        mutableStateOf("")
-    }
-
-    var userRole by remember {
-        mutableStateOf("Student")
-    }
-
-    var username by remember {
-        mutableStateOf("")
-    }
-
-    LaunchedEffect(currentStudentId) {
-        if (currentStudentId.isNotBlank()) {
-            val loadedStudent = studentFirebaseService.getStudentById(currentStudentId)
-            student = loadedStudent
-
-            grades = gradeFirebaseService.getGradesByStudentId(currentStudentId)
-
-            if (loadedStudent?.userId?.isNotBlank() == true) {
-                val userDocument = firestore
-                    .collection("users")
-                    .document(loadedStudent.userId)
-                    .get()
-                    .await()
-
-                userFullName = userDocument.getString("fullName")
-                    ?: userDocument.getString("name")
-                            ?: loadedStudent.studentName
-
-                userEmail = userDocument.getString("email")
-                    ?: loadedStudent.email
-
-                userRole = userDocument.getString("role")
-                    ?: "Student"
-
-                username = userDocument.getString("username")
-                    ?: userEmail.substringBefore("@", missingDelimiterValue = "-")
-            } else {
-                userFullName = loadedStudent?.studentName.orEmpty()
-                userEmail = loadedStudent?.email.orEmpty()
-                userRole = "Student"
-                username = userEmail.substringBefore("@", missingDelimiterValue = "-")
-            }
-        }
-    }
+    val userFullName = account?.fullName?.ifBlank { null } ?: student?.studentName.orEmpty()
+    val userEmail = account?.email?.ifBlank { null } ?: student?.email.orEmpty()
+    val username = account?.username?.ifBlank { null }
+        ?: userEmail.substringBefore("@", missingDelimiterValue = "-")
 
     val completedGrades = grades.filter { grade ->
         grade.status.equals("Complete", ignoreCase = true)
@@ -187,7 +116,8 @@ fun StudentProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ProfileImageView(
-                imageBase64 = student?.profileImageBase64.orEmpty(),
+                imageUrl = student?.profileImageUrl.orEmpty(),
+                legacyImageBase64 = student?.profileImageBase64.orEmpty(),
                 size = 90
             )
 
@@ -271,7 +201,7 @@ fun StudentProfileScreen(
                     StudentProfileInfoRow(
                         icon = Icons.Default.Badge,
                         title = "Role",
-                        value = userRole.ifBlank { "Student" }
+                        value = account?.role?.ifBlank { null } ?: UserRole.STUDENT.value
                     )
 
                     HorizontalDivider(

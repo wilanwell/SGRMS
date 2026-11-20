@@ -24,6 +24,7 @@ import {
   getFirestore,
 } from "firebase-admin/firestore";
 import {getMessaging} from "firebase-admin/messaging";
+import {getStorage} from "firebase-admin/storage";
 
 initializeApp();
 setGlobalOptions({maxInstances: 10});
@@ -370,7 +371,19 @@ export const deleteUserAccount = onCall(async (request) => {
     }
   }
 
-  // 2. Profile documents.
+  // 2. Profile photo in Cloud Storage.
+  if (userId) {
+    try {
+      await getStorage()
+        .bucket()
+        .file(`profile_images/${userId}.jpg`)
+        .delete({ignoreNotFound: true});
+    } catch (error) {
+      logger.warn("Deleting profile photo failed", {userId, error});
+    }
+  }
+
+  // 3. Profile documents.
   const refs: DocumentReference[] = [];
   if (userId) refs.push(db.collection("users").doc(userId));
   if (teacherId) refs.push(db.collection("teachers").doc(teacherId));
@@ -383,7 +396,7 @@ export const deleteUserAccount = onCall(async (request) => {
   refs.forEach((ref) => batch.delete(ref));
   await batch.commit();
 
-  // 3. Records that belong to the account.
+  // 4. Records that belong to the account.
   if (studentId) {
     await deleteQuery(
       db.collection("grades").where("studentId", "==", studentId)

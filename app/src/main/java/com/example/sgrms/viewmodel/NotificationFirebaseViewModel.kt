@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class NotificationFirebaseUiState(
     val notifications: List<NotificationModel> = emptyList(),
@@ -16,7 +19,8 @@ data class NotificationFirebaseUiState(
     val successMessage: String = ""
 )
 
-class NotificationFirebaseViewModel(
+@HiltViewModel
+class NotificationFirebaseViewModel @Inject constructor(
     private val notificationRepository: NotificationFirebaseRepository
 ) : ViewModel() {
 
@@ -55,7 +59,7 @@ class NotificationFirebaseViewModel(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = exception.message ?: "Failed to load notifications",
+                    errorMessage = exception.toUserMessage("Failed to load notifications"),
                     successMessage = ""
                 )
             }
@@ -105,7 +109,7 @@ class NotificationFirebaseViewModel(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.message ?: "Failed to mark notification as read",
+                    errorMessage = exception.toUserMessage("Failed to mark notification as read"),
                     successMessage = ""
                 )
             }
@@ -148,7 +152,7 @@ class NotificationFirebaseViewModel(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.message ?: "Failed to mark all notifications as read",
+                    errorMessage = exception.toUserMessage("Failed to mark all notifications as read"),
                     successMessage = ""
                 )
             }
@@ -182,7 +186,7 @@ class NotificationFirebaseViewModel(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.message ?: "Failed to delete notification",
+                    errorMessage = exception.toUserMessage("Failed to delete notification"),
                     successMessage = ""
                 )
             }

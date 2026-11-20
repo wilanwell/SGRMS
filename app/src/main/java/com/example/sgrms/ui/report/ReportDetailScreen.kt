@@ -55,16 +55,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.data.repository.GradeFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
@@ -76,15 +69,12 @@ import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
-import com.example.sgrms.viewmodel.GradeFirebaseViewModelFactory
+import com.example.sgrms.viewmodel.ReportRemarksViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.ui.theme.markColor
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 data class ReportGradeDisplayItem(
     val grade: GradeModel,
@@ -100,50 +90,20 @@ fun ReportDetailScreen(
     onUpdateReportClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
-
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
-
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    val gradeFirebaseRepository = remember {
-        GradeFirebaseRepository(gradeFirebaseService)
-    }
-
-    val gradeViewModel: GradeFirebaseViewModel = viewModel(
-        factory = GradeFirebaseViewModelFactory(gradeFirebaseRepository)
-    )
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val gradeUiState by gradeViewModel.uiState.collectAsState()
     val subjectUiState by subjectViewModel.uiState.collectAsState()
 
-    var additionalRemarks by remember { mutableStateOf("") }
-    var localErrorMessage by remember { mutableStateOf("") }
+    val remarksViewModel: ReportRemarksViewModel = hiltViewModel()
+    val remarksUiState by remarksViewModel.uiState.collectAsState()
+    val additionalRemarks = remarksUiState.remarks
+    val localErrorMessage = remarksUiState.errorMessage
 
     LaunchedEffect(reportId) {
         if (reportId.isNotBlank()) {
@@ -151,17 +111,7 @@ fun ReportDetailScreen(
             gradeViewModel.loadGradesByStudentId(reportId)
             subjectViewModel.loadSubjects()
 
-            try {
-                val remarkDocument = firestore
-                    .collection("reportRemarks")
-                    .document(reportId)
-                    .get()
-                    .await()
-
-                additionalRemarks = remarkDocument.getString("remarks").orEmpty()
-            } catch (e: Exception) {
-                localErrorMessage = e.message ?: "Failed to load report remarks"
-            }
+            remarksViewModel.loadRemarks(reportId)
         }
     }
 

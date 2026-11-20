@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class SubjectFirebaseUiState(
     val subjects: List<SubjectModel> = emptyList(),
@@ -17,7 +20,8 @@ data class SubjectFirebaseUiState(
     val successMessage: String = ""
 )
 
-class SubjectFirebaseViewModel(
+@HiltViewModel
+class SubjectFirebaseViewModel @Inject constructor(
     private val subjectRepository: SubjectFirebaseRepository
 ) : ViewModel() {
 
@@ -57,7 +61,7 @@ class SubjectFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to add subject"
+                    errorMessage = e.toUserMessage("Failed to add subject")
                 )
             }
         }
@@ -81,7 +85,7 @@ class SubjectFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load subjects"
+                    errorMessage = e.toUserMessage("Failed to load subjects")
                 )
             }
         }
@@ -105,7 +109,7 @@ class SubjectFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load subject"
+                    errorMessage = e.toUserMessage("Failed to load subject")
                 )
             }
         }
@@ -134,7 +138,7 @@ class SubjectFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to update subject"
+                    errorMessage = e.toUserMessage("Failed to update subject")
                 )
             }
         }
@@ -163,7 +167,7 @@ class SubjectFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to delete subject"
+                    errorMessage = e.toUserMessage("Failed to delete subject")
                 )
             }
         }

@@ -57,10 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.StudentFirebaseService
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.components.TopBar
@@ -70,29 +67,20 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import java.io.File
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun StudentManagementScreen(
     onBackClick: () -> Unit = {},
     onAddStudentClick: () -> Unit = {},
+    canAddStudent: Boolean = true,
     onStudentDetailClick: (String) -> Unit = {},
     onEditStudentClick: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
-
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
-
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val uiState by studentViewModel.uiState.collectAsState()
 
@@ -291,7 +279,8 @@ fun StudentManagementScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            // Only an Admin can create login accounts (Cloud Function).
+            if (canAddStudent) FloatingActionButton(
                 onClick = onAddStudentClick,
                 containerColor = PrimaryBlue,
                 contentColor = Color.White,

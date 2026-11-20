@@ -34,10 +34,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,10 +45,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
-import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
@@ -59,23 +53,12 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import com.example.sgrms.ui.theme.markColor
 import com.example.sgrms.utils.GradeCalculator
-
-data class AddStudentGradeSubjectItem(
-    val subjectId: String,
-    val subjectName: String,
-    val subjectCode: String,
-    val existingGradeId: String = "",
-    val marksText: String = "",
-    val remarks: String = "",
-    val status: String = "Pending",
-    val message: String = "",
-    val isSaving: Boolean = false
-)
+import com.example.sgrms.viewmodel.AddStudentGradeSubjectItem
+import com.example.sgrms.viewmodel.AddStudentGradeViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun AddStudentGradeScreen(
@@ -83,216 +66,18 @@ fun AddStudentGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val viewModel: AddStudentGradeViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
-    val firestore = remember {
-        FirebaseFirestore.getInstance()
-    }
-
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    var student by remember {
-        mutableStateOf<StudentModel?>(null)
-    }
-
-    val subjectItems = remember {
-        mutableStateListOf<AddStudentGradeSubjectItem>()
-    }
-
-    var isLoading by remember {
-        mutableStateOf(true)
-    }
-
-    var errorMessage by remember {
-        mutableStateOf("")
-    }
+    val student = uiState.student
+    val subjectItems = uiState.subjectItems
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
     LaunchedEffect(studentId) {
-        try {
-            isLoading = true
-            errorMessage = ""
-
-            if (studentId.isBlank()) {
-                errorMessage = "Student ID is missing."
-                return@LaunchedEffect
-            }
-
-            val loadedStudent = studentFirebaseService.getStudentById(studentId)
-
-            if (loadedStudent == null) {
-                errorMessage = "Student not found."
-                return@LaunchedEffect
-            }
-
-            student = loadedStudent
-
-            val subjects = subjectFirebaseService.getAllSubjects()
-            val existingGrades = gradeFirebaseService.getGradesByStudentId(studentId)
-
-            subjectItems.clear()
-
-            subjects.forEach { subject ->
-                val existingGrade = existingGrades.find { grade ->
-                    grade.subjectId == subject.subjectId
-                }
-
-                subjectItems.add(
-                    AddStudentGradeSubjectItem(
-                        subjectId = subject.subjectId,
-                        subjectName = subject.subjectName,
-                        subjectCode = subject.subjectCode,
-                        existingGradeId = existingGrade?.gradeId ?: "",
-                        marksText = if (existingGrade != null && existingGrade.marks > 0) {
-                            existingGrade.marks.toString()
-                        } else {
-                            ""
-                        },
-                        remarks = existingGrade?.remarks ?: "",
-                        status = existingGrade?.status ?: "Pending"
-                    )
-                )
-            }
-        } catch (exception: Exception) {
-            errorMessage = exception.message ?: "Failed to load subjects."
-        } finally {
-            isLoading = false
-        }
+        viewModel.load(studentId)
     }
 
-    fun updateSubjectItem(
-        index: Int,
-        updatedItem: AddStudentGradeSubjectItem
-    ) {
-        if (index in subjectItems.indices) {
-            subjectItems[index] = updatedItem
-        }
-    }
-
-    fun saveGradeForSubject(
-        index: Int,
-        item: AddStudentGradeSubjectItem
-    ) {
-        val currentStudent = student
-
-        if (currentStudent == null) {
-            updateSubjectItem(
-                index = index,
-                updatedItem = item.copy(
-                    message = "Student not found."
-                )
-            )
-            return
-        }
-
-        val marks = item.marksText.toDoubleOrNull()
-
-        if (marks == null || marks < 0 || marks > 100) {
-            updateSubjectItem(
-                index = index,
-                updatedItem = item.copy(
-                    message = "Please enter marks between 0 and 100."
-                )
-            )
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                updateSubjectItem(
-                    index = index,
-                    updatedItem = item.copy(
-                        isSaving = true,
-                        message = ""
-                    )
-                )
-
-                val gradeDocument = if (item.existingGradeId.isNotBlank()) {
-                    firestore
-                        .collection("grades")
-                        .document(item.existingGradeId)
-                } else {
-                    firestore
-                        .collection("grades")
-                        .document()
-                }
-
-                val gradeId = gradeDocument.id
-                val gradeLetter = GradeCalculator.gradeLetter(marks)
-                val now = System.currentTimeMillis()
-
-                val gradeData = mapOf(
-                    "gradeId" to gradeId,
-                    "studentId" to currentStudent.studentId,
-                    "studentName" to currentStudent.studentName,
-                    "studentCode" to currentStudent.studentCode,
-                    "classId" to currentStudent.classId,
-                    "className" to currentStudent.className,
-                    "subjectId" to item.subjectId,
-                    "subjectName" to item.subjectName,
-                    "subjectCode" to item.subjectCode,
-                    "marks" to marks,
-                    "gradeLetter" to gradeLetter,
-                    "remarks" to item.remarks.trim(),
-                    "status" to "Complete",
-                    "updatedAt" to now,
-                    "createdAt" to now
-                )
-
-                gradeDocument
-                    .set(gradeData)
-                    .await()
-
-                val notificationDocument = firestore
-                    .collection("notifications")
-                    .document()
-
-                notificationDocument
-                    .set(
-                        mapOf(
-                            "notificationId" to notificationDocument.id,
-                            "studentId" to currentStudent.studentId,
-                            "title" to "Grade Updated",
-                            "message" to "Your ${item.subjectName} grade has been updated.",
-                            "type" to "GRADE_UPDATED",
-                            "relatedGradeId" to gradeId,
-                            "relatedSubjectId" to item.subjectId,
-                            "isRead" to false,
-                            "read" to false,
-                            "createdAt" to now
-                        )
-                    )
-                    .await()
-
-                updateSubjectItem(
-                    index = index,
-                    updatedItem = item.copy(
-                        existingGradeId = gradeId,
-                        status = "Complete",
-                        isSaving = false,
-                        message = "Grade saved successfully."
-                    )
-                )
-            } catch (exception: Exception) {
-                updateSubjectItem(
-                    index = index,
-                    updatedItem = item.copy(
-                        isSaving = false,
-                        message = exception.message ?: "Failed to save grade."
-                    )
-                )
-            }
-        }
-    }
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -411,28 +196,13 @@ fun AddStudentGradeScreen(
                         AddStudentGradeSubjectCard(
                             item = item,
                             onMarksChange = { newMarks ->
-                                updateSubjectItem(
-                                    index = index,
-                                    updatedItem = item.copy(
-                                        marksText = newMarks,
-                                        message = ""
-                                    )
-                                )
+                                viewModel.onMarksChange(index, newMarks)
                             },
                             onRemarksChange = { newRemarks ->
-                                updateSubjectItem(
-                                    index = index,
-                                    updatedItem = item.copy(
-                                        remarks = newRemarks,
-                                        message = ""
-                                    )
-                                )
+                                viewModel.onRemarksChange(index, newRemarks)
                             },
                             onSaveClick = {
-                                saveGradeForSubject(
-                                    index = index,
-                                    item = item
-                                )
+                                viewModel.saveGrade(index)
                             }
                         )
                     }

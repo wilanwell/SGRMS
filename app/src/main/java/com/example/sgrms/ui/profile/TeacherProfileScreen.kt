@@ -37,9 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,10 +48,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.model.ClassModel
-import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.data.model.TeacherModel
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
@@ -61,188 +55,32 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.TeacherProfileViewModel
 
 @Composable
 fun TeacherProfileScreen(
-    teacherId: Int = 0,
-    firebaseTeacherId: String = "",
     onBackClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: TeacherProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
+    val assignments by viewModel.assignments.collectAsState()
 
-    var teacher by remember { mutableStateOf<TeacherModel?>(null) }
+    val teacher = uiState.profile
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
-    var classCount by remember { mutableIntStateOf(0) }
-    var studentCount by remember { mutableIntStateOf(0) }
-    var subjectCount by remember { mutableIntStateOf(0) }
-    var reportCount by remember { mutableIntStateOf(0) }
+    val classCount = assignments.classes.size
+    val studentCount = assignments.studentCount
+    val subjectCount = assignments.subjects.size
+    val reportCount = assignments.reportCount
 
-    var assignedClassNames by remember { mutableStateOf("") }
-    var assignedSubjectNames by remember { mutableStateOf("") }
-
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    LaunchedEffect(firebaseTeacherId, teacherId) {
-        try {
-            isLoading = true
-            errorMessage = ""
-
-            val firebaseUser = firebaseAuth.currentUser
-
-            if (firebaseUser == null) {
-                errorMessage = "User session not found. Please log in again."
-                teacher = null
-                return@LaunchedEffect
-            }
-
-            val currentUserId = firebaseUser.uid
-
-            val userDocument = firestore
-                .collection("users")
-                .document(currentUserId)
-                .get()
-                .await()
-
-            val resolvedTeacherId = firebaseTeacherId.ifBlank {
-                userDocument.getString("teacherId").orEmpty()
-            }
-
-            val loadedTeacher = if (resolvedTeacherId.isNotBlank()) {
-                val teacherDocument = firestore
-                    .collection("teachers")
-                    .document(resolvedTeacherId)
-                    .get()
-                    .await()
-
-                teacherDocument.toObject(TeacherModel::class.java)?.copy(
-                    teacherId = teacherDocument.id
-                )
-            } else {
-                val teacherQuery = firestore
-                    .collection("teachers")
-                    .whereEqualTo("userId", currentUserId)
-                    .limit(1)
-                    .get()
-                    .await()
-
-                teacherQuery.documents.firstOrNull()?.let { document ->
-                    document.toObject(TeacherModel::class.java)?.copy(
-                        teacherId = document.id
-                    )
-                }
-            }
-
-            teacher = loadedTeacher
-
-            if (loadedTeacher == null) {
-                errorMessage = "The teacher account is not linked to a teacher profile."
-                return@LaunchedEffect
-            }
-
-            val classesSnapshot = firestore
-                .collection("classes")
-                .get()
-                .await()
-
-            val studentsSnapshot = firestore
-                .collection("students")
-                .get()
-                .await()
-
-            val subjectsSnapshot = firestore
-                .collection("subjects")
-                .get()
-                .await()
-
-            val reportsSnapshot = firestore
-                .collection("reports")
-                .get()
-                .await()
-
-            val assignedClasses = classesSnapshot.documents.mapNotNull { document ->
-                document.toObject(ClassModel::class.java)?.copy(
-                    classId = document.id
-                )
-            }.filter { schoolClass ->
-                schoolClass.classTeacherId == loadedTeacher.teacherId ||
-                        schoolClass.classTeacherName.equals(
-                            loadedTeacher.teacherName,
-                            ignoreCase = true
-                        )
-            }
-
-            val assignedSubjects = subjectsSnapshot.documents.mapNotNull { document ->
-                document.toObject(SubjectModel::class.java)?.copy(
-                    subjectId = document.id
-                )
-            }.filter { subject ->
-                subject.teacherId == loadedTeacher.teacherId ||
-                        subject.teacherName.equals(
-                            loadedTeacher.teacherName,
-                            ignoreCase = true
-                        )
-            }
-
-            val assignedClassIds = assignedClasses.map { schoolClass ->
-                schoolClass.classId
-            }.toSet()
-
-            val assignedClassNameSet = assignedClasses.map { schoolClass ->
-                schoolClass.className
-            }.toSet()
-
-            val assignedStudents = studentsSnapshot.documents.mapNotNull { document ->
-                document.toObject(StudentModel::class.java)?.copy(
-                    studentId = document.id
-                )
-            }.filter { student ->
-                student.classId in assignedClassIds ||
-                        student.className in assignedClassNameSet
-            }
-
-            val assignedStudentIds = assignedStudents.map { student ->
-                student.studentId
-            }.toSet()
-
-            val assignedReports = reportsSnapshot.documents.filter { document ->
-                document.getString("studentId") in assignedStudentIds
-            }
-
-            classCount = assignedClasses.size
-            studentCount = assignedStudents.size
-            subjectCount = assignedSubjects.size
-            reportCount = assignedReports.size
-
-            assignedClassNames = if (assignedClasses.isNotEmpty()) {
-                assignedClasses.joinToString { schoolClass ->
-                    schoolClass.className
-                }
-            } else {
-                ""
-            }
-
-            assignedSubjectNames = if (assignedSubjects.isNotEmpty()) {
-                assignedSubjects.joinToString { subject ->
-                    subject.subjectName
-                }
-            } else {
-                ""
-            }
-        } catch (e: Exception) {
-            errorMessage = e.message ?: "Failed to load teacher profile"
-            teacher = null
-        } finally {
-            isLoading = false
-        }
-    }
+    val assignedClassNames = assignments.classes.joinToString { it.className }
+    val assignedSubjectNames = assignments.subjects.joinToString { it.subjectName }
 
     Column(
         modifier = Modifier
@@ -318,7 +156,8 @@ fun TeacherProfileScreen(
                 }
             } else {
                 ProfileImageView(
-                    imageBase64 = teacher?.profileImageBase64.orEmpty(),
+                    imageUrl = teacher?.profileImageUrl.orEmpty(),
+                    legacyImageBase64 = teacher?.profileImageBase64.orEmpty(),
                     size = 90
                 )
 

@@ -48,15 +48,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.GradeFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
@@ -66,13 +59,11 @@ import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
-import com.example.sgrms.utils.createReportPdfDataFromDatabase
+import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
-import com.example.sgrms.viewmodel.GradeFirebaseViewModelFactory
+import com.example.sgrms.viewmodel.ReportRemarksViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -80,6 +71,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.ui.theme.markColor
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 data class StudentReportSubjectItem(
     val grade: GradeModel,
@@ -96,41 +88,12 @@ fun StudentReportSummaryScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
-
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    val gradeFirebaseRepository = remember {
-        GradeFirebaseRepository(gradeFirebaseService)
-    }
-
-    val gradeViewModel: GradeFirebaseViewModel = viewModel(
-        factory = GradeFirebaseViewModelFactory(gradeFirebaseRepository)
-    )
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
+    val remarksViewModel: ReportRemarksViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val gradeUiState by gradeViewModel.uiState.collectAsState()
@@ -199,7 +162,7 @@ fun StudentReportSummaryScreen(
         }
 
         coroutineScope.launch {
-            val reportForPdf = createReportPdfDataFromDatabase(
+            val reportForPdf = ReportPdfData(
                 reportId = studentId,
                 studentId = studentId,
                 totalMarks = totalMarks,
@@ -207,7 +170,7 @@ fun StudentReportSummaryScreen(
                 overallGrade = overallGrade,
                 remarks = reportRemarks,
                 generatedDate = reportDate,
-                student = student
+                classTeacherName = remarksViewModel.getClassTeacherName(student)
             )
 
             ReportPdfGenerator.saveReportAsPdf(

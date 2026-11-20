@@ -37,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,8 +55,9 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.AdminDashboardViewModel
 
 @Composable
 fun AdminDashboardScreen(
@@ -71,77 +71,21 @@ fun AdminDashboardScreen(
     onReportClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: AdminDashboardViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
-    var totalAccounts by remember { mutableIntStateOf(0) }
-    var adminCount by remember { mutableIntStateOf(0) }
-    var teacherAccountCount by remember { mutableIntStateOf(0) }
-    var studentAccountCount by remember { mutableIntStateOf(0) }
+    val summary = uiState.summary
+    val totalAccounts = summary.totalAccounts
+    val adminCount = summary.adminAccounts
+    val teacherAccountCount = summary.teacherAccounts
+    val studentAccountCount = summary.studentAccounts
+    val teacherCount = summary.teachers
+    val studentCount = summary.students
+    val subjectCount = summary.subjects
+    val classCount = summary.classes
 
-    var teacherCount by remember { mutableIntStateOf(0) }
-    var studentCount by remember { mutableIntStateOf(0) }
-    var subjectCount by remember { mutableIntStateOf(0) }
-    var classCount by remember { mutableIntStateOf(0) }
-
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        try {
-            isLoading = true
-            errorMessage = ""
-
-            val usersSnapshot = firestore
-                .collection("users")
-                .get()
-                .await()
-
-            val teachersSnapshot = firestore
-                .collection("teachers")
-                .get()
-                .await()
-
-            val studentsSnapshot = firestore
-                .collection("students")
-                .get()
-                .await()
-
-            val subjectsSnapshot = firestore
-                .collection("subjects")
-                .get()
-                .await()
-
-            val classesSnapshot = firestore
-                .collection("classes")
-                .get()
-                .await()
-
-            val users = usersSnapshot.documents
-
-            totalAccounts = users.size
-
-            adminCount = users.count { document ->
-                document.getString("role") == "Admin"
-            }
-
-            teacherAccountCount = users.count { document ->
-                document.getString("role") == "Teacher"
-            }
-
-            studentAccountCount = users.count { document ->
-                document.getString("role") == "Student"
-            }
-
-            teacherCount = teachersSnapshot.size()
-            studentCount = studentsSnapshot.size()
-            subjectCount = subjectsSnapshot.size()
-            classCount = classesSnapshot.size()
-        } catch (e: Exception) {
-            errorMessage = e.message ?: "Failed to load dashboard data"
-        } finally {
-            isLoading = false
-        }
-    }
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),

@@ -3,11 +3,14 @@ package com.example.sgrms.data.firebase
 import com.example.sgrms.data.model.SubjectModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class SubjectFirebaseService {
-
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val subjectsCollection = firestore.collection("subjects")
+@Singleton
+class SubjectFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore
+) {
+     private val subjectsCollection = firestore.collection("subjects")
 
     suspend fun addSubject(
         subjectCode: String,

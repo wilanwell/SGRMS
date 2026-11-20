@@ -4,11 +4,14 @@ import com.example.sgrms.data.model.NotificationModel
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NotificationFirebaseService {
-
-    private val firestore = FirebaseFirestore.getInstance()
-    private val notificationsCollection = firestore.collection("notifications")
+@Singleton
+class NotificationFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore
+) {
+     private val notificationsCollection = firestore.collection("notifications")
 
     suspend fun addNotification(
         notification: NotificationModel

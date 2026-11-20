@@ -51,11 +51,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.ClassFirebaseService
 import com.example.sgrms.data.model.ClassModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.ClassFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsDeleteDialog
@@ -72,9 +69,9 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
-import com.example.sgrms.viewmodel.ClassFirebaseViewModelFactory
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import com.example.sgrms.viewmodel.StudentFirebaseViewModel
+import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 data class ClassTeacherItem(
     val teacherId: String = "",
@@ -87,26 +84,22 @@ fun ClassManagementScreen(
     onViewClassClick: (String) -> Unit = {},
     onAddStudentClick: () -> Unit = {}
 ) {
-    val classFirebaseService = remember {
-        ClassFirebaseService()
-    }
-
-    val classFirebaseRepository = remember {
-        ClassFirebaseRepository(classFirebaseService)
-    }
-
-    val classViewModel: ClassFirebaseViewModel = viewModel(
-        factory = ClassFirebaseViewModelFactory(classFirebaseRepository)
-    )
+    val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 
     val uiState by classViewModel.uiState.collectAsState()
 
-    val firestore = remember {
-        FirebaseFirestore.getInstance()
-    }
+    val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
+    val teacherUiState by teacherViewModel.uiState.collectAsState()
+    val studentUiState by studentViewModel.uiState.collectAsState()
 
-    var teachers by remember { mutableStateOf<List<ClassTeacherItem>>(emptyList()) }
-    var students by remember { mutableStateOf<List<StudentModel>>(emptyList()) }
+    val teachers = remember(teacherUiState.teachers) {
+        teacherUiState.teachers
+            .filter { it.teacherName.isNotBlank() }
+            .map { ClassTeacherItem(teacherId = it.teacherId, teacherName = it.teacherName) }
+            .sortedBy { it.teacherName }
+    }
+    val students = studentUiState.students
 
     var searchText by remember { mutableStateOf("") }
 
@@ -120,44 +113,8 @@ fun ClassManagementScreen(
 
     LaunchedEffect(Unit) {
         classViewModel.loadClasses()
-
-        try {
-            val teacherSnapshot = firestore
-                .collection("teachers")
-                .get()
-                .await()
-
-            teachers = teacherSnapshot.documents.mapNotNull { document ->
-                val teacherName = document.getString("teacherName")
-                    ?: document.getString("fullName")
-                    ?: document.getString("name")
-                    ?: ""
-
-                if (teacherName.isNotBlank()) {
-                    ClassTeacherItem(
-                        teacherId = document.id,
-                        teacherName = teacherName
-                    )
-                } else {
-                    null
-                }
-            }.sortedBy { teacher ->
-                teacher.teacherName
-            }
-        } catch (_: Exception) {
-            teachers = emptyList()
-        }
-
-        try {
-            val studentSnapshot = firestore
-                .collection("students")
-                .get()
-                .await()
-
-            students = studentSnapshot.toObjects(StudentModel::class.java)
-        } catch (_: Exception) {
-            students = emptyList()
-        }
+        teacherViewModel.loadTeachers()
+        studentViewModel.loadStudents()
     }
 
     val classes = uiState.classes

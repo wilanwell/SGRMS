@@ -54,15 +54,17 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextDark
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.utils.decodeBase64ToImageBytes
+import coil.compose.AsyncImage
 import java.io.File
 
 @Composable
 fun ProfileImagePicker(
-    imageBase64: String,
+    imageUrl: String,
     isUploading: Boolean,
     modifier: Modifier = Modifier,
     size: Int = 96,
     enabled: Boolean = true,
+    legacyImageBase64: String = "",
     onImageSelected: (Uri) -> Unit
 ) {
     val context = LocalContext.current
@@ -125,24 +127,6 @@ fun ProfileImagePicker(
         galleryLauncher.launch("image/*")
     }
 
-    val bitmap = remember(imageBase64) {
-        try {
-            if (imageBase64.isNotBlank()) {
-                val imageBytes = decodeBase64ToImageBytes(imageBase64)
-
-                BitmapFactory.decodeByteArray(
-                    imageBytes,
-                    0,
-                    imageBytes.size
-                )
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     Box(
         modifier = modifier.size((size + 14).dp),
         contentAlignment = Alignment.Center
@@ -157,23 +141,11 @@ fun ProfileImagePicker(
                 },
             contentAlignment = Alignment.Center
         ) {
-            if (bitmap != null) {
-                Image(
-                    bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(size.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Default Profile Picture",
-                    tint = Color.White,
-                    modifier = Modifier.size((size * 0.52).dp)
-                )
-            }
+            ProfilePhoto(
+                imageUrl = imageUrl,
+                legacyImageBase64 = legacyImageBase64,
+                size = size
+            )
 
             if (isUploading) {
                 Box(
@@ -336,28 +308,11 @@ private fun ProfileImageOptionCard(
 
 @Composable
 fun ProfileImageView(
-    imageBase64: String,
+    imageUrl: String,
     modifier: Modifier = Modifier,
-    size: Int = 90
+    size: Int = 90,
+    legacyImageBase64: String = ""
 ) {
-    val bitmap = remember(imageBase64) {
-        try {
-            if (imageBase64.isNotBlank()) {
-                val imageBytes = decodeBase64ToImageBytes(imageBase64)
-
-                BitmapFactory.decodeByteArray(
-                    imageBytes,
-                    0,
-                    imageBytes.size
-                )
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            null
-        }
-    }
-
     Box(
         modifier = modifier
             .size(size.dp)
@@ -365,23 +320,60 @@ fun ProfileImageView(
             .background(PrimaryBlue),
         contentAlignment = Alignment.Center
     ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(size.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
+        ProfilePhoto(
+            imageUrl = imageUrl,
+            legacyImageBase64 = legacyImageBase64,
+            size = size
+        )
+    }
+}
+
+/**
+ * Shows the Firebase Storage photo when there is one, otherwise a photo
+ * still stored the old way (Base64 in Firestore), otherwise a placeholder.
+ */
+@Composable
+private fun ProfilePhoto(
+    imageUrl: String,
+    legacyImageBase64: String,
+    size: Int
+) {
+    val legacyBitmap = remember(legacyImageBase64) {
+        if (legacyImageBase64.isBlank()) {
+            null
         } else {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Default Profile Picture",
-                tint = Color.White,
-                modifier = Modifier.size((size * 0.52).dp)
-            )
+            runCatching {
+                val imageBytes = decodeBase64ToImageBytes(legacyImageBase64)
+                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            }.getOrNull()
         }
+    }
+
+    when {
+        imageUrl.isNotBlank() -> AsyncImage(
+            model = imageUrl,
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(size.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+
+        legacyBitmap != null -> Image(
+            bitmap = legacyBitmap.asImageBitmap(),
+            contentDescription = "Profile Picture",
+            modifier = Modifier
+                .size(size.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+
+        else -> Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = "Default Profile Picture",
+            tint = Color.White,
+            modifier = Modifier.size((size * 0.52).dp)
+        )
     }
 }
 

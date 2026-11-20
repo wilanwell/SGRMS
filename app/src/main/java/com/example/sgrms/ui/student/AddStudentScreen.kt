@@ -25,45 +25,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun AddStudentScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
-
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
-
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val uiState by studentViewModel.uiState.collectAsState()
 
-    val firestore = remember {
-        FirebaseFirestore.getInstance()
-    }
+    val classViewModel: ClassFirebaseViewModel = hiltViewModel()
+    val classUiState by classViewModel.uiState.collectAsState()
 
-    var classList by remember { mutableStateOf<List<String>>(emptyList()) }
-    val classIdMap = remember { mutableStateMapOf<String, String>() }
+    val classIdMap = remember(classUiState.classes) {
+        classUiState.classes
+            .filter { it.className.isNotBlank() }
+            .associate { it.className to it.classId }
+    }
+    val classList = remember(classIdMap) { classIdMap.keys.sorted() }
 
     val classDropdownList = if (classList.isEmpty()) {
         listOf("No class available")
@@ -107,31 +96,11 @@ fun AddStudentScreen(
     var classLoadError by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        try {
-            classLoadError = ""
+        classViewModel.loadClasses()
+    }
 
-            val classSnapshot = firestore
-                .collection("classes")
-                .get()
-                .await()
-
-            val loadedClasses = classSnapshot.documents.mapNotNull { document ->
-                val className = document.getString("className").orEmpty()
-
-                if (className.isNotBlank()) {
-                    classIdMap[className] = document.id
-                    className
-                } else {
-                    null
-                }
-            }
-                .distinct()
-                .sorted()
-
-            classList = loadedClasses
-        } catch (e: Exception) {
-            classLoadError = e.message ?: "Failed to load class list"
-        }
+    LaunchedEffect(classUiState.errorMessage) {
+        classLoadError = classUiState.errorMessage
     }
 
     fun clearMessages() {

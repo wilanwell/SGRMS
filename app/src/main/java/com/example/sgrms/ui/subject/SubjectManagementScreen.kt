@@ -58,17 +58,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.SubjectFirebaseService
 import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun SubjectManagementScreen(
@@ -77,17 +74,7 @@ fun SubjectManagementScreen(
     onSubjectDetailClick: (String) -> Unit = {},
     onEditSubjectClick: (String) -> Unit = {}
 ) {
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val uiState by subjectViewModel.uiState.collectAsState()
 

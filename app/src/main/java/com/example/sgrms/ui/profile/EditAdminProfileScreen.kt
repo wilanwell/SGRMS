@@ -33,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,28 +48,24 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.utils.convertImageUriToBase64
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.AdminProfileViewModel
+import com.example.sgrms.data.repository.UserProfileUpdate
 
 @Composable
 fun EditAdminProfileScreen(
-    userId: Int = 0,
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: AdminProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
 
-    var resolvedUserId by remember { mutableStateOf("") }
-
-    var profileImageBase64 by remember { mutableStateOf("") }
+    val profileImageUrl = uiState.profile?.profileImageUrl.orEmpty()
+    val legacyImageBase64 = uiState.profile?.profileImageBase64.orEmpty()
 
     var fullName by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
@@ -85,9 +80,9 @@ fun EditAdminProfileScreen(
     var usernameError by remember { mutableStateOf("") }
     var phoneNumberError by remember { mutableStateOf("") }
 
-    var isLoading by remember { mutableStateOf(true) }
-    var isSaving by remember { mutableStateOf(false) }
-    var isUploadingImage by remember { mutableStateOf(false) }
+    val isLoading = uiState.isLoading
+    val isSaving = uiState.isSaving
+    val isUploadingImage = uiState.isUploadingImage
     var generalError by remember { mutableStateOf("") }
 
     fun clearErrors() {
@@ -127,95 +122,39 @@ fun EditAdminProfileScreen(
     }
 
     fun removeProfilePicture() {
-        if (resolvedUserId.isBlank()) {
-            generalError = "User profile not found."
-            return
-        }
+        viewModel.removeImage()
+    }
 
-        coroutineScope.launch {
-            try {
-                isUploadingImage = true
-                generalError = ""
+    var formFilled by remember { mutableStateOf(false) }
 
-                firestore
-                    .collection("users")
-                    .document(resolvedUserId)
-                    .update(
-                        mapOf(
-                            "profileImageBase64" to "",
-                            "updatedAt" to System.currentTimeMillis()
-                        )
-                    )
-                    .await()
-
-                profileImageBase64 = ""
-
-                snackbarHostState.showSnackbar(
-                    message = "Profile picture removed successfully"
-                )
-            } catch (e: Exception) {
-                generalError = e.message ?: "Failed to remove profile picture."
-            } finally {
-                isUploadingImage = false
-            }
+    LaunchedEffect(uiState.profile) {
+        val loaded = uiState.profile
+        if (loaded != null && !formFilled) {
+            fullName = loaded.fullName
+            username = loaded.username.ifBlank { loaded.email }
+            email = loaded.email
+            phoneNumber = loaded.phoneNumber
+            address = loaded.address
+            profileNote = loaded.profileNote
+            role = loaded.role.ifBlank { "Admin" }
+            status = loaded.status.ifBlank { "Active" }
+            formFilled = true
         }
     }
 
-    LaunchedEffect(userId) {
-        try {
-            isLoading = true
-            generalError = ""
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage.isNotBlank()) generalError = uiState.errorMessage
+    }
 
-            val firebaseUser = firebaseAuth.currentUser
-
-            if (firebaseUser == null) {
-                generalError = "User session not found. Please log in again."
-                return@LaunchedEffect
-            }
-
-            resolvedUserId = firebaseUser.uid
-
-            val userDocument = firestore
-                .collection("users")
-                .document(firebaseUser.uid)
-                .get()
-                .await()
-
-            if (!userDocument.exists()) {
-                fullName = firebaseUser.displayName ?: "Admin Account"
-                username = firebaseUser.email.orEmpty()
-                email = firebaseUser.email.orEmpty()
-                phoneNumber = ""
-                address = ""
-                profileNote = ""
-                profileImageBase64 = ""
-                role = "Admin"
-                status = "Active"
-                return@LaunchedEffect
-            }
-
-            fullName = userDocument.getString("fullName")
-                ?: firebaseUser.displayName
-                        ?: "Admin Account"
-
-            username = userDocument.getString("username")
-                ?: userDocument.getString("staffId")
-                        ?: firebaseUser.email.orEmpty()
-
-            email = userDocument.getString("email")
-                ?: firebaseUser.email.orEmpty()
-
-            phoneNumber = userDocument.getString("phoneNumber").orEmpty()
-            address = userDocument.getString("address").orEmpty()
-            profileNote = userDocument.getString("profileNote").orEmpty()
-            profileImageBase64 = userDocument.getString("profileImageBase64").orEmpty()
-            role = userDocument.getString("role") ?: "Admin"
-            status = userDocument.getString("status") ?: "Active"
-        } catch (e: Exception) {
-            generalError = e.message ?: "Failed to load admin profile."
-        } finally {
-            isLoading = false
+    LaunchedEffect(uiState.message) {
+        if (uiState.message.isNotBlank()) {
+            snackbarHostState.showSnackbar(message = uiState.message)
+            viewModel.clearMessage()
         }
+    }
+
+    LaunchedEffect(uiState.saved) {
+        if (uiState.saved) onSaveSuccess()
     }
 
     Column(
@@ -280,47 +219,12 @@ fun EditAdminProfileScreen(
                         )
                     } else {
                         ProfileImagePicker(
-                            imageBase64 = profileImageBase64,
+                            imageUrl = profileImageUrl,
+                            legacyImageBase64 = legacyImageBase64,
                             isUploading = isUploadingImage,
                             enabled = !isSaving,
                             onImageSelected = { imageUri ->
-                                if (resolvedUserId.isBlank()) {
-                                    generalError = "User profile not found."
-                                    return@ProfileImagePicker
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isUploadingImage = true
-                                        generalError = ""
-
-                                        val convertedImageBase64 = convertImageUriToBase64(
-                                            context = context,
-                                            imageUri = imageUri
-                                        )
-
-                                        firestore
-                                            .collection("users")
-                                            .document(resolvedUserId)
-                                            .update(
-                                                mapOf(
-                                                    "profileImageBase64" to convertedImageBase64,
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        profileImageBase64 = convertedImageBase64
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile picture updated successfully"
-                                        )
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to save profile picture."
-                                    } finally {
-                                        isUploadingImage = false
-                                    }
-                                }
+                                viewModel.onImageSelected(imageUri)
                             }
                         )
 
@@ -330,7 +234,7 @@ fun EditAdminProfileScreen(
                             onClick = {
                                 removeProfilePicture()
                             },
-                            enabled = profileImageBase64.isNotBlank() &&
+                            enabled = (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) &&
                                     !isSaving &&
                                     !isUploadingImage,
                             modifier = Modifier.fillMaxWidth(),
@@ -480,42 +384,15 @@ fun EditAdminProfileScreen(
                             onClick = {
                                 if (!validateForm()) return@Button
 
-                                if (resolvedUserId.isBlank()) {
-                                    generalError = "User profile not found."
-                                    return@Button
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isSaving = true
-                                        generalError = ""
-
-                                        firestore
-                                            .collection("users")
-                                            .document(resolvedUserId)
-                                            .update(
-                                                mapOf(
-                                                    "fullName" to fullName.trim(),
-                                                    "username" to username.trim(),
-                                                    "phoneNumber" to phoneNumber.trim(),
-                                                    "address" to address.trim(),
-                                                    "profileNote" to profileNote.trim(),
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile updated successfully"
-                                        )
-
-                                        onSaveSuccess()
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to update profile."
-                                    } finally {
-                                        isSaving = false
-                                    }
-                                }
+                                viewModel.saveProfile(
+                                    UserProfileUpdate(
+                                        fullName = fullName.trim(),
+                                        username = username.trim(),
+                                        phoneNumber = phoneNumber.trim(),
+                                        address = address.trim(),
+                                        profileNote = profileNote.trim()
+                                    )
+                                )
                             },
                             enabled = !isSaving && !isLoading && !isUploadingImage,
                             modifier = Modifier

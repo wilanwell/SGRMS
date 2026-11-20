@@ -54,11 +54,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,9 +68,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.viewmodel.GradeFirebaseViewModel
+import com.example.sgrms.viewmodel.StudentFirebaseViewModel
+import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.data.model.SubjectModel
@@ -81,7 +82,6 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
-import kotlinx.coroutines.launch
 import com.example.sgrms.utils.GradeCalculator
 
 data class GradeDisplayItem(
@@ -99,26 +99,24 @@ fun GradeManagementScreen(
     onStudentDetailClick: (String) -> Unit = {},
     onEditGradeClick: (String) -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
+    val gradeUiState by gradeViewModel.uiState.collectAsState()
+    val studentUiState by studentViewModel.uiState.collectAsState()
+    val subjectUiState by subjectViewModel.uiState.collectAsState()
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val grades = gradeUiState.grades
+    val students = studentUiState.students
+    val subjects = subjectUiState.subjects
 
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    var grades by remember { mutableStateOf<List<GradeModel>>(emptyList()) }
-    var students by remember { mutableStateOf<List<StudentModel>>(emptyList()) }
-    var subjects by remember { mutableStateOf<List<SubjectModel>>(emptyList()) }
-
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    val isLoading = gradeUiState.isLoading || studentUiState.isLoading || subjectUiState.isLoading
+    val errorMessage = listOf(
+        gradeUiState.errorMessage,
+        studentUiState.errorMessage,
+        subjectUiState.errorMessage
+    ).firstOrNull { it.isNotBlank() }.orEmpty()
 
     var searchText by remember { mutableStateOf("") }
     var selectedClass by remember { mutableStateOf("All Classes") }
@@ -133,20 +131,9 @@ fun GradeManagementScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     fun loadGradeData() {
-        coroutineScope.launch {
-            isLoading = true
-            errorMessage = ""
-
-            try {
-                grades = gradeFirebaseService.getAllGrades()
-                students = studentFirebaseService.getAllStudents()
-                subjects = subjectFirebaseService.getAllSubjects()
-            } catch (exception: Exception) {
-                errorMessage = exception.message ?: "Failed to load grade records."
-            } finally {
-                isLoading = false
-            }
-        }
+        gradeViewModel.loadGrades()
+        studentViewModel.loadStudents()
+        subjectViewModel.loadSubjects()
     }
 
     LaunchedEffect(Unit) {
@@ -233,17 +220,7 @@ fun GradeManagementScreen(
                         val gradeToDelete = selectedGradeToDelete
 
                         if (gradeToDelete != null) {
-                            coroutineScope.launch {
-                                try {
-                                    gradeFirebaseService.deleteGrade(
-                                        gradeId = gradeToDelete.gradeId
-                                    )
-
-                                    loadGradeData()
-                                } catch (exception: Exception) {
-                                    errorMessage = exception.message ?: "Failed to delete grade."
-                                }
-                            }
+                            gradeViewModel.deleteGrade(gradeId = gradeToDelete.gradeId)
                         }
 
                         showDeleteDialog = false

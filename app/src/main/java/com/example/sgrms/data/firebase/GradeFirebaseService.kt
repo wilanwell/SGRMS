@@ -3,11 +3,14 @@ package com.example.sgrms.data.firebase
 import com.example.sgrms.data.model.GradeModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GradeFirebaseService {
-
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-    private val gradesCollection = firestore.collection("grades")
+@Singleton
+class GradeFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore
+) {
+     private val gradesCollection = firestore.collection("grades")
 
     suspend fun addGrade(
         grade: GradeModel

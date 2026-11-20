@@ -82,7 +82,7 @@ service cloud.firestore {
         // Everyone may edit the personal fields of their own profile.
         || (request.auth.uid == userId && onlyChanges([
               "fullName", "username", "phoneNumber", "address",
-              "profileNote", "profileImageBase64", "updatedAt"
+              "profileNote", "profileImageUrl", "profileImageBase64", "updatedAt"
             ]))
         // A teacher may keep a student's name / email in sync.
         || (isTeacher() && resource.data.role == "Student"
@@ -100,7 +100,7 @@ service cloud.firestore {
         || (isTeacher() && teacherId == myTeacherId() && onlyChanges([
               "phoneNumber", "department", "position", "officeLocation",
               "qualification", "specialization", "address", "profileNote",
-              "profileImageBase64", "updatedAt"
+              "profileImageUrl", "profileImageBase64", "updatedAt"
             ]));
     }
 
@@ -115,7 +115,7 @@ service cloud.firestore {
         || (isOwnStudent(studentId) && onlyChanges([
               "phoneNumber", "dateOfBirth", "address", "guardianName",
               "guardianPhone", "emergencyContact", "profileNote",
-              "profileImageBase64", "fcmToken", "updatedAt"
+              "profileImageUrl", "profileImageBase64", "fcmToken", "updatedAt"
             ]));
     }
 

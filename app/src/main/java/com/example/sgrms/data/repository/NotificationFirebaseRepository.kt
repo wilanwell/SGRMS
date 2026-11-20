@@ -2,8 +2,11 @@ package com.example.sgrms.data.repository
 
 import com.example.sgrms.data.firebase.NotificationFirebaseService
 import com.example.sgrms.data.model.NotificationModel
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class NotificationFirebaseRepository(
+@Singleton
+class NotificationFirebaseRepository @Inject constructor(
     private val notificationFirebaseService: NotificationFirebaseService
 ) {
     suspend fun addNotification(

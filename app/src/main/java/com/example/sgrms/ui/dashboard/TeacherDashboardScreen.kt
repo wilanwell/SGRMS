@@ -31,8 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -43,16 +41,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.model.GradeModel
-import com.example.sgrms.data.model.SubjectModel
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.TeacherDashboardViewModel
 
 data class ClassAverageItem(
     val subjectName: String,
@@ -62,136 +58,32 @@ data class ClassAverageItem(
 
 @Composable
 fun TeacherDashboardScreen(
-    teacherId: Int = 0,
-    firebaseTeacherId: String = "",
     onStudentClick: () -> Unit = {},
     onSubjectClick: () -> Unit = {},
     onGradeClick: () -> Unit = {},
     onReportClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: TeacherDashboardViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
-    var teacherName by remember { mutableStateOf("Teacher") }
+    val teacherName = uiState.teacherName
+    val studentCount = uiState.summary.students
+    val subjectCount = uiState.summary.subjects
+    val gradeCount = uiState.summary.grades
+    val reportCount = uiState.summary.reports
 
-    var studentCount by remember { mutableIntStateOf(0) }
-    var subjectCount by remember { mutableIntStateOf(0) }
-    var gradeCount by remember { mutableIntStateOf(0) }
-    var reportCount by remember { mutableIntStateOf(0) }
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-
-    val subjects = remember { mutableStateListOf<SubjectModel>() }
-    val grades = remember { mutableStateListOf<GradeModel>() }
-
-    LaunchedEffect(teacherId, firebaseTeacherId) {
-        try {
-            isLoading = true
-            errorMessage = ""
-
-            val currentUserId = firebaseAuth.currentUser?.uid.orEmpty()
-
-            val userDocument = if (currentUserId.isNotBlank()) {
-                firestore
-                    .collection("users")
-                    .document(currentUserId)
-                    .get()
-                    .await()
-            } else {
-                null
-            }
-
-            val resolvedTeacherId = firebaseTeacherId.ifBlank {
-                userDocument?.getString("teacherId").orEmpty()
-            }
-
-            teacherName = if (resolvedTeacherId.isNotBlank()) {
-                val teacherDocument = firestore
-                    .collection("teachers")
-                    .document(resolvedTeacherId)
-                    .get()
-                    .await()
-
-                teacherDocument.getString("teacherName")
-                    ?: userDocument?.getString("fullName")
-                    ?: "Teacher"
-            } else {
-                userDocument?.getString("fullName") ?: "Teacher"
-            }
-
-            val studentsSnapshot = firestore
-                .collection("students")
-                .get()
-                .await()
-
-            val subjectsSnapshot = firestore
-                .collection("subjects")
-                .get()
-                .await()
-
-            val gradesSnapshot = firestore
-                .collection("grades")
-                .get()
-                .await()
-
-            val reportsSnapshot = firestore
-                .collection("reports")
-                .get()
-                .await()
-
-            studentCount = studentsSnapshot.size()
-            subjectCount = subjectsSnapshot.size()
-            gradeCount = gradesSnapshot.size()
-            reportCount = reportsSnapshot.size()
-
-            subjects.clear()
-            subjects.addAll(
-                subjectsSnapshot.documents.mapNotNull { document ->
-                    document.toObject(SubjectModel::class.java)?.copy(
-                        subjectId = document.id
-                    )
-                }
-            )
-
-            grades.clear()
-            grades.addAll(
-                gradesSnapshot.documents.mapNotNull { document ->
-                    document.toObject(GradeModel::class.java)?.copy(
-                        gradeId = document.id
-                    )
-                }
-            )
-        } catch (e: Exception) {
-            errorMessage = e.message ?: "Failed to load dashboard data"
-        } finally {
-            isLoading = false
-        }
-    }
-
-    val classAverageList = subjects.map { subject ->
-        val subjectGrades = grades.filter { grade ->
-            grade.subjectId == subject.subjectId
-        }
-
-        val averageMarks = if (subjectGrades.isNotEmpty()) {
-            subjectGrades.map { grade ->
-                grade.marks
-            }.average()
-        } else {
-            0.0
-        }
-
+    val classAverageList = uiState.summary.subjectAverages.map { item ->
         ClassAverageItem(
-            subjectName = subject.subjectName,
-            progress = (averageMarks / 100.0)
+            subjectName = item.subjectName,
+            progress = (item.averageMarks / 100.0)
                 .toFloat()
                 .coerceIn(0f, 1f),
-            percentage = "%.1f%%".format(averageMarks)
+            percentage = "%.1f%%".format(item.averageMarks)
         )
-    }.sortedByDescending { item ->
-        item.progress
     }
 
     Column(

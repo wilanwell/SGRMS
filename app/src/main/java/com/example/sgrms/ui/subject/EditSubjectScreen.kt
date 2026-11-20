@@ -31,12 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.SubjectFirebaseService
-import com.example.sgrms.data.firebase.TeacherFirebaseService
 import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
-import com.example.sgrms.data.repository.TeacherFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
@@ -46,9 +41,8 @@ import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
-import com.example.sgrms.viewmodel.TeacherFirebaseViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun EditSubjectScreen(
@@ -56,29 +50,9 @@ fun EditSubjectScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
-
-    val teacherFirebaseService = remember {
-        TeacherFirebaseService()
-    }
-
-    val teacherFirebaseRepository = remember {
-        TeacherFirebaseRepository(teacherFirebaseService)
-    }
-
-    val teacherViewModel: TeacherFirebaseViewModel = viewModel(
-        factory = TeacherFirebaseViewModelFactory(teacherFirebaseRepository)
-    )
+    val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
 
     val subjectUiState by subjectViewModel.uiState.collectAsState()
     val teacherUiState by teacherViewModel.uiState.collectAsState()

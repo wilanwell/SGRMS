@@ -53,16 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.GradeFirebaseService
-import com.example.sgrms.data.firebase.NotificationFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.firebase.SubjectFirebaseService
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.GradeFirebaseRepository
-import com.example.sgrms.data.repository.NotificationFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsInfoRow
@@ -74,64 +65,21 @@ import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.GradeBulkEntry
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
-import com.example.sgrms.viewmodel.GradeFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import com.example.sgrms.utils.GradeCalculator
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun QuickAddGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
-
-    val gradeFirebaseService = remember {
-        GradeFirebaseService()
-    }
-
-    val gradeFirebaseRepository = remember {
-        GradeFirebaseRepository(gradeFirebaseService)
-    }
-
-    val notificationFirebaseService = remember {
-        NotificationFirebaseService()
-    }
-
-    val notificationFirebaseRepository = remember {
-        NotificationFirebaseRepository(notificationFirebaseService)
-    }
-
-    val gradeViewModel: GradeFirebaseViewModel = viewModel(
-        factory = GradeFirebaseViewModelFactory(
-            gradeRepository = gradeFirebaseRepository,
-            notificationRepository = notificationFirebaseRepository
-        )
-    )
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val subjectUiState by subjectViewModel.uiState.collectAsState()

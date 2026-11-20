@@ -7,17 +7,19 @@ import android.net.Uri
 import android.util.Base64
 import java.io.ByteArrayOutputStream
 
-fun convertImageUriToBase64(
+/**
+ * Reads the selected image, scales it down to [maxSize] px on its longest
+ * side and returns it as JPEG bytes ready to upload.
+ */
+fun compressImageUri(
     context: Context,
     imageUri: Uri,
-    maxSize: Int = 400,
-    quality: Int = 60
-): String {
-    val inputStream = context.contentResolver.openInputStream(imageUri)
-        ?: throw IllegalArgumentException("Unable to open selected image.")
-
-    val originalBitmap = BitmapFactory.decodeStream(inputStream)
-        ?: throw IllegalArgumentException("Unable to decode selected image.")
+    maxSize: Int = 512,
+    quality: Int = 80
+): ByteArray {
+    val originalBitmap = context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+        BitmapFactory.decodeStream(inputStream)
+    } ?: throw IllegalArgumentException("Unable to open selected image.")
 
     val resizedBitmap = resizeBitmap(
         bitmap = originalBitmap,
@@ -40,10 +42,7 @@ fun convertImageUriToBase64(
         resizedBitmap.recycle()
     }
 
-    return Base64.encodeToString(
-        imageBytes,
-        Base64.NO_WRAP
-    )
+    return imageBytes
 }
 
 fun decodeBase64ToImageBytes(

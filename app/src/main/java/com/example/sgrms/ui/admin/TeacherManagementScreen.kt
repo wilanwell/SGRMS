@@ -54,10 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.TeacherFirebaseService
 import com.example.sgrms.data.model.TeacherModel
-import com.example.sgrms.data.repository.TeacherFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsDeleteDialog
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
@@ -70,8 +67,8 @@ import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
-import com.example.sgrms.viewmodel.TeacherFirebaseViewModelFactory
 import java.io.File
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun TeacherManagementScreen(
@@ -82,17 +79,7 @@ fun TeacherManagementScreen(
 ) {
     val context = LocalContext.current
 
-    val teacherFirebaseService = remember {
-        TeacherFirebaseService()
-    }
-
-    val teacherFirebaseRepository = remember {
-        TeacherFirebaseRepository(teacherFirebaseService)
-    }
-
-    val teacherViewModel: TeacherFirebaseViewModel = viewModel(
-        factory = TeacherFirebaseViewModelFactory(teacherFirebaseRepository)
-    )
+    val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
 
     val uiState by teacherViewModel.uiState.collectAsState()
 

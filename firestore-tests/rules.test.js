@@ -20,6 +20,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
+import {deleteObject, ref, uploadBytes} from "firebase/storage";
 
 let env;
 
@@ -34,6 +35,9 @@ before(async () => {
     firestore: {
       rules: readFileSync(new URL("../firestore.rules", import.meta.url), "utf8"),
     },
+    storage: {
+      rules: readFileSync(new URL("../storage.rules", import.meta.url), "utf8"),
+    },
   });
 });
 
@@ -43,6 +47,7 @@ after(async () => {
 
 beforeEach(async () => {
   await env.clearFirestore();
+  await env.clearStorage();
 
   await env.withSecurityRulesDisabled(async (ctx) => {
     const db = ctx.firestore();
@@ -286,6 +291,56 @@ describe("report remarks", () => {
   test("only staff write remarks", async () => {
     await assertSucceeds(setDoc(doc(as(TEACHER), "reportRemarks", "s1"), {remarks: "Cemerlang"}));
     await assertFails(setDoc(doc(as(STUDENT), "reportRemarks", "s1"), {remarks: "Cemerlang"}));
+  });
+});
+
+describe("profile photos (Firestore URL fields)", () => {
+  test("each role can set the photo URL on their own profile", async () => {
+    await assertSucceeds(updateDoc(doc(as(STUDENT), "students", "s1"), {
+      profileImageUrl: "https://x/y.jpg", profileImageBase64: "", updatedAt: 1,
+    }));
+    await assertSucceeds(updateDoc(doc(as(TEACHER), "teachers", "t1"), {
+      profileImageUrl: "https://x/y.jpg", profileImageBase64: "", updatedAt: 1,
+    }));
+    await assertSucceeds(updateDoc(doc(as(ADMIN), "users", ADMIN), {
+      profileImageUrl: "https://x/y.jpg", profileImageBase64: "", updatedAt: 1,
+    }));
+  });
+
+  test("a student cannot set another student's photo", async () => {
+    await assertFails(updateDoc(doc(as(STUDENT), "students", "s2"), {profileImageUrl: "x"}));
+  });
+});
+
+describe("storage: profile_images", () => {
+  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
+  const meta = {contentType: "image/jpeg"};
+  const storageAs = (uid) => env.authenticatedContext(uid).storage();
+
+  test("a user can upload and delete their own photo", async () => {
+    const file = ref(storageAs(STUDENT), `profile_images/${STUDENT}.jpg`);
+    await assertSucceeds(uploadBytes(file, jpeg, meta));
+    await assertSucceeds(deleteObject(file));
+  });
+
+  test("a user cannot overwrite someone else's photo", async () => {
+    const file = ref(storageAs(STUDENT), `profile_images/${OTHER_STUDENT}.jpg`);
+    await assertFails(uploadBytes(file, jpeg, meta));
+  });
+
+  test("only images are accepted", async () => {
+    const file = ref(storageAs(STUDENT), `profile_images/${STUDENT}.jpg`);
+    await assertFails(uploadBytes(file, jpeg, {contentType: "application/pdf"}));
+  });
+
+  test("not signed in cannot upload", async () => {
+    const file = ref(env.unauthenticatedContext().storage(), `profile_images/${STUDENT}.jpg`);
+    await assertFails(uploadBytes(file, jpeg, meta));
+  });
+
+  test("files outside profile_images are denied", async () => {
+    const file = ref(storageAs(ADMIN), "other/file.jpg");
+    await assertFails(uploadBytes(file, jpeg, meta));
   });
 });
 

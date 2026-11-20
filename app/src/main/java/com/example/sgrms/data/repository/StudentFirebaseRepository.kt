@@ -2,8 +2,11 @@ package com.example.sgrms.data.repository
 
 import com.example.sgrms.data.firebase.StudentFirebaseService
 import com.example.sgrms.data.model.StudentModel
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StudentFirebaseRepository(
+@Singleton
+class StudentFirebaseRepository @Inject constructor(
     private val studentFirebaseService: StudentFirebaseService
 ) {
     suspend fun addStudentWithAccount(
@@ -51,4 +54,13 @@ class StudentFirebaseRepository(
     ) {
         studentFirebaseService.deleteStudent(studentId)
     }
+
+    suspend fun updateOwnProfile(studentId: String, update: StudentProfileUpdate) =
+        studentFirebaseService.updateOwnProfile(studentId, update)
+
+    suspend fun updateProfileImage(studentId: String, imageUrl: String) =
+        studentFirebaseService.updateProfileImage(studentId, imageUrl)
+
+    suspend fun saveFcmToken(studentId: String, token: String) =
+        studentFirebaseService.saveFcmToken(studentId, token)
 }

@@ -11,6 +11,10 @@ data class UserModel(
     val studentId: String = "",
     val teacherId: String = "",
 
+    /** Download URL of the photo in Firebase Storage. */
+    val profileImageUrl: String = "",
+
+    /** Legacy: photos saved before the move to Firebase Storage. */
     val profileImageBase64: String = "",
 
     val address: String = "",

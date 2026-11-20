@@ -40,7 +40,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +48,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.AccountFunctionsService
 import com.example.sgrms.data.model.UserModel
+import com.example.sgrms.viewmodel.UserManagementViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
 import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsDeleteDialog
@@ -66,9 +67,6 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
 fun UserManagementScreen(
@@ -77,13 +75,12 @@ fun UserManagementScreen(
     onAddStudentAccountClick: () -> Unit = {},
     onEditUserClick: (String) -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val firestore = remember { FirebaseFirestore.getInstance() }
-    val accountFunctions = remember { AccountFunctionsService() }
+    val viewModel: UserManagementViewModel = hiltViewModel()
+    val uiState by viewModel.uiState.collectAsState()
 
-    var users by remember { mutableStateOf<List<UserModel>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
+    val users = uiState.users
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
     var searchText by remember { mutableStateOf("") }
     var selectedRole by remember { mutableStateOf("All Roles") }
@@ -96,27 +93,8 @@ fun UserManagementScreen(
     var selectedLinkedIdentityToView by remember { mutableStateOf("") }
     var showViewDialog by remember { mutableStateOf(false) }
 
-    fun loadUsers() {
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                errorMessage = ""
-
-                users = firestore
-                    .collection("users")
-                    .get()
-                    .await()
-                    .toObjects(UserModel::class.java)
-            } catch (e: Exception) {
-                errorMessage = e.message ?: "Failed to load users"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
     LaunchedEffect(Unit) {
-        loadUsers()
+        viewModel.loadUsers()
     }
 
     val roleList = listOf(
@@ -158,19 +136,7 @@ fun UserManagementScreen(
                 val userToDelete = selectedUserToDelete
 
                 if (userToDelete != null) {
-                    coroutineScope.launch {
-                        try {
-                            accountFunctions.deleteAccount(
-                                userId = userToDelete.userId
-                            )
-
-                            users = users.filter {
-                                it.userId != userToDelete.userId
-                            }
-                        } catch (e: Exception) {
-                            errorMessage = e.message ?: "Failed to delete user"
-                        }
-                    }
+                    viewModel.deleteAccount(userToDelete)
                 }
 
                 showDeleteDialog = false

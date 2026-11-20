@@ -39,9 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,128 +57,44 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.AdminProfileViewModel
+import com.example.sgrms.data.model.UserRole
 
 @Composable
 fun AdminProfileScreen(
-    userId: Int = 0,
     onBackClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
-    val firestore = remember { FirebaseFirestore.getInstance() }
+    val viewModel: AdminProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
+    val summary by viewModel.summary.collectAsState()
 
-    var profileImageBase64 by remember { mutableStateOf("") }
+    val user = uiState.profile
+    val profileFound = user != null
+    val isLoading = uiState.isLoading
+    val errorMessage = uiState.errorMessage
 
-    var fullName by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phoneNumber by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-    var profileNote by remember { mutableStateOf("") }
-    var role by remember { mutableStateOf("Admin") }
-    var status by remember { mutableStateOf("Active") }
+    val fullName = user?.fullName?.ifBlank { null } ?: "Admin Account"
+    val username = user?.username?.ifBlank { null } ?: user?.email.orEmpty()
+    val email = user?.email.orEmpty()
+    val phoneNumber = user?.phoneNumber.orEmpty()
+    val address = user?.address.orEmpty()
+    val profileNote = user?.profileNote.orEmpty()
+    val role = user?.role?.ifBlank { null } ?: UserRole.ADMIN.value
+    val status = user?.status?.ifBlank { null } ?: "Active"
 
-    var userCount by remember { mutableIntStateOf(0) }
-    var teacherCount by remember { mutableIntStateOf(0) }
-    var studentCount by remember { mutableIntStateOf(0) }
-    var classCount by remember { mutableIntStateOf(0) }
-    var subjectCount by remember { mutableIntStateOf(0) }
-
-    var adminCount by remember { mutableIntStateOf(0) }
-    var teacherAccountCount by remember { mutableIntStateOf(0) }
-    var studentAccountCount by remember { mutableIntStateOf(0) }
-
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf("") }
-    var profileFound by remember { mutableStateOf(false) }
-
-    LaunchedEffect(userId) {
-        try {
-            isLoading = true
-            errorMessage = ""
-
-            val firebaseUser = firebaseAuth.currentUser
-
-            if (firebaseUser == null) {
-                profileFound = false
-                errorMessage = "User session not found. Please log in again."
-                return@LaunchedEffect
-            }
-
-            val currentUserId = firebaseUser.uid
-
-            val userDocument = firestore
-                .collection("users")
-                .document(currentUserId)
-                .get()
-                .await()
-
-            profileFound = userDocument.exists()
-
-            if (profileFound) {
-                fullName = userDocument.getString("fullName")
-                    ?: firebaseUser.displayName
-                            ?: "Admin Account"
-
-                username = userDocument.getString("username")
-                    ?: userDocument.getString("staffId")
-                            ?: firebaseUser.email.orEmpty()
-
-                email = userDocument.getString("email")
-                    ?: firebaseUser.email.orEmpty()
-
-                phoneNumber = userDocument.getString("phoneNumber").orEmpty()
-                address = userDocument.getString("address").orEmpty()
-                profileNote = userDocument.getString("profileNote").orEmpty()
-                profileImageBase64 = userDocument.getString("profileImageBase64").orEmpty()
-                role = userDocument.getString("role") ?: "Admin"
-                status = userDocument.getString("status") ?: "Active"
-            } else {
-                fullName = firebaseUser.displayName ?: "Admin Account"
-                username = firebaseUser.email.orEmpty()
-                email = firebaseUser.email.orEmpty()
-                phoneNumber = ""
-                address = ""
-                profileNote = ""
-                profileImageBase64 = ""
-                role = "Admin"
-                status = "Active"
-            }
-
-            val usersSnapshot = firestore.collection("users").get().await()
-            val teachersSnapshot = firestore.collection("teachers").get().await()
-            val studentsSnapshot = firestore.collection("students").get().await()
-            val classesSnapshot = firestore.collection("classes").get().await()
-            val subjectsSnapshot = firestore.collection("subjects").get().await()
-
-            userCount = usersSnapshot.size()
-            teacherCount = teachersSnapshot.size()
-            studentCount = studentsSnapshot.size()
-            classCount = classesSnapshot.size()
-            subjectCount = subjectsSnapshot.size()
-
-            adminCount = usersSnapshot.documents.count { document ->
-                document.getString("role") == "Admin"
-            }
-
-            teacherAccountCount = usersSnapshot.documents.count { document ->
-                document.getString("role") == "Teacher"
-            }
-
-            studentAccountCount = usersSnapshot.documents.count { document ->
-                document.getString("role") == "Student"
-            }
-        } catch (e: Exception) {
-            errorMessage = e.message ?: "Failed to load admin profile"
-        } finally {
-            isLoading = false
-        }
-    }
+    val userCount = summary.totalAccounts
+    val teacherCount = summary.teachers
+    val studentCount = summary.students
+    val classCount = summary.classes
+    val subjectCount = summary.subjects
+    val adminCount = summary.adminAccounts
+    val teacherAccountCount = summary.teacherAccounts
+    val studentAccountCount = summary.studentAccounts
 
     Column(
         modifier = Modifier
@@ -254,7 +168,8 @@ fun AdminProfileScreen(
                 }
             } else {
                 ProfileImageView(
-                    imageBase64 = profileImageBase64,
+                    imageUrl = user?.profileImageUrl.orEmpty(),
+                    legacyImageBase64 = user?.profileImageBase64.orEmpty(),
                     size = 90
                 )
 

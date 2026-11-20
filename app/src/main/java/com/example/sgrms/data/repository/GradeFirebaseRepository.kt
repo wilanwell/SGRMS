@@ -2,8 +2,11 @@ package com.example.sgrms.data.repository
 
 import com.example.sgrms.data.firebase.GradeFirebaseService
 import com.example.sgrms.data.model.GradeModel
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class GradeFirebaseRepository(
+@Singleton
+class GradeFirebaseRepository @Inject constructor(
     private val gradeFirebaseService: GradeFirebaseService
 ) {
     suspend fun addGrade(grade: GradeModel): GradeModel {

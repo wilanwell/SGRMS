@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class GradeFirebaseUiState(
     val grades: List<GradeModel> = emptyList(),
@@ -30,9 +33,10 @@ data class GradeBulkEntry(
     val subjectName: String = ""
 )
 
-class GradeFirebaseViewModel(
+@HiltViewModel
+class GradeFirebaseViewModel @Inject constructor(
     private val gradeRepository: GradeFirebaseRepository,
-    private val notificationRepository: NotificationFirebaseRepository? = null
+    private val notificationRepository: NotificationFirebaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GradeFirebaseUiState())
@@ -56,7 +60,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load grades"
+                    errorMessage = e.toUserMessage("Failed to load grades")
                 )
             }
         }
@@ -95,7 +99,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load grade"
+                    errorMessage = e.toUserMessage("Failed to load grade")
                 )
             }
         }
@@ -129,7 +133,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load student grades"
+                    errorMessage = e.toUserMessage("Failed to load student grades")
                 )
             }
         }
@@ -163,7 +167,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load subject grades"
+                    errorMessage = e.toUserMessage("Failed to load subject grades")
                 )
             }
         }
@@ -195,12 +199,11 @@ class GradeFirebaseViewModel(
                     successMessage = "Grade added successfully"
                 )
 
-                loadGrades()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to add grade"
+                    errorMessage = e.toUserMessage("Failed to add grade")
                 )
             }
         }
@@ -276,7 +279,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to save grades"
+                    errorMessage = e.toUserMessage("Failed to save grades")
                 )
             }
         }
@@ -354,7 +357,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to save grade"
+                    errorMessage = e.toUserMessage("Failed to save grade")
                 )
             }
         }
@@ -397,7 +400,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to update grade"
+                    errorMessage = e.toUserMessage("Failed to update grade")
                 )
             }
         }
@@ -434,7 +437,7 @@ class GradeFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to delete grade"
+                    errorMessage = e.toUserMessage("Failed to delete grade")
                 )
             }
         }

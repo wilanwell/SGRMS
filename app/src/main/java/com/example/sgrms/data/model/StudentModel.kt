@@ -12,6 +12,10 @@ data class StudentModel(
     val gender: String = "",
     val status: String = "Active",
 
+    /** Download URL of the photo in Firebase Storage. */
+    val profileImageUrl: String = "",
+
+    /** Legacy: photos saved before the move to Firebase Storage. */
     val profileImageBase64: String = "",
 
     val dateOfBirth: String = "",

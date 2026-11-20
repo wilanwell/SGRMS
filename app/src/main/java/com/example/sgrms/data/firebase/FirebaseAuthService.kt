@@ -1,15 +1,18 @@
 package com.example.sgrms.data.firebase
 
 import com.example.sgrms.data.model.UserModel
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FirebaseAuthService {
-
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-
+@Singleton
+class FirebaseAuthService @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
+) {
     private val usersCollection = firestore.collection("users")
 
     suspend fun loginUser(
@@ -21,7 +24,7 @@ class FirebaseAuthService {
             .await()
 
         val firebaseUser = authResult.user
-            ?: throw Exception("Login failed. User not found.")
+            ?: throw IllegalStateException("Login failed. User not found.")
 
         val userDocument = usersCollection
             .document(firebaseUser.uid)
@@ -29,7 +32,7 @@ class FirebaseAuthService {
             .await()
 
         val userModel = userDocument.toObject(UserModel::class.java)
-            ?: throw Exception("User profile not found.")
+            ?: throw IllegalStateException("User profile not found.")
 
         return userModel.copy(
             userId = firebaseUser.uid
@@ -59,5 +62,26 @@ class FirebaseAuthService {
 
     fun logoutUser() {
         firebaseAuth.signOut()
+    }
+
+    /** Re-authenticates with the current password, then sets a new one. */
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String
+    ) {
+        val firebaseUser = firebaseAuth.currentUser
+        val email = firebaseUser?.email
+
+        if (firebaseUser == null || email.isNullOrBlank()) {
+            throw IllegalStateException("User session not found. Please log in again.")
+        }
+
+        firebaseUser
+            .reauthenticate(EmailAuthProvider.getCredential(email, currentPassword))
+            .await()
+
+        firebaseUser
+            .updatePassword(newPassword)
+            .await()
     }
 }

@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class ClassFirebaseUiState(
     val classes: List<ClassModel> = emptyList(),
@@ -17,7 +20,8 @@ data class ClassFirebaseUiState(
     val successMessage: String = ""
 )
 
-class ClassFirebaseViewModel(
+@HiltViewModel
+class ClassFirebaseViewModel @Inject constructor(
     private val classRepository: ClassFirebaseRepository
 ) : ViewModel() {
 
@@ -42,7 +46,7 @@ class ClassFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load classes"
+                    errorMessage = e.toUserMessage("Failed to load classes")
                 )
             }
         }
@@ -68,7 +72,7 @@ class ClassFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load class"
+                    errorMessage = e.toUserMessage("Failed to load class")
                 )
             }
         }
@@ -108,7 +112,7 @@ class ClassFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to add class"
+                    errorMessage = e.toUserMessage("Failed to add class")
                 )
             }
         }
@@ -138,7 +142,7 @@ class ClassFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to update class"
+                    errorMessage = e.toUserMessage("Failed to update class")
                 )
             }
         }
@@ -168,7 +172,7 @@ class ClassFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to delete class"
+                    errorMessage = e.toUserMessage("Failed to delete class")
                 )
             }
         }

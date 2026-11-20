@@ -43,10 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.NotificationFirebaseService
 import com.example.sgrms.data.model.NotificationModel
-import com.example.sgrms.data.repository.NotificationFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
@@ -55,27 +52,17 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextDark
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.NotificationFirebaseViewModel
-import com.example.sgrms.viewmodel.NotificationFirebaseViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun StudentNotificationScreen(
     studentId: String,
     onBackClick: () -> Unit = {}
 ) {
-    val notificationFirebaseService = remember {
-        NotificationFirebaseService()
-    }
-
-    val notificationFirebaseRepository = remember {
-        NotificationFirebaseRepository(notificationFirebaseService)
-    }
-
-    val notificationViewModel: NotificationFirebaseViewModel = viewModel(
-        factory = NotificationFirebaseViewModelFactory(notificationFirebaseRepository)
-    )
+    val notificationViewModel: NotificationFirebaseViewModel = hiltViewModel()
 
     val notificationUiState by notificationViewModel.uiState.collectAsState()
 

@@ -33,7 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,19 +48,19 @@ import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import com.example.sgrms.viewmodel.ChangePasswordResult
+import com.example.sgrms.viewmodel.ChangePasswordViewModel
 
 @Composable
 fun ChangePasswordScreen(
-    userId: Int = 0,
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val firebaseAuth = remember { FirebaseAuth.getInstance() }
+    val viewModel: ChangePasswordViewModel = hiltViewModel()
+    val result by viewModel.result.collectAsState()
 
     var currentPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
@@ -79,7 +78,7 @@ fun ChangePasswordScreen(
     var generalErrorMessage by remember { mutableStateOf("") }
 
     var showConfirmDialog by remember { mutableStateOf(false) }
-    var isLoading by remember { mutableStateOf(false) }
+    val isLoading = result is ChangePasswordResult.Loading
 
     fun clearMessages() {
         successMessage = ""
@@ -92,17 +91,6 @@ fun ChangePasswordScreen(
         confirmPasswordError = ""
         clearMessages()
 
-        val firebaseUser = firebaseAuth.currentUser
-
-        if (firebaseUser == null) {
-            generalErrorMessage = "User session not found. Please log in again."
-            return false
-        }
-
-        if (firebaseUser.email.isNullOrBlank()) {
-            generalErrorMessage = "User email not found. Please log in again."
-            return false
-        }
 
         if (currentPassword.isBlank()) {
             currentPasswordError = "Current password is required"
@@ -128,86 +116,38 @@ fun ChangePasswordScreen(
                 generalErrorMessage.isBlank()
     }
 
-    fun getReadableFirebaseError(message: String?): String {
-        val error = message.orEmpty()
-
-        return when {
-            error.contains("password is invalid", ignoreCase = true) ||
-                    error.contains("INVALID_LOGIN_CREDENTIALS", ignoreCase = true) ||
-                    error.contains("INVALID_PASSWORD", ignoreCase = true) -> {
-                "Current password is incorrect"
-            }
-
-            error.contains("network", ignoreCase = true) -> {
-                "Network error. Please check your internet connection."
-            }
-
-            error.contains("requires recent login", ignoreCase = true) -> {
-                "Please log in again before changing your password."
-            }
-
-            error.isNotBlank() -> {
-                error
-            }
-
-            else -> {
-                "Failed to update password. Please try again."
-            }
-        }
+    fun updatePasswordWithFirebase() {
+        viewModel.changePassword(
+            currentPassword = currentPassword,
+            newPassword = newPassword.trim()
+        )
     }
 
-    fun updatePasswordWithFirebase() {
-        val firebaseUser = firebaseAuth.currentUser
-        val email = firebaseUser?.email
-
-        if (firebaseUser == null || email.isNullOrBlank()) {
-            generalErrorMessage = "User session not found. Please log in again."
-            showConfirmDialog = false
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                isLoading = true
-                generalErrorMessage = ""
-                currentPasswordError = ""
-                newPasswordError = ""
-                confirmPasswordError = ""
-
-                val credential = EmailAuthProvider.getCredential(
-                    email,
-                    currentPassword
-                )
-
-                firebaseUser
-                    .reauthenticate(credential)
-                    .await()
-
-                firebaseUser
-                    .updatePassword(newPassword.trim())
-                    .await()
-
+    LaunchedEffect(result) {
+        when (val state = result) {
+            ChangePasswordResult.Success -> {
                 showConfirmDialog = false
                 successMessage = "Password updated successfully"
-
                 currentPassword = ""
                 newPassword = ""
                 confirmPassword = ""
-
+                viewModel.reset()
                 onSaveClick()
-            } catch (e: Exception) {
-                val readableError = getReadableFirebaseError(e.message)
-
-                if (readableError == "Current password is incorrect") {
-                    currentPasswordError = readableError
-                } else {
-                    generalErrorMessage = readableError
-                }
-
-                showConfirmDialog = false
-            } finally {
-                isLoading = false
             }
+
+            ChangePasswordResult.WrongCurrentPassword -> {
+                showConfirmDialog = false
+                currentPasswordError = "Current password is incorrect"
+                viewModel.reset()
+            }
+
+            is ChangePasswordResult.Error -> {
+                showConfirmDialog = false
+                generalErrorMessage = state.message
+                viewModel.reset()
+            }
+
+            else -> Unit
         }
     }
 

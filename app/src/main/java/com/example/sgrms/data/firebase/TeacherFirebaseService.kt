@@ -3,14 +3,17 @@ package com.example.sgrms.data.firebase
 import com.example.sgrms.data.model.TeacherModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.example.sgrms.data.repository.TeacherProfileUpdate
+import com.example.sgrms.data.repository.profileImageFields
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TeacherFirebaseService(
-    private val accountFunctions: AccountFunctionsService = AccountFunctionsService()
+@Singleton
+class TeacherFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore,
+    private val accountFunctions: AccountFunctionsService
 ) {
-
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-
     private val teachersCollection = firestore.collection("teachers")
     private val usersCollection = firestore.collection("users")
 
@@ -92,5 +95,54 @@ class TeacherFirebaseService(
         teacherId: String
     ) {
         accountFunctions.deleteAccount(teacherId = teacherId)
+    }
+
+    /** Finds the teacher profile linked to a login account. */
+    suspend fun getTeacherByUserId(
+        userId: String
+    ): TeacherModel? {
+        val document = teachersCollection
+            .whereEqualTo("userId", userId)
+            .limit(1)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
+            ?: return null
+
+        return document.toObject(TeacherModel::class.java)?.copy(teacherId = document.id)
+    }
+
+    suspend fun updateOwnProfile(
+        teacherId: String,
+        update: TeacherProfileUpdate
+    ) {
+        teachersCollection
+            .document(teacherId)
+            .update(
+                mapOf(
+                    "phoneNumber" to update.phoneNumber,
+                    "department" to update.department,
+                    "position" to update.position,
+                    "officeLocation" to update.officeLocation,
+                    "qualification" to update.qualification,
+                    "specialization" to update.specialization,
+                    "address" to update.address,
+                    "profileNote" to update.profileNote,
+                    "updatedAt" to System.currentTimeMillis()
+                )
+            )
+            .await()
+    }
+
+    /** Pass an empty [imageUrl] to remove the photo. */
+    suspend fun updateProfileImage(
+        teacherId: String,
+        imageUrl: String
+    ) {
+        teachersCollection
+            .document(teacherId)
+            .update(profileImageFields(imageUrl))
+            .await()
     }
 }

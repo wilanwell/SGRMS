@@ -42,7 +42,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,11 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.ClassFirebaseService
-import com.example.sgrms.data.firebase.StudentFirebaseService
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.ClassFirebaseRepository
-import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.SgrmsSearchBar
@@ -65,9 +60,8 @@ import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
-import com.example.sgrms.viewmodel.ClassFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
-import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun ClassDetailScreen(
@@ -75,29 +69,9 @@ fun ClassDetailScreen(
     onBackClick: () -> Unit = {},
     onAddStudentClick: () -> Unit = {}
 ) {
-    val classFirebaseService = remember {
-        ClassFirebaseService()
-    }
+    val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 
-    val classFirebaseRepository = remember {
-        ClassFirebaseRepository(classFirebaseService)
-    }
-
-    val classViewModel: ClassFirebaseViewModel = viewModel(
-        factory = ClassFirebaseViewModelFactory(classFirebaseRepository)
-    )
-
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
-
-    val studentFirebaseRepository = remember {
-        StudentFirebaseRepository(studentFirebaseService)
-    }
-
-    val studentViewModel: StudentFirebaseViewModel = viewModel(
-        factory = StudentFirebaseViewModelFactory(studentFirebaseRepository)
-    )
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val classUiState by classViewModel.uiState.collectAsState()
     val studentUiState by studentViewModel.uiState.collectAsState()

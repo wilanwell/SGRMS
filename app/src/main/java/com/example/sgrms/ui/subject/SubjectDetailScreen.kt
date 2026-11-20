@@ -44,7 +44,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,11 +52,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.SubjectFirebaseService
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.components.TopBar
@@ -66,11 +62,10 @@ import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.viewmodel.GradeFirebaseViewModel
+import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun SubjectDetailScreen(
@@ -79,65 +74,28 @@ fun SubjectDetailScreen(
     onEditClick: () -> Unit = {},
     onViewStudentsClick: () -> Unit = {}
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val firestore = remember { FirebaseFirestore.getInstance() }
-
-    val subjectFirebaseService = remember {
-        SubjectFirebaseService()
-    }
-
-    val subjectFirebaseRepository = remember {
-        SubjectFirebaseRepository(subjectFirebaseService)
-    }
-
-    val subjectViewModel: SubjectFirebaseViewModel = viewModel(
-        factory = SubjectFirebaseViewModelFactory(subjectFirebaseRepository)
-    )
+    val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
+    val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
+    val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
     val subjectUiState by subjectViewModel.uiState.collectAsState()
 
-    var students by remember { mutableStateOf<List<StudentModel>>(emptyList()) }
-    var grades by remember { mutableStateOf<List<GradeModel>>(emptyList()) }
+    val studentUiState by studentViewModel.uiState.collectAsState()
+    val gradeUiState by gradeViewModel.uiState.collectAsState()
 
-    var isStudentGradeLoading by remember { mutableStateOf(false) }
-    var studentGradeErrorMessage by remember { mutableStateOf("") }
+    val students = studentUiState.students
+    val grades = gradeUiState.grades
+
+    val isStudentGradeLoading = studentUiState.isLoading || gradeUiState.isLoading
+    val studentGradeErrorMessage = gradeUiState.errorMessage.ifBlank { studentUiState.errorMessage }
 
     var showAddStudentDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(subjectId) {
         if (subjectId.isNotBlank()) {
             subjectViewModel.loadSubjectById(subjectId)
-
-            try {
-                isStudentGradeLoading = true
-                studentGradeErrorMessage = ""
-
-                val studentSnapshot = firestore
-                    .collection("students")
-                    .get()
-                    .await()
-
-                students = studentSnapshot.documents.mapNotNull { document ->
-                    document.toObject(StudentModel::class.java)?.copy(
-                        studentId = document.id
-                    )
-                }
-
-                val gradeSnapshot = firestore
-                    .collection("grades")
-                    .get()
-                    .await()
-
-                grades = gradeSnapshot.documents.mapNotNull { document ->
-                    document.toObject(GradeModel::class.java)?.copy(
-                        gradeId = document.id
-                    )
-                }
-            } catch (e: Exception) {
-                studentGradeErrorMessage = e.message ?: "Failed to load students and grades"
-            } finally {
-                isStudentGradeLoading = false
-            }
+            studentViewModel.loadStudents()
+            gradeViewModel.loadGradesBySubjectId(subjectId)
         }
     }
 
@@ -173,35 +131,21 @@ fun SubjectDetailScreen(
                 showAddStudentDialog = false
             },
             onStudentSelected = { student ->
-                coroutineScope.launch {
-                    try {
-                        studentGradeErrorMessage = ""
-
-                        val gradeDocument = firestore
-                            .collection("grades")
-                            .document()
-
-                        val newGrade = GradeModel(
-                            gradeId = gradeDocument.id,
-                            studentId = student.studentId,
-                            subjectId = subjectId,
-                            marks = 0.0,
-                            gradeLetter = "",
-                            remarks = "Added to subject",
-                            status = "Pending",
-                            createdByTeacherId = subject.teacherId,
-                            createdAt = System.currentTimeMillis()
-                        )
-
-                        gradeDocument
-                            .set(newGrade)
-                            .await()
-
-                        grades = grades + newGrade
-                    } catch (e: Exception) {
-                        studentGradeErrorMessage = e.message ?: "Failed to add student to subject"
+                gradeViewModel.addGrade(
+                    grade = GradeModel(
+                        studentId = student.studentId,
+                        subjectId = subjectId,
+                        marks = 0.0,
+                        gradeLetter = "",
+                        remarks = "Added to subject",
+                        status = "Pending",
+                        createdByTeacherId = subject.teacherId,
+                        createdAt = System.currentTimeMillis()
+                    ),
+                    onSuccess = {
+                        gradeViewModel.loadGradesBySubjectId(subjectId)
                     }
-                }
+                )
 
                 showAddStudentDialog = false
             }

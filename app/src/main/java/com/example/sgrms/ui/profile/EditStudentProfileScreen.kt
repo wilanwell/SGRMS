@@ -33,7 +33,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,8 +41,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.firebase.StudentFirebaseService
-import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.ProfileImagePicker
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
@@ -51,49 +48,30 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.utils.convertImageUriToBase64
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.sgrms.viewmodel.StudentProfileViewModel
+import com.example.sgrms.data.repository.StudentProfileUpdate
 
 @Composable
 fun EditStudentProfileScreen(
-    studentId: Int = 0,
-    firebaseStudentId: String = "",
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val studentFirebaseService = remember {
-        StudentFirebaseService()
-    }
+    val viewModel: StudentProfileViewModel = hiltViewModel()
+    val uiState by viewModel.profileUiState.collectAsState()
+    val student = uiState.profile
 
-    val firestore = remember {
-        FirebaseFirestore.getInstance()
-    }
 
-    val currentStudentId = firebaseStudentId.ifBlank {
-        if (studentId != 0) {
-            studentId.toString()
-        } else {
-            ""
-        }
-    }
-
-    var student by remember {
-        mutableStateOf<StudentModel?>(null)
-    }
-
-    var profileImageBase64 by remember {
-        mutableStateOf("")
-    }
+    val profileImageUrl = uiState.profile?.profileImageUrl.orEmpty()
+    val legacyImageBase64 = uiState.profile?.profileImageBase64.orEmpty()
 
     var phoneNumber by remember {
         mutableStateOf("")
@@ -135,17 +113,11 @@ fun EditStudentProfileScreen(
         mutableStateOf("")
     }
 
-    var isLoading by remember {
-        mutableStateOf(true)
-    }
+    val isLoading = uiState.isLoading
 
-    var isSaving by remember {
-        mutableStateOf(false)
-    }
+    val isSaving = uiState.isSaving
 
-    var isUploadingImage by remember {
-        mutableStateOf(false)
-    }
+    val isUploadingImage = uiState.isUploadingImage
 
     var generalError by remember {
         mutableStateOf("")
@@ -223,71 +195,38 @@ fun EditStudentProfileScreen(
     }
 
     fun removeProfilePicture() {
-        if (currentStudentId.isBlank()) {
-            generalError = "Student profile not found."
-            return
-        }
+        viewModel.removeImage()
+    }
 
-        coroutineScope.launch {
-            try {
-                isUploadingImage = true
-                generalError = ""
+    var formFilled by remember { mutableStateOf(false) }
 
-                firestore
-                    .collection("students")
-                    .document(currentStudentId)
-                    .update(
-                        mapOf(
-                            "profileImageBase64" to "",
-                            "updatedAt" to System.currentTimeMillis()
-                        )
-                    )
-                    .await()
-
-                profileImageBase64 = ""
-
-                snackbarHostState.showSnackbar(
-                    message = "Profile picture removed successfully"
-                )
-            } catch (e: Exception) {
-                generalError = e.message ?: "Failed to remove profile picture."
-            } finally {
-                isUploadingImage = false
-            }
+    LaunchedEffect(uiState.profile) {
+        val loaded = uiState.profile
+        if (loaded != null && !formFilled) {
+            phoneNumber = loaded.phoneNumber
+            dateOfBirth = loaded.dateOfBirth
+            address = loaded.address
+            guardianName = loaded.guardianName
+            guardianPhone = loaded.guardianPhone
+            emergencyContact = loaded.emergencyContact
+            profileNote = loaded.profileNote
+            formFilled = true
         }
     }
 
-    LaunchedEffect(currentStudentId) {
-        try {
-            isLoading = true
-            generalError = ""
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage.isNotBlank()) generalError = uiState.errorMessage
+    }
 
-            if (currentStudentId.isBlank()) {
-                generalError = "Student profile not found."
-                return@LaunchedEffect
-            }
-
-            val loadedStudent = studentFirebaseService.getStudentById(currentStudentId)
-            student = loadedStudent
-
-            if (loadedStudent == null) {
-                generalError = "Student profile not found."
-                return@LaunchedEffect
-            }
-
-            profileImageBase64 = loadedStudent.profileImageBase64
-            phoneNumber = loadedStudent.phoneNumber
-            dateOfBirth = loadedStudent.dateOfBirth
-            address = loadedStudent.address
-            guardianName = loadedStudent.guardianName
-            guardianPhone = loadedStudent.guardianPhone
-            emergencyContact = loadedStudent.emergencyContact
-            profileNote = loadedStudent.profileNote
-        } catch (e: Exception) {
-            generalError = e.message ?: "Failed to load student profile."
-        } finally {
-            isLoading = false
+    LaunchedEffect(uiState.message) {
+        if (uiState.message.isNotBlank()) {
+            snackbarHostState.showSnackbar(message = uiState.message)
+            viewModel.clearMessage()
         }
+    }
+
+    LaunchedEffect(uiState.saved) {
+        if (uiState.saved) onSaveSuccess()
     }
 
     Column(
@@ -360,47 +299,12 @@ fun EditStudentProfileScreen(
                         )
                     } else {
                         ProfileImagePicker(
-                            imageBase64 = profileImageBase64,
+                            imageUrl = profileImageUrl,
+                            legacyImageBase64 = legacyImageBase64,
                             isUploading = isUploadingImage,
                             enabled = !isSaving,
                             onImageSelected = { imageUri ->
-                                if (currentStudentId.isBlank()) {
-                                    generalError = "Student profile not found."
-                                    return@ProfileImagePicker
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isUploadingImage = true
-                                        generalError = ""
-
-                                        val convertedImageBase64 = convertImageUriToBase64(
-                                            context = context,
-                                            imageUri = imageUri
-                                        )
-
-                                        firestore
-                                            .collection("students")
-                                            .document(currentStudentId)
-                                            .update(
-                                                mapOf(
-                                                    "profileImageBase64" to convertedImageBase64,
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        profileImageBase64 = convertedImageBase64
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile picture updated successfully"
-                                        )
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to save profile picture."
-                                    } finally {
-                                        isUploadingImage = false
-                                    }
-                                }
+                                viewModel.onImageSelected(imageUri)
                             }
                         )
 
@@ -410,7 +314,7 @@ fun EditStudentProfileScreen(
                             onClick = {
                                 removeProfilePicture()
                             },
-                            enabled = profileImageBase64.isNotBlank() &&
+                            enabled = (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) &&
                                     !isSaving &&
                                     !isUploadingImage,
                             modifier = Modifier.fillMaxWidth(),
@@ -619,44 +523,17 @@ fun EditStudentProfileScreen(
                                     return@Button
                                 }
 
-                                if (currentStudentId.isBlank()) {
-                                    generalError = "Student profile not found."
-                                    return@Button
-                                }
-
-                                coroutineScope.launch {
-                                    try {
-                                        isSaving = true
-                                        generalError = ""
-
-                                        firestore
-                                            .collection("students")
-                                            .document(currentStudentId)
-                                            .update(
-                                                mapOf(
-                                                    "phoneNumber" to phoneNumber.trim(),
-                                                    "dateOfBirth" to dateOfBirth.trim(),
-                                                    "address" to address.trim(),
-                                                    "guardianName" to guardianName.trim(),
-                                                    "guardianPhone" to guardianPhone.trim(),
-                                                    "emergencyContact" to emergencyContact.trim(),
-                                                    "profileNote" to profileNote.trim(),
-                                                    "updatedAt" to System.currentTimeMillis()
-                                                )
-                                            )
-                                            .await()
-
-                                        snackbarHostState.showSnackbar(
-                                            message = "Profile updated successfully"
-                                        )
-
-                                        onSaveSuccess()
-                                    } catch (e: Exception) {
-                                        generalError = e.message ?: "Failed to update profile."
-                                    } finally {
-                                        isSaving = false
-                                    }
-                                }
+                                viewModel.saveProfile(
+                                    StudentProfileUpdate(
+                                        phoneNumber = phoneNumber.trim(),
+                                        dateOfBirth = dateOfBirth.trim(),
+                                        address = address.trim(),
+                                        guardianName = guardianName.trim(),
+                                        guardianPhone = guardianPhone.trim(),
+                                        emergencyContact = emergencyContact.trim(),
+                                        profileNote = profileNote.trim()
+                                    )
+                                )
                             },
                             enabled = !isSaving && !isLoading && !isUploadingImage,
                             modifier = Modifier

@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "firebase emulators:exec --only firestore --project demo-sgrms \"node --test\""
+    "test": "firebase emulators:exec --only firestore,storage --project demo-sgrms \"node --test\"",
+    "pretest": "node -e \"const fs=require('fs');fs.mkdirSync('.rules',{recursive:true});for(const f of ['firestore.rules','storage.rules'])fs.copyFileSync('../'+f,'.rules/'+f)\""
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^6.0.0",

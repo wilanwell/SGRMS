@@ -44,34 +44,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.FirebaseAuthService
-import com.example.sgrms.data.model.UserModel
-import com.example.sgrms.data.repository.AuthRepository
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.AuthViewModel
-import com.example.sgrms.viewmodel.AuthViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
-fun LoginScreen(
-    onLoginClick: (UserModel) -> Unit = {}
-) {
-    val firebaseAuthService = remember {
-        FirebaseAuthService()
-    }
+fun LoginScreen() {
+    val authViewModel: AuthViewModel = hiltViewModel()
 
-    val authRepository = remember {
-        AuthRepository(firebaseAuthService)
-    }
-
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(authRepository)
-    )
-
-    val authUiState by authViewModel.authUiState.collectAsState()
+    val authUiState by authViewModel.loginUiState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -81,12 +65,6 @@ fun LoginScreen(
     var passwordError by remember { mutableStateOf(false) }
 
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
-
-    LaunchedEffect(authUiState.isLoggedIn, authUiState.currentUser) {
-        if (authUiState.isLoggedIn && authUiState.currentUser != null) {
-            onLoginClick(authUiState.currentUser!!)
-        }
-    }
 
     if (showForgotPasswordDialog) {
         AlertDialog(
@@ -302,9 +280,7 @@ fun LoginScreen(
                             val isValid = !emailError && !passwordError
 
                             if (isValid) {
-                                authViewModel.loginUser(
-                                    email = email.trim(),
-                                    password = password.trim()
+                                authViewModel.login(email = email.trim(), password = password
                                 )
                             }
                         },

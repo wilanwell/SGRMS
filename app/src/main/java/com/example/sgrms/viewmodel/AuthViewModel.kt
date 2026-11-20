@@ -2,99 +2,63 @@ package com.example.sgrms.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sgrms.data.model.UserModel
-import com.example.sgrms.data.repository.AuthRepository
+import com.example.sgrms.data.session.SessionManager
+import com.example.sgrms.data.session.SessionState
+import com.example.sgrms.utils.toUserMessage
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-data class AuthUiState(
-    val currentUser: UserModel? = null,
+data class LoginUiState(
     val isLoading: Boolean = false,
-    val errorMessage: String = "",
-    val isLoggedIn: Boolean = false
+    val errorMessage: String = ""
 )
 
-class AuthViewModel(
-    private val authRepository: AuthRepository
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
-    private val _authUiState = MutableStateFlow(AuthUiState())
-    val authUiState: StateFlow<AuthUiState> = _authUiState.asStateFlow()
+    val session: StateFlow<SessionState> = sessionManager.state
 
-    fun loginUser(
-        email: String,
-        password: String
-    ) {
+    private val _loginUiState = MutableStateFlow(LoginUiState())
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
+
+    init {
+        if (sessionManager.state.value is SessionState.Loading) {
+            viewModelScope.launch { sessionManager.restore() }
+        }
+    }
+
+    fun login(email: String, password: String) {
+        if (email.isBlank() || password.isBlank()) {
+            _loginUiState.update { it.copy(errorMessage = "Please enter your email and password.") }
+            return
+        }
+
         viewModelScope.launch {
+            _loginUiState.update { it.copy(isLoading = true, errorMessage = "") }
+
             try {
-                _authUiState.value = _authUiState.value.copy(
-                    isLoading = true,
-                    errorMessage = ""
-                )
-
-                val user = authRepository.loginUser(
-                    email = email,
-                    password = password
-                )
-
-                _authUiState.value = AuthUiState(
-                    currentUser = user,
-                    isLoading = false,
-                    errorMessage = "",
-                    isLoggedIn = true
-                )
+                sessionManager.login(email = email.trim(), password = password)
+                _loginUiState.value = LoginUiState()
             } catch (e: Exception) {
-                _authUiState.value = _authUiState.value.copy(
-                    isLoading = false,
-                    errorMessage = e.message ?: "Login failed",
-                    isLoggedIn = false
-                )
+                _loginUiState.update {
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Login failed."))
+                }
             }
         }
     }
 
-    fun loadCurrentUser() {
-        viewModelScope.launch {
-            try {
-                _authUiState.value = _authUiState.value.copy(
-                    isLoading = true,
-                    errorMessage = ""
-                )
-
-                val user = authRepository.getCurrentUserProfile()
-
-                _authUiState.value = AuthUiState(
-                    currentUser = user,
-                    isLoading = false,
-                    errorMessage = "",
-                    isLoggedIn = user != null
-                )
-            } catch (e: Exception) {
-                _authUiState.value = _authUiState.value.copy(
-                    isLoading = false,
-                    errorMessage = e.message ?: "Failed to load user",
-                    isLoggedIn = false
-                )
-            }
-        }
-    }
-
-    fun logoutUser() {
-        authRepository.logoutUser()
-
-        _authUiState.value = AuthUiState(
-            currentUser = null,
-            isLoading = false,
-            errorMessage = "",
-            isLoggedIn = false
-        )
+    fun logout() {
+        sessionManager.logout()
     }
 
     fun clearError() {
-        _authUiState.value = _authUiState.value.copy(
-            errorMessage = ""
-        )
+        _loginUiState.update { it.copy(errorMessage = "") }
     }
 }

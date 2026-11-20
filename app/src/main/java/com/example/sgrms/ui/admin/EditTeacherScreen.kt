@@ -35,10 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.sgrms.data.firebase.TeacherFirebaseService
-import com.example.sgrms.data.model.TeacherModel
-import com.example.sgrms.data.repository.TeacherFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
@@ -49,7 +45,7 @@ import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
-import com.example.sgrms.viewmodel.TeacherFirebaseViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun EditTeacherScreen(
@@ -57,17 +53,7 @@ fun EditTeacherScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
-    val teacherFirebaseService = remember {
-        TeacherFirebaseService()
-    }
-
-    val teacherFirebaseRepository = remember {
-        TeacherFirebaseRepository(teacherFirebaseService)
-    }
-
-    val teacherViewModel: TeacherFirebaseViewModel = viewModel(
-        factory = TeacherFirebaseViewModelFactory(teacherFirebaseRepository)
-    )
+    val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
 
     val uiState by teacherViewModel.uiState.collectAsState()
 
@@ -300,23 +286,15 @@ fun EditTeacherScreen(
                                             !emailError
 
                                     if (isValid) {
-                                        val updatedTeacher = TeacherModel(
-                                            teacherId = teacher.teacherId,
+                                        // copy() keeps fields this form does not edit
+                                        // (photo, qualification, office, ...).
+                                        val updatedTeacher = teacher.copy(
                                             staffId = staffId.trim(),
                                             teacherName = teacherName.trim(),
                                             email = email.trim(),
                                             phoneNumber = phoneNumber.trim(),
                                             department = department.trim(),
-                                            position = position.trim().ifBlank { "Teacher" },
-                                            userId = teacher.userId,
-                                            profileImageBase64 = teacher.profileImageBase64,
-                                            officeLocation = teacher.officeLocation,
-                                            qualification = teacher.qualification,
-                                            specialization = teacher.specialization,
-                                            address = teacher.address,
-                                            profileNote = teacher.profileNote,
-                                            createdAt = teacher.createdAt,
-                                            updatedAt = System.currentTimeMillis()
+                                            position = position.trim().ifBlank { "Teacher" }
                                         )
 
                                         teacherViewModel.updateTeacher(

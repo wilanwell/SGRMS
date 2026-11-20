@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class StudentFirebaseUiState(
     val students: List<StudentModel> = emptyList(),
@@ -17,7 +20,8 @@ data class StudentFirebaseUiState(
     val successMessage: String = ""
 )
 
-class StudentFirebaseViewModel(
+@HiltViewModel
+class StudentFirebaseViewModel @Inject constructor(
     private val studentRepository: StudentFirebaseRepository
 ) : ViewModel() {
 
@@ -42,7 +46,7 @@ class StudentFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load students"
+                    errorMessage = e.toUserMessage("Failed to load students")
                 )
             }
         }
@@ -68,7 +72,7 @@ class StudentFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load student"
+                    errorMessage = e.toUserMessage("Failed to load student")
                 )
             }
         }
@@ -116,7 +120,7 @@ class StudentFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to add student"
+                    errorMessage = e.toUserMessage("Failed to add student")
                 )
             }
         }
@@ -146,7 +150,7 @@ class StudentFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to update student"
+                    errorMessage = e.toUserMessage("Failed to update student")
                 )
             }
         }
@@ -176,7 +180,7 @@ class StudentFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to delete student"
+                    errorMessage = e.toUserMessage("Failed to delete student")
                 )
             }
         }

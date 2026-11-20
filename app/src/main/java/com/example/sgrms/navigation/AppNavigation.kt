@@ -5,12 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,28 +53,75 @@ import com.example.sgrms.ui.subject.AddSubjectScreen
 import com.example.sgrms.ui.subject.EditSubjectScreen
 import com.example.sgrms.ui.subject.SubjectDetailScreen
 import com.example.sgrms.ui.subject.SubjectManagementScreen
-import com.example.sgrms.utils.FcmTokenHelper
-import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
+import com.example.sgrms.data.model.UserModel
+import com.example.sgrms.data.model.UserRole
+import com.example.sgrms.data.session.SessionState
+import com.example.sgrms.viewmodel.AuthViewModel
+
+private val AdminOnly = setOf(UserRole.ADMIN)
+private val TeacherOnly = setOf(UserRole.TEACHER)
+private val StudentOnly = setOf(UserRole.STUDENT)
+private val StaffOnly = setOf(UserRole.ADMIN, UserRole.TEACHER)
+private val AnyRole = UserRole.entries.toSet()
+
+private fun homeRouteFor(role: UserRole): String = when (role) {
+    UserRole.ADMIN -> Screen.AdminDashboard.route
+    UserRole.TEACHER -> Screen.TeacherDashboard.route
+    UserRole.STUDENT -> Screen.StudentDashboard.route
+}
+
+private fun NavHostController.navigateClearingBackStack(route: String) {
+    navigate(route) {
+        popUpTo(0) { inclusive = true }
+        launchSingleTop = true
+    }
+}
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val context = LocalContext.current
+    val authViewModel: AuthViewModel = hiltViewModel()
+    val session by authViewModel.session.collectAsState()
 
-    var currentFirebaseUserId by rememberSaveable { mutableStateOf("") }
-
-    var currentUserId by rememberSaveable { mutableIntStateOf(0) }
-    var currentUserRole by rememberSaveable { mutableStateOf("") }
-    var currentUserName by rememberSaveable { mutableStateOf("") }
-
-    var currentStudentId by rememberSaveable { mutableIntStateOf(0) }
-    var currentTeacherId by rememberSaveable { mutableIntStateOf(0) }
-
-    var currentFirebaseStudentId by rememberSaveable { mutableStateOf("") }
-    var currentFirebaseTeacherId by rememberSaveable { mutableStateOf("") }
+    val loggedIn = session as? SessionState.LoggedIn
+    val loggedInUser: UserModel? = loggedIn?.user
+    val currentRole: UserRole? = loggedIn?.role
+    val currentStudentId = loggedInUser?.studentId.orEmpty()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    // Route the app whenever the session changes:
+    // restored session -> home, login -> home, logout -> login.
+    LaunchedEffect(session) {
+        when (val state = session) {
+            SessionState.Loading -> Unit
+
+            SessionState.LoggedOut -> {
+                if (navController.currentDestination?.route != Screen.Login.route) {
+                    navController.navigateClearingBackStack(Screen.Login.route)
+                }
+            }
+
+            is SessionState.LoggedIn -> {
+                val route = navController.currentDestination?.route
+                if (route == Screen.Splash.route || route == Screen.Login.route) {
+                    navController.navigateClearingBackStack(homeRouteFor(state.role))
+                }
+            }
+        }
+    }
 
     val adminBottomBarRoutes = listOf(
         Screen.AdminDashboard.route,
@@ -107,35 +149,35 @@ fun AppNavigation() {
         Screen.StudentProfile.route
     )
 
-    val showBottomBar = when (currentUserRole) {
-        "Admin" -> currentRoute in adminBottomBarRoutes
-        "Student" -> currentRoute in studentBottomBarRoutes
-        "Teacher" -> currentRoute in teacherBottomBarRoutes
-        else -> false
+    val showBottomBar = when (currentRole) {
+        UserRole.ADMIN -> currentRoute in adminBottomBarRoutes
+        UserRole.STUDENT -> currentRoute in studentBottomBarRoutes
+        UserRole.TEACHER -> currentRoute in teacherBottomBarRoutes
+        null -> false
     }
 
-    fun clearCurrentUserSession() {
-        FirebaseAuth.getInstance().signOut()
+    /**
+     * A destination that only [allowedRoles] may open. Anyone else (for
+     * example a student reaching an admin route) is sent to their own home.
+     */
+    fun NavGraphBuilder.guardedComposable(
+        allowedRoles: Set<UserRole>,
+        route: String,
+        arguments: List<NamedNavArgument> = emptyList(),
+        content: @Composable (NavBackStackEntry) -> Unit
+    ) {
+        composable(route = route, arguments = arguments) { entry ->
+            val role = (session as? SessionState.LoggedIn)?.role
 
-        currentFirebaseUserId = ""
-        currentUserId = 0
-        currentUserRole = ""
-        currentUserName = ""
-
-        currentStudentId = 0
-        currentTeacherId = 0
-
-        currentFirebaseStudentId = ""
-        currentFirebaseTeacherId = ""
-
-        navController.navigate(Screen.Login.route) {
-            popUpTo(0)
-        }
-    }
-
-    fun getCurrentStudentRouteId(): String {
-        return currentFirebaseStudentId.ifBlank {
-            currentStudentId.toString()
+            if (role != null && role in allowedRoles) {
+                content(entry)
+            } else {
+                LaunchedEffect(role) {
+                    navController.navigateClearingBackStack(
+                        role?.let(::homeRouteFor) ?: Screen.Login.route
+                    )
+                }
+            }
         }
     }
 
@@ -143,9 +185,9 @@ fun AppNavigation() {
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
-                val bottomItems = when (currentUserRole) {
-                    "Admin" -> AdminBottomNavItems
-                    "Student" -> StudentBottomNavItems
+                val bottomItems = when (currentRole) {
+                    UserRole.ADMIN -> AdminBottomNavItems
+                    UserRole.STUDENT -> StudentBottomNavItems
                     else -> TeacherBottomNavItems
                 }
 
@@ -153,31 +195,21 @@ fun AppNavigation() {
                     currentRoute = currentRoute,
                     items = bottomItems,
                     onItemClick = { route ->
-                        if (
-                            currentUserRole == "Student" &&
-                            route == Screen.StudentReportSummary.route
-                        ) {
-                            navController.navigate(
-                                Screen.StudentReportSummary.createRoute(getCurrentStudentRouteId())
-                            ) {
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        } else if (
-                            currentUserRole == "Student" &&
-                            route == Screen.StudentNotifications.route
-                        ) {
-                            navController.navigate(
-                                Screen.StudentNotifications.createRoute(getCurrentStudentRouteId())
-                            ) {
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        } else {
-                            navController.navigate(route) {
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                        val target = when {
+                            currentRole == UserRole.STUDENT &&
+                                route == Screen.StudentReportSummary.route ->
+                                Screen.StudentReportSummary.createRoute(currentStudentId)
+
+                            currentRole == UserRole.STUDENT &&
+                                route == Screen.StudentNotifications.route ->
+                                Screen.StudentNotifications.createRoute(currentStudentId)
+
+                            else -> route
+                        }
+
+                        navController.navigate(target) {
+                            launchSingleTop = true
+                            restoreState = true
                         }
                     }
                 )
@@ -187,64 +219,25 @@ fun AppNavigation() {
 
         NavHost(
             navController = navController,
-            startDestination = Screen.Login.route,
+            startDestination = Screen.Splash.route,
             modifier = Modifier.padding(paddingValues)
         ) {
-            composable(Screen.Login.route) {
-                LoginScreen(
-                    onLoginClick = { user ->
-                        currentFirebaseUserId = user.userId
-                        currentUserRole = user.role
-                        currentUserName = user.fullName
-
-                        currentFirebaseStudentId = user.studentId
-                        currentFirebaseTeacherId = user.teacherId
-
-                        currentUserId = 0
-                        currentStudentId = user.studentId.toIntOrNull() ?: 0
-                        currentTeacherId = user.teacherId.toIntOrNull() ?: 0
-
-                        when (user.role) {
-                            "Admin" -> {
-                                navController.navigate(Screen.AdminDashboard.route) {
-                                    popUpTo(Screen.Login.route) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-
-                            "Teacher" -> {
-                                navController.navigate(Screen.TeacherDashboard.route) {
-                                    popUpTo(Screen.Login.route) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-
-                            "Student" -> {
-                                FcmTokenHelper.saveStudentFcmToken(
-                                    context = context,
-                                    studentId = user.studentId
-                                )
-
-                                navController.navigate(Screen.StudentDashboard.route) {
-                                    popUpTo(Screen.Login.route) {
-                                        inclusive = true
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                navController.navigate(Screen.Login.route)
-                            }
-                        }
-                    }
-                )
+            composable(Screen.Splash.route) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
 
-            composable(Screen.AdminDashboard.route) {
+            composable(Screen.Login.route) {
+                LoginScreen()
+            }
+
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.AdminDashboard.route) {
                 AdminDashboardScreen(
-                    adminName = currentUserName,
+                    adminName = loggedInUser?.fullName.orEmpty(),
                     onUserManagementClick = {
                         navController.navigate(Screen.UserManagement.route)
                     },
@@ -272,9 +265,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.AdminProfile.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.AdminProfile.route) {
                 AdminProfileScreen(
-                    userId = currentUserId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -285,14 +277,13 @@ fun AppNavigation() {
                         navController.navigate(Screen.ChangePassword.route)
                     },
                     onLogoutClick = {
-                        clearCurrentUserSession()
+                        authViewModel.logout()
                     }
                 )
             }
 
-            composable(Screen.EditAdminProfile.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.EditAdminProfile.route) {
                 EditAdminProfileScreen(
-                    userId = currentUserId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -302,7 +293,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.UserManagement.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.UserManagement.route) {
                 UserManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -321,7 +312,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.TeacherManagement.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.TeacherManagement.route) {
                 TeacherManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -342,7 +333,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.AddTeacher.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.AddTeacher.route) {
                 AddTeacherScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -353,7 +344,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = AdminOnly,
                 route = Screen.TeacherDetail.route,
                 arguments = listOf(
                     navArgument("teacherId") {
@@ -376,7 +368,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = AdminOnly,
                 route = Screen.EditTeacher.route,
                 arguments = listOf(
                     navArgument("teacherId") {
@@ -397,7 +390,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.ClassManagement.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.ClassManagement.route) {
                 ClassManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -413,7 +406,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = AdminOnly,
                 route = Screen.ClassDetail.route,
                 arguments = listOf(
                     navArgument("classId") {
@@ -434,10 +428,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.TeacherDashboard.route) {
+            guardedComposable(allowedRoles = TeacherOnly, route = Screen.TeacherDashboard.route) {
                 TeacherDashboardScreen(
-                    teacherId = currentTeacherId,
-                    firebaseTeacherId = currentFirebaseTeacherId,
                     onStudentClick = {
                         navController.navigate(Screen.StudentManagement.route)
                     },
@@ -456,22 +448,21 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.StudentDashboard.route) {
+            guardedComposable(allowedRoles = StudentOnly, route = Screen.StudentDashboard.route) {
                 StudentDashboardScreen(
                     studentId = currentStudentId,
-                    firebaseStudentId = currentFirebaseStudentId,
                     onProfileClick = {
                         navController.navigate(Screen.StudentProfile.route)
                     },
                     onReportClick = {
                         navController.navigate(
-                            Screen.StudentReportSummary.createRoute(getCurrentStudentRouteId())
+                            Screen.StudentReportSummary.createRoute(currentStudentId)
                         )
                     }
                 )
             }
 
-            composable(Screen.StudentManagement.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.StudentManagement.route) {
                 StudentManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -479,6 +470,7 @@ fun AppNavigation() {
                     onAddStudentClick = {
                         navController.navigate(Screen.AddStudent.route)
                     },
+                    canAddStudent = currentRole == UserRole.ADMIN,
                     onStudentDetailClick = { studentId ->
                         navController.navigate(
                             Screen.StudentDetail.createRoute(studentId)
@@ -492,7 +484,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.AddStudent.route) {
+            guardedComposable(allowedRoles = AdminOnly, route = Screen.AddStudent.route) {
                 AddStudentScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -503,7 +495,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.StudentDetail.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -534,7 +527,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.EditStudent.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -555,7 +549,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.SubjectManagement.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.SubjectManagement.route) {
                 SubjectManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -576,7 +570,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.AddSubject.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.AddSubject.route) {
                 AddSubjectScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -587,7 +581,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.SubjectDetail.route,
                 arguments = listOf(
                     navArgument("subjectId") {
@@ -613,7 +608,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.EditSubject.route,
                 arguments = listOf(
                     navArgument("subjectId") {
@@ -634,7 +630,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.GradeManagement.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.GradeManagement.route) {
                 GradeManagementScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -655,7 +651,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.AddGrade.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.AddGrade.route) {
                 AddGradeScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -666,7 +662,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.AddStudentGrade.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -687,7 +684,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.QuickAddGrade.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.QuickAddGrade.route) {
                 QuickAddGradeScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -698,7 +695,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.EditGrade.route,
                 arguments = listOf(
                     navArgument("gradeId") {
@@ -719,7 +717,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.StudentGradeDetail.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -745,7 +744,7 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.Report.route) {
+            guardedComposable(allowedRoles = StaffOnly, route = Screen.Report.route) {
                 ReportScreen(
                     onBackClick = {
                         navController.popBackStack()
@@ -766,7 +765,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.ReportDetail.route,
                 arguments = listOf(
                     navArgument("reportId") {
@@ -792,7 +792,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StaffOnly,
                 route = Screen.UpdateReport.route,
                 arguments = listOf(
                     navArgument("reportId") {
@@ -813,7 +814,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StudentOnly,
                 route = Screen.StudentReportSummary.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -821,8 +823,11 @@ fun AppNavigation() {
                     }
                 )
             ) { backStackEntry ->
-                val studentId = backStackEntry.arguments?.getString("studentId")
-                    ?: getCurrentStudentRouteId()
+                val studentId = if (currentRole == UserRole.STUDENT) {
+                    currentStudentId
+                } else {
+                    backStackEntry.arguments?.getString("studentId").orEmpty()
+                }
 
                 StudentReportSummaryScreen(
                     studentId = studentId,
@@ -832,7 +837,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(
+            guardedComposable(
+                allowedRoles = StudentOnly,
                 route = Screen.StudentNotifications.route,
                 arguments = listOf(
                     navArgument("studentId") {
@@ -840,8 +846,11 @@ fun AppNavigation() {
                     }
                 )
             ) { backStackEntry ->
-                val studentId = backStackEntry.arguments?.getString("studentId")
-                    ?: getCurrentStudentRouteId()
+                val studentId = if (currentRole == UserRole.STUDENT) {
+                    currentStudentId
+                } else {
+                    backStackEntry.arguments?.getString("studentId").orEmpty()
+                }
 
                 StudentNotificationScreen(
                     studentId = studentId,
@@ -851,10 +860,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.TeacherProfile.route) {
+            guardedComposable(allowedRoles = TeacherOnly, route = Screen.TeacherProfile.route) {
                 TeacherProfileScreen(
-                    teacherId = currentTeacherId,
-                    firebaseTeacherId = currentFirebaseTeacherId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -865,15 +872,13 @@ fun AppNavigation() {
                         navController.navigate(Screen.ChangePassword.route)
                     },
                     onLogoutClick = {
-                        clearCurrentUserSession()
+                        authViewModel.logout()
                     }
                 )
             }
 
-            composable(Screen.EditTeacherProfile.route) {
+            guardedComposable(allowedRoles = TeacherOnly, route = Screen.EditTeacherProfile.route) {
                 EditTeacherProfileScreen(
-                    teacherId = currentTeacherId,
-                    firebaseTeacherId = currentFirebaseTeacherId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -883,10 +888,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.StudentProfile.route) {
+            guardedComposable(allowedRoles = StudentOnly, route = Screen.StudentProfile.route) {
                 StudentProfileScreen(
-                    studentId = currentStudentId,
-                    firebaseStudentId = currentFirebaseStudentId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -897,15 +900,13 @@ fun AppNavigation() {
                         navController.navigate(Screen.ChangePassword.route)
                     },
                     onLogoutClick = {
-                        clearCurrentUserSession()
+                        authViewModel.logout()
                     }
                 )
             }
 
-            composable(Screen.EditStudentProfile.route) {
+            guardedComposable(allowedRoles = StudentOnly, route = Screen.EditStudentProfile.route) {
                 EditStudentProfileScreen(
-                    studentId = currentStudentId,
-                    firebaseStudentId = currentFirebaseStudentId,
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -915,9 +916,8 @@ fun AppNavigation() {
                 )
             }
 
-            composable(Screen.ChangePassword.route) {
+            guardedComposable(allowedRoles = AnyRole, route = Screen.ChangePassword.route) {
                 ChangePasswordScreen(
-                    userId = currentUserId,
                     onBackClick = {
                         navController.popBackStack()
                     },

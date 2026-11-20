@@ -2,6 +2,7 @@ package com.example.sgrms.navigation
 
 sealed class Screen(val route: String) {
 
+    object Splash : Screen("splash")
     object Login : Screen("login")
 
     object AdminDashboard : Screen("admin_dashboard")
@@ -25,7 +26,6 @@ sealed class Screen(val route: String) {
         }
     }
 
-    object AddStudentAccount : Screen("add_student_account")
     object ClassManagement : Screen("class_management")
 
     object ClassDetail : Screen("class_detail/{classId}") {
@@ -34,11 +34,6 @@ sealed class Screen(val route: String) {
         }
     }
 
-    object EditUser : Screen("edit_user/{userId}") {
-        fun createRoute(userId: Int): String {
-            return "edit_user/$userId"
-        }
-    }
 
     object StudentManagement : Screen("student_management")
     object AddStudent : Screen("add_student")

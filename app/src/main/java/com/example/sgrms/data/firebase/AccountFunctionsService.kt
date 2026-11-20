@@ -3,6 +3,8 @@ package com.example.sgrms.data.firebase
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.functions.FirebaseFunctionsException
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Calls the SGRMS Cloud Functions that create and delete login accounts.
@@ -11,8 +13,9 @@ import kotlinx.coroutines.tasks.await
  * FirebaseAuth.createUserWithEmailAndPassword from the app signs the admin
  * out and signs in as the new user.
  */
-class AccountFunctionsService(
-    private val functions: FirebaseFunctions = FirebaseFunctions.getInstance()
+@Singleton
+class AccountFunctionsService @Inject constructor(
+    private val functions: FirebaseFunctions
 ) {
 
     /** Returns the new teacher's document id. */

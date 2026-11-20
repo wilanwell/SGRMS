@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import com.example.sgrms.utils.toUserMessage
 
 data class TeacherFirebaseUiState(
     val teachers: List<TeacherModel> = emptyList(),
@@ -17,7 +20,8 @@ data class TeacherFirebaseUiState(
     val successMessage: String = ""
 )
 
-class TeacherFirebaseViewModel(
+@HiltViewModel
+class TeacherFirebaseViewModel @Inject constructor(
     private val teacherRepository: TeacherFirebaseRepository
 ) : ViewModel() {
 
@@ -42,7 +46,7 @@ class TeacherFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load teachers"
+                    errorMessage = e.toUserMessage("Failed to load teachers")
                 )
             }
         }
@@ -68,7 +72,7 @@ class TeacherFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to load teacher"
+                    errorMessage = e.toUserMessage("Failed to load teacher")
                 )
             }
         }
@@ -112,7 +116,7 @@ class TeacherFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to add teacher"
+                    errorMessage = e.toUserMessage("Failed to add teacher")
                 )
             }
         }
@@ -142,7 +146,7 @@ class TeacherFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to update teacher"
+                    errorMessage = e.toUserMessage("Failed to update teacher")
                 )
             }
         }
@@ -172,7 +176,7 @@ class TeacherFirebaseViewModel(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Failed to delete teacher"
+                    errorMessage = e.toUserMessage("Failed to delete teacher")
                 )
             }
         }
