@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.update
+import com.example.sgrms.data.repository.PageCursor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import com.example.sgrms.utils.toUserMessage
@@ -19,7 +21,10 @@ data class GradeFirebaseUiState(
     val selectedGrade: GradeModel? = null,
     val isLoading: Boolean = false,
     val errorMessage: String = "",
-    val successMessage: String = ""
+    val successMessage: String = "",
+    /** Paging (management list screens): more pages can be loaded. */
+    val hasMore: Boolean = false,
+    val isLoadingMore: Boolean = false
 )
 
 data class GradeBulkEntry(
@@ -41,6 +46,50 @@ class GradeFirebaseViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(GradeFirebaseUiState())
     val uiState: StateFlow<GradeFirebaseUiState> = _uiState.asStateFlow()
+
+    private var nextCursor: PageCursor? = null
+    private var pageFilter: String? = null
+
+    /** Loads the first page; [subjectId] narrows the query on the server. */
+    fun loadFirstGradePage(subjectId: String? = null) {
+        pageFilter = subjectId
+        nextCursor = null
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = "", successMessage = "") }
+
+            try {
+                val page = gradeRepository.getGradesPage(subjectId = pageFilter, cursor = null)
+                nextCursor = page.nextCursor
+                _uiState.update { it.copy(grades = page.items, hasMore = page.hasMore, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load grades")) }
+            }
+        }
+    }
+
+    fun loadMoreGrades() {
+        val cursor = nextCursor ?: return
+        if (_uiState.value.isLoadingMore) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingMore = true, errorMessage = "") }
+
+            try {
+                val page = gradeRepository.getGradesPage(subjectId = pageFilter, cursor = cursor)
+                nextCursor = page.nextCursor
+                _uiState.update {
+                    it.copy(
+                        grades = (it.grades + page.items).distinctBy { item -> item.gradeId },
+                        hasMore = page.hasMore,
+                        isLoadingMore = false
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoadingMore = false, errorMessage = e.toUserMessage("Failed to load more grades")) }
+            }
+        }
+    }
 
     fun loadGrades() {
         viewModelScope.launch {
@@ -274,7 +323,6 @@ class GradeFirebaseViewModel @Inject constructor(
                     successMessage = "Grades saved successfully"
                 )
 
-                loadGrades()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -352,7 +400,6 @@ class GradeFirebaseViewModel @Inject constructor(
                     successMessage = "Grade saved successfully"
                 )
 
-                loadGrades()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -395,7 +442,6 @@ class GradeFirebaseViewModel @Inject constructor(
                     successMessage = "Grade updated successfully"
                 )
 
-                loadGrades()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -428,11 +474,11 @@ class GradeFirebaseViewModel @Inject constructor(
                 gradeRepository.deleteGrade(gradeId)
 
                 _uiState.value = _uiState.value.copy(
+                    grades = _uiState.value.grades.filterNot { it.gradeId == gradeId },
                     isLoading = false,
                     successMessage = "Grade deleted successfully"
                 )
 
-                loadGrades()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(

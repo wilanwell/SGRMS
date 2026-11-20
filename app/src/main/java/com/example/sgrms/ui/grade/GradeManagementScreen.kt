@@ -83,6 +83,7 @@ import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
 import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.components.LoadMoreButton
 
 data class GradeDisplayItem(
     val grade: GradeModel,
@@ -131,7 +132,6 @@ fun GradeManagementScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     fun loadGradeData() {
-        gradeViewModel.loadGrades()
         studentViewModel.loadStudents()
         subjectViewModel.loadSubjects()
     }
@@ -140,14 +140,23 @@ fun GradeManagementScreen(
         loadGradeData()
     }
 
-    val gradeDisplayList = grades.map { grade ->
-        val student = students.find { student ->
-            student.studentId == grade.studentId
-        }
+    // The subject filter runs on the server; changing it reloads page one.
+    val subjectIdByName = subjects
+        .filter { it.subjectName.isNotBlank() }
+        .associate { it.subjectName to it.subjectId }
 
-        val subject = subjects.find { subject ->
-            subject.subjectId == grade.subjectId
-        }
+    val selectedSubjectId = subjectIdByName[selectedSubject]
+
+    LaunchedEffect(selectedSubjectId) {
+        gradeViewModel.loadFirstGradePage(subjectId = selectedSubjectId)
+    }
+
+    val studentsById = remember(students) { students.associateBy { it.studentId } }
+    val subjectsById = remember(subjects) { subjects.associateBy { it.subjectId } }
+
+    val gradeDisplayList = grades.map { grade ->
+        val student = studentsById[grade.studentId]
+        val subject = subjectsById[grade.subjectId]
 
         GradeDisplayItem(
             grade = grade,
@@ -188,8 +197,8 @@ fun GradeManagementScreen(
         val matchesClass =
             selectedClass == "All Classes" || item.className == selectedClass
 
-        val matchesSubject =
-            selectedSubject == "All Subjects" || item.subjectName == selectedSubject
+        // Filtered on the server by subjectId (see loadFirstGradePage).
+        val matchesSubject = true
 
         val matchesStatus =
             selectedStatus == "All Status" || item.grade.status == selectedStatus
@@ -546,6 +555,15 @@ fun GradeManagementScreen(
                                     showDeleteDialog = true
                                 }
                             )
+                        }
+
+                        if (gradeUiState.hasMore) {
+                            item(key = "load_more") {
+                                LoadMoreButton(
+                                    isLoading = gradeUiState.isLoadingMore,
+                                    onClick = { gradeViewModel.loadMoreGrades() }
+                                )
+                            }
                         }
                     }
                 }

@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.ui.theme.markColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.utils.ReportCalculator
 
 data class StudentReportSubjectItem(
     val grade: GradeModel,
@@ -152,9 +153,11 @@ fun StudentReportSummaryScreen(
         hasGrades = completedSubjectItems.isNotEmpty()
     )
 
-    val reportRemarks = buildStudentReportRemarks(subjectItems)
+    val reportRemarks = ReportCalculator.buildRemarks(subjectItems.map { it.grade }) { subjectId ->
+        subjectItems.firstOrNull { it.grade.subjectId == subjectId }?.subjectName
+    }
 
-    val reportDate = getStudentReportCurrentDateText()
+    val reportDate = ReportCalculator.todayText()
 
     fun downloadPdf() {
         if (completedSubjectItems.isEmpty()) {
@@ -758,41 +761,3 @@ fun StudentReportMiniInfo(
     }
 }
 
-fun buildStudentReportRemarks(
-    subjectItems: List<StudentReportSubjectItem>
-): String {
-    val completedRemarks = subjectItems
-        .filter { item ->
-            item.grade.status.equals("Complete", ignoreCase = true) &&
-                    item.grade.remarks.isNotBlank()
-        }
-        .map { item ->
-            "${item.subjectName}: ${item.grade.remarks}"
-        }
-        .toMutableList()
-
-    val pendingCount = subjectItems.count { item ->
-        !item.grade.status.equals("Complete", ignoreCase = true)
-    }
-
-    if (pendingCount > 0) {
-        completedRemarks.add(
-            "Needs update: $pendingCount subject grade record(s) are still pending."
-        )
-    }
-
-    return if (completedRemarks.isNotEmpty()) {
-        completedRemarks.joinToString(separator = "\n")
-    } else {
-        "No specific remarks from completed grade records."
-    }
-}
-
-fun getStudentReportCurrentDateText(): String {
-    val formatter = SimpleDateFormat(
-        "dd/MM/yyyy",
-        Locale.getDefault()
-    )
-
-    return formatter.format(Date())
-}

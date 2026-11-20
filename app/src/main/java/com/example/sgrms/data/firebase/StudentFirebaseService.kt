@@ -5,6 +5,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.example.sgrms.data.repository.StudentProfileUpdate
 import com.example.sgrms.data.repository.profileImageFields
+import com.example.sgrms.data.repository.Page
+import com.example.sgrms.data.repository.PageCursor
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -142,5 +145,37 @@ class StudentFirebaseService @Inject constructor(
             .document(studentId)
             .update("fcmToken", token)
             .await()
+    }
+
+    /**
+     * One page of students ordered by name, optionally only one class.
+     * Needs the composite index students(classId, studentName) in
+     * firestore.indexes.json when [classId] is set.
+     */
+    suspend fun getStudentsPage(
+        pageSize: Long,
+        classId: String?,
+        cursor: PageCursor?
+    ): Page<StudentModel> {
+        var query: Query = studentsCollection
+
+        if (!classId.isNullOrBlank()) {
+            query = query.whereEqualTo("classId", classId)
+        }
+
+        query = query.orderBy("studentName").limit(pageSize)
+
+        if (cursor != null) {
+            query = query.startAfter(cursor.lastDocument)
+        }
+
+        val documents = query.get().await().documents
+
+        return Page(
+            items = documents.mapNotNull { it.toObject(StudentModel::class.java)?.copy(studentId = it.id) },
+            nextCursor = documents.lastOrNull()
+                ?.takeIf { documents.size.toLong() == pageSize }
+                ?.let(::PageCursor)
+        )
     }
 }

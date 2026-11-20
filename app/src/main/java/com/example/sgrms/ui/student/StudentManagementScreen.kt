@@ -69,6 +69,8 @@ import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import java.io.File
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.viewmodel.ClassFirebaseViewModel
+import com.example.sgrms.ui.components.LoadMoreButton
 
 @Composable
 fun StudentManagementScreen(
@@ -96,18 +98,27 @@ fun StudentManagementScreen(
     var selectedStudentToDelete by remember { mutableStateOf<StudentModel?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val classViewModel: ClassFirebaseViewModel = hiltViewModel()
+    val classUiState by classViewModel.uiState.collectAsState()
+
     LaunchedEffect(Unit) {
-        studentViewModel.loadStudents()
+        classViewModel.loadClasses()
+    }
+
+    // The class filter runs on the server; changing it reloads page one.
+    val classIdByName = classUiState.classes
+        .filter { it.className.isNotBlank() }
+        .associate { it.className to it.classId }
+
+    val selectedClassId = classIdByName[selectedClass]
+
+    LaunchedEffect(selectedClassId) {
+        studentViewModel.loadFirstStudentPage(classId = selectedClassId)
     }
 
     val students = uiState.students
 
-    val classList = listOf("All Classes") + students
-        .map { student ->
-            student.className.ifBlank { "Not assigned" }
-        }
-        .distinct()
-        .sorted()
+    val classList = listOf("All Classes") + classIdByName.keys.sorted()
 
     val genderList = listOf(
         "All Gender",
@@ -143,8 +154,8 @@ fun StudentManagementScreen(
                     studentGender.contains(searchText, ignoreCase = true) ||
                     studentStatus.contains(searchText, ignoreCase = true)
 
-        val matchesClass =
-            selectedClass == "All Classes" || studentClass == selectedClass
+        // Filtered on the server by classId (see loadFirstStudentPage).
+        val matchesClass = true
 
         val matchesGender =
             selectedGender == "All Gender" || studentGender == selectedGender
@@ -200,9 +211,6 @@ fun StudentManagementScreen(
                         selectedStudentToDelete?.let { student ->
                             studentViewModel.deleteStudent(
                                 studentId = student.studentId,
-                                onSuccess = {
-                                    studentViewModel.loadStudents()
-                                }
                             )
                         }
 
@@ -456,6 +464,15 @@ fun StudentManagementScreen(
                                     showDeleteDialog = true
                                 }
                             )
+                        }
+
+                        if (uiState.hasMore) {
+                            item(key = "load_more") {
+                                LoadMoreButton(
+                                    isLoading = uiState.isLoadingMore,
+                                    onClick = { studentViewModel.loadMoreStudents() }
+                                )
+                            }
                         }
                     }
                 }

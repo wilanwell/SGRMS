@@ -63,4 +63,10 @@ class StudentFirebaseRepository @Inject constructor(
 
     suspend fun saveFcmToken(studentId: String, token: String) =
         studentFirebaseService.saveFcmToken(studentId, token)
+
+    suspend fun getStudentsPage(
+        pageSize: Long = DEFAULT_PAGE_SIZE,
+        classId: String? = null,
+        cursor: PageCursor? = null
+    ): Page<StudentModel> = studentFirebaseService.getStudentsPage(pageSize, classId, cursor)
 }

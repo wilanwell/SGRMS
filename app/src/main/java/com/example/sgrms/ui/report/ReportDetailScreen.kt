@@ -75,6 +75,7 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.ui.theme.markColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.utils.ReportCalculator
 
 data class ReportGradeDisplayItem(
     val grade: GradeModel,
@@ -189,11 +190,8 @@ fun ReportDetailScreen(
         Icons.Default.CheckCircle
     }
 
-    val generatedRemarks = buildReportDetailRemarks(
-        completedGrades = completedGrades,
-        allStudentGrades = allGrades,
-        subjects = subjects
-    )
+    val subjectNames = subjects.associate { it.subjectId to it.subjectName }
+    val generatedRemarks = ReportCalculator.buildRemarks(allGrades) { subjectNames[it] }
 
     val reportRemarks = if (additionalRemarks.isNotBlank()) {
         "$generatedRemarks\n\nAdditional remarks: $additionalRemarks"
@@ -208,7 +206,7 @@ fun ReportDetailScreen(
         averageMarks = averageMarks,
         overallGrade = overallGrade,
         remarks = reportRemarks,
-        generatedDate = getCurrentDateText()
+        generatedDate = ReportCalculator.todayText()
     )
 
     val isLoading =
@@ -921,39 +919,3 @@ fun ReportSmallInfo(
     }
 }
 
-fun buildReportDetailRemarks(
-    completedGrades: List<GradeModel>,
-    allStudentGrades: List<GradeModel>,
-    subjects: List<SubjectModel>
-): String {
-    val remarksList = completedGrades
-        .filter { grade ->
-            grade.remarks.isNotBlank()
-        }
-        .map { grade ->
-            val subject = subjects.find { subject ->
-                subject.subjectId == grade.subjectId
-            }
-
-            val subjectName = subject?.subjectName ?: "Unknown Subject"
-
-            "$subjectName: ${grade.remarks}"
-        }
-        .toMutableList()
-
-    val pendingCount = allStudentGrades.count { grade ->
-        !grade.status.equals("Complete", ignoreCase = true)
-    }
-
-    if (pendingCount > 0) {
-        remarksList.add(
-            "Needs update: $pendingCount subject grade record(s) are still pending."
-        )
-    }
-
-    return if (remarksList.isNotEmpty()) {
-        remarksList.joinToString(separator = "\n")
-    } else {
-        "No specific remarks from completed grade records."
-    }
-}

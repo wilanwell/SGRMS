@@ -2,6 +2,9 @@ package com.example.sgrms.data.firebase
 
 import com.example.sgrms.data.model.GradeModel
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.sgrms.data.repository.Page
+import com.example.sgrms.data.repository.PageCursor
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -146,5 +149,37 @@ class GradeFirebaseService @Inject constructor(
             .document(gradeId)
             .delete()
             .await()
+    }
+
+    /**
+     * One page of grades, newest first, optionally only one subject.
+     * Needs the composite index grades(subjectId, createdAt desc) in
+     * firestore.indexes.json when [subjectId] is set.
+     */
+    suspend fun getGradesPage(
+        pageSize: Long,
+        subjectId: String?,
+        cursor: PageCursor?
+    ): Page<GradeModel> {
+        var query: Query = gradesCollection
+
+        if (!subjectId.isNullOrBlank()) {
+            query = query.whereEqualTo("subjectId", subjectId)
+        }
+
+        query = query.orderBy("createdAt", Query.Direction.DESCENDING).limit(pageSize)
+
+        if (cursor != null) {
+            query = query.startAfter(cursor.lastDocument)
+        }
+
+        val documents = query.get().await().documents
+
+        return Page(
+            items = documents.mapNotNull { it.toObject(GradeModel::class.java)?.copy(gradeId = it.id) },
+            nextCursor = documents.lastOrNull()
+                ?.takeIf { documents.size.toLong() == pageSize }
+                ?.let(::PageCursor)
+        )
     }
 }

@@ -46,4 +46,10 @@ class GradeFirebaseRepository @Inject constructor(
     suspend fun deleteGrade(gradeId: String) {
         gradeFirebaseService.deleteGrade(gradeId)
     }
+
+    suspend fun getGradesPage(
+        pageSize: Long = DEFAULT_PAGE_SIZE,
+        subjectId: String? = null,
+        cursor: PageCursor? = null
+    ): Page<GradeModel> = gradeFirebaseService.getGradesPage(pageSize, subjectId, cursor)
 }
