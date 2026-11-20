@@ -59,6 +59,7 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
 
 data class StudentDashboardGradeItem(
     val gradeId: String,
@@ -171,7 +172,7 @@ fun StudentDashboardScreen(
         0.0
     }
 
-    val overallGrade = calculateOverallGrade(averageMarks)
+    val overallGrade = GradeCalculator.overallGrade(averageMarks)
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -386,16 +387,3 @@ fun StudentDashboardScreen(
     }
 }
 
-fun calculateOverallGrade(
-    averageMarks: Double
-): String {
-    return when {
-        averageMarks >= 90 -> "A+"
-        averageMarks >= 80 -> "A"
-        averageMarks >= 70 -> "B"
-        averageMarks >= 60 -> "C"
-        averageMarks >= 50 -> "D"
-        averageMarks > 0 -> "E"
-        else -> "-"
-    }
-}

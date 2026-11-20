@@ -82,6 +82,7 @@ import com.example.sgrms.ui.theme.SuccessGreen
 import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.ui.theme.WarningOrange
 import kotlinx.coroutines.launch
+import com.example.sgrms.utils.GradeCalculator
 
 data class GradeDisplayItem(
     val grade: GradeModel,
@@ -690,7 +691,7 @@ fun GradeCard(
                 ) {
                     Text(
                         text = item.grade.gradeLetter.ifBlank {
-                            calculateGradeLetter(item.grade.marks)
+                            GradeCalculator.gradeLetter(item.grade.marks)
                         },
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -821,15 +822,3 @@ fun GradeCard(
     }
 }
 
-fun calculateGradeLetter(
-    marks: Double
-): String {
-    return when {
-        marks >= 90 -> "A+"
-        marks >= 80 -> "A"
-        marks >= 70 -> "B"
-        marks >= 60 -> "C"
-        marks >= 50 -> "D"
-        else -> "E"
-    }
-}

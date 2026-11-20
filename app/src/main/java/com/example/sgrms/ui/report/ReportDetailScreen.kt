@@ -66,7 +66,6 @@ import com.example.sgrms.data.repository.GradeFirebaseRepository
 import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.grade.calculateGradeLetter
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
@@ -84,6 +83,8 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.markColor
 
 data class ReportGradeDisplayItem(
     val grade: GradeModel,
@@ -211,7 +212,7 @@ fun ReportDetailScreen(
     }
 
     val overallGrade = if (completedGrades.isNotEmpty()) {
-        calculateGradeLetter(averageMarks.toString())
+        GradeCalculator.gradeLetter(averageMarks)
     } else {
         "-"
     }
@@ -635,7 +636,7 @@ fun ReportPerformanceSummaryCard(
     overallGrade: String,
     completedSubjectCount: Int
 ) {
-    val markColor = getReportDetailMarkColor(averageMarks)
+    val markColor = markColor(averageMarks)
     val progress = (averageMarks / 100.0).toFloat().coerceIn(0f, 1f)
 
     Card(
@@ -833,7 +834,7 @@ fun ReportInfoRow(
 fun ReportGradeCard(
     item: ReportGradeDisplayItem
 ) {
-    val markColor = getReportDetailMarkColor(item.grade.marks)
+    val markColor = markColor(item.grade.marks)
     val progress = (item.grade.marks / 100.0).toFloat().coerceIn(0f, 1f)
     val statusText = item.grade.status.ifBlank { "Pending" }
 
@@ -967,17 +968,6 @@ fun ReportSmallInfo(
             fontSize = 11.sp,
             color = TextGrey
         )
-    }
-}
-
-fun getReportDetailMarkColor(
-    marks: Double
-): Color {
-    return when {
-        marks >= 80 -> SuccessGreen
-        marks >= 60 -> PrimaryBlue
-        marks >= 50 -> WarningOrange
-        else -> Color.Red
     }
 }
 

@@ -62,6 +62,8 @@ import com.example.sgrms.ui.theme.WarningOrange
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.example.sgrms.ui.theme.markColor
+import com.example.sgrms.utils.GradeCalculator
 
 data class AddStudentGradeSubjectItem(
     val subjectId: String,
@@ -225,7 +227,7 @@ fun AddStudentGradeScreen(
                 }
 
                 val gradeId = gradeDocument.id
-                val gradeLetter = calculateAddStudentGradeLetter(marks)
+                val gradeLetter = GradeCalculator.gradeLetter(marks)
                 val now = System.currentTimeMillis()
 
                 val gradeData = mapOf(
@@ -469,18 +471,12 @@ private fun AddStudentGradeSubjectCard(
 ) {
     val marks = item.marksText.toDoubleOrNull()
     val gradeLetter = if (marks != null) {
-        calculateAddStudentGradeLetter(marks)
+        GradeCalculator.gradeLetter(marks)
     } else {
         "-"
     }
 
-    val gradeColor = when {
-        marks == null -> TextGrey
-        marks >= 80 -> SuccessGreen
-        marks >= 60 -> PrimaryBlue
-        marks >= 50 -> WarningOrange
-        else -> Color.Red
-    }
+    val gradeColor = if (marks == null) TextGrey else markColor(marks)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -652,15 +648,3 @@ private fun AddStudentGradeSubjectCard(
     }
 }
 
-private fun calculateAddStudentGradeLetter(
-    marks: Double
-): String {
-    return when {
-        marks >= 90 -> "A+"
-        marks >= 80 -> "A"
-        marks >= 70 -> "B"
-        marks >= 60 -> "C"
-        marks >= 50 -> "D"
-        else -> "E"
-    }
-}

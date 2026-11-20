@@ -40,7 +40,6 @@ import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.grade.calculateGradeLetter
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
@@ -52,6 +51,7 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.example.sgrms.utils.GradeCalculator
 
 @Composable
 fun UpdateReportScreen(
@@ -134,7 +134,7 @@ fun UpdateReportScreen(
     }
 
     val overallGrade = if (completedGrades.isNotEmpty()) {
-        calculateGradeLetter(averageMarks.toString())
+        GradeCalculator.gradeLetter(averageMarks)
     } else {
         "-"
     }

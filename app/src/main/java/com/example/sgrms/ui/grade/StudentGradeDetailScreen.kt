@@ -68,6 +68,8 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.markColor
 
 data class StudentGradeSubjectDisplayItem(
     val grade: GradeModel,
@@ -169,7 +171,7 @@ fun StudentGradeDetailScreen(
     }
 
     val overallGrade = if (completedGrades.isNotEmpty()) {
-        calculateGradeLetter(averageMarks.toString())
+        GradeCalculator.gradeLetter(averageMarks)
     } else {
         "-"
     }
@@ -366,7 +368,7 @@ fun StudentGradeDetailScreen(
 fun StudentGradeSubjectCard(
     item: StudentGradeSubjectDisplayItem
 ) {
-    val markColor = getStudentGradeDetailMarkColor(item.grade.marks)
+    val markColor = markColor(item.grade.marks)
     val progress = (item.grade.marks / 100.0).toFloat().coerceIn(0f, 1f)
     val statusText = item.grade.status.ifBlank { "Pending" }
 
@@ -482,13 +484,3 @@ fun StudentGradeSubjectCard(
     }
 }
 
-fun getStudentGradeDetailMarkColor(
-    marks: Double
-): Color {
-    return when {
-        marks >= 80 -> SuccessGreen
-        marks >= 60 -> PrimaryBlue
-        marks >= 50 -> WarningOrange
-        else -> Color.Red
-    }
-}

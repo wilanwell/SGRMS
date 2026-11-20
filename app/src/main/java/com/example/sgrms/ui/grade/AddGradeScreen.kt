@@ -42,6 +42,7 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
 
 @Composable
 fun AddGradeScreen(
@@ -252,7 +253,7 @@ fun AddGradeScreen(
 
                             if (marksValue == null || marksValue <= 100.0) {
                                 marks = value
-                                gradeLetter = calculateGradeLetter(value)
+                                gradeLetter = GradeCalculator.gradeLetter(value)
                                 marksError = false
                                 clearMessages()
                             }
@@ -334,7 +335,7 @@ fun AddGradeScreen(
                                 studentId = selectedStudentId,
                                 subjectId = selectedSubjectId,
                                 marks = marksValue,
-                                gradeLetter = calculateGradeLetter(marks),
+                                gradeLetter = GradeCalculator.gradeLetter(marks),
                                 remarks = remarks.trim(),
                                 status = "Complete",
                                 createdByTeacherId = "",
@@ -353,15 +354,3 @@ fun AddGradeScreen(
     }
 }
 
-fun calculateGradeLetter(marksText: String): String {
-    val marks = marksText.toDoubleOrNull() ?: return ""
-
-    return when {
-        marks >= 90 -> "A+"
-        marks >= 80 -> "A"
-        marks >= 70 -> "B"
-        marks >= 60 -> "C"
-        marks >= 50 -> "D"
-        else -> "E"
-    }
-}

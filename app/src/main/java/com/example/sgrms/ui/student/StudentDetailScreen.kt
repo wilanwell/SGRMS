@@ -69,6 +69,8 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.markColor
 
 data class StudentDetailSubjectItem(
     val subjectName: String,
@@ -170,14 +172,10 @@ fun StudentDetailScreen(
         0.0
     }
 
-    val overallGrade = when {
-        averageMarks >= 80 -> "A"
-        averageMarks >= 70 -> "B"
-        averageMarks >= 60 -> "C"
-        averageMarks >= 50 -> "D"
-        subjectResults.isEmpty() -> "-"
-        else -> "E"
-    }
+    val overallGrade = GradeCalculator.overallGrade(
+        averageMarks = averageMarks,
+        hasGrades = subjectResults.isNotEmpty()
+    )
 
     val isLoading =
         studentUiState.isLoading ||
@@ -581,7 +579,7 @@ fun StudentDetailSubjectRow(
                 Text(
                     text = "${subject.subjectCode} • Grade ${subject.grade.ifBlank { "-" }}",
                     fontSize = 13.sp,
-                    color = getStudentGradeColor(subject.marks),
+                    color = markColor(subject.marks),
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -590,7 +588,7 @@ fun StudentDetailSubjectRow(
                 text = "%.2f%%".format(subject.marks),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = getStudentGradeColor(subject.marks)
+                color = markColor(subject.marks)
             )
         }
 
@@ -603,20 +601,9 @@ fun StudentDetailSubjectRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),
-            color = getStudentGradeColor(subject.marks),
+            color = markColor(subject.marks),
             trackColor = BackgroundGrey
         )
     }
 }
 
-fun getStudentGradeColor(
-    marks: Double
-): Color {
-    return when {
-        marks >= 80 -> SuccessGreen
-        marks >= 70 -> PrimaryBlue
-        marks >= 60 -> Color(0xFFFF9800)
-        marks >= 50 -> Color(0xFFFF5722)
-        else -> Color.Red
-    }
-}

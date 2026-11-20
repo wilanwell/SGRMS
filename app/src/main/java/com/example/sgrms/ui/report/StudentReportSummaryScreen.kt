@@ -58,7 +58,6 @@ import com.example.sgrms.data.repository.GradeFirebaseRepository
 import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.grade.calculateGradeLetter
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
@@ -79,6 +78,8 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
+import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.markColor
 
 data class StudentReportSubjectItem(
     val grade: GradeModel,
@@ -178,12 +179,12 @@ fun StudentReportSummaryScreen(
     }
 
     val overallGrade = if (completedSubjectItems.isNotEmpty()) {
-        calculateGradeLetter(averageMarks.toString())
+        GradeCalculator.gradeLetter(averageMarks)
     } else {
         "-"
     }
 
-    val performanceStatus = getStudentPerformanceStatus(
+    val performanceStatus = GradeCalculator.performanceStatus(
         averageMarks = averageMarks,
         hasGrades = completedSubjectItems.isNotEmpty()
     )
@@ -447,7 +448,7 @@ fun StudentMainPerformanceCard(
     performanceStatus: String
 ) {
     val progress = (averageMarks / 100.0).toFloat().coerceIn(0f, 1f)
-    val gradeColor = getStudentReportMarkColor(averageMarks)
+    val gradeColor = markColor(averageMarks)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -654,7 +655,7 @@ fun StudentReportRemarksCard(
 fun StudentReportSubjectCard(
     item: StudentReportSubjectItem
 ) {
-    val markColor = getStudentReportMarkColor(item.grade.marks)
+    val markColor = markColor(item.grade.marks)
     val progress = (item.grade.marks / 100.0).toFloat().coerceIn(0f, 1f)
 
     Card(
@@ -791,34 +792,6 @@ fun StudentReportMiniInfo(
             fontSize = 11.sp,
             color = TextGrey
         )
-    }
-}
-
-fun getStudentPerformanceStatus(
-    averageMarks: Double,
-    hasGrades: Boolean
-): String {
-    if (!hasGrades) {
-        return "-"
-    }
-
-    return when {
-        averageMarks >= 80 -> "Excellent"
-        averageMarks >= 70 -> "Good"
-        averageMarks >= 60 -> "Satisfactory"
-        averageMarks >= 50 -> "Needs Improvement"
-        else -> "At Risk"
-    }
-}
-
-fun getStudentReportMarkColor(
-    marks: Double
-): Color {
-    return when {
-        marks >= 80 -> SuccessGreen
-        marks >= 60 -> PrimaryBlue
-        marks >= 50 -> WarningOrange
-        else -> Color.Red
     }
 }
 

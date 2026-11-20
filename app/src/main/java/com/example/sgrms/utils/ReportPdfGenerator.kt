@@ -563,7 +563,7 @@ object ReportPdfGenerator {
             )
         }
 
-        val status = getPerformanceStatus(report.averageMarks)
+        val status = GradeCalculator.performanceStatus(report.averageMarks)
         val statusColor = getStatusColor(report.averageMarks)
 
         val statusPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -975,19 +975,6 @@ object ReportPdfGenerator {
         }
 
         return lines
-    }
-
-    private fun getPerformanceStatus(
-        averageMarks: Double
-    ): String {
-        return when {
-            averageMarks >= 80 -> "Excellent"
-            averageMarks >= 70 -> "Good"
-            averageMarks >= 60 -> "Satisfactory"
-            averageMarks >= 50 -> "Needs Improvement"
-            averageMarks > 0 -> "At Risk"
-            else -> "-"
-        }
     }
 
     private fun getStatusColor(

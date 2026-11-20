@@ -80,7 +80,6 @@ import com.example.sgrms.data.repository.StudentFirebaseRepository
 import com.example.sgrms.data.repository.SubjectFirebaseRepository
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.grade.calculateGradeLetter
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
@@ -99,6 +98,8 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.markColor
 
 data class ReportDisplayItem(
     val report: ReportPdfData,
@@ -259,7 +260,7 @@ fun ReportScreen(
             }
 
             val overallGrade = if (completedGrades.isNotEmpty()) {
-                calculateGradeLetter(averageMarks.toString())
+                GradeCalculator.gradeLetter(averageMarks)
             } else {
                 "-"
             }
@@ -757,7 +758,7 @@ fun ReportCard(
                         text = item.report.overallGrade,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = getReportGradeColor(item.report.averageMarks)
+                        color = markColor(item.report.averageMarks)
                     )
 
                     Text(
@@ -1042,17 +1043,6 @@ fun ReportDialogDropdown(
                 )
             }
         }
-    }
-}
-
-fun getReportGradeColor(
-    percentage: Double
-): Color {
-    return when {
-        percentage >= 80 -> SuccessGreen
-        percentage >= 70 -> PrimaryBlue
-        percentage >= 60 -> WarningOrange
-        else -> Color.Red
     }
 }
 

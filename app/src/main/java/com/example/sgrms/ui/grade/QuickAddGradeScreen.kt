@@ -79,6 +79,7 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
 
 @Composable
 fun QuickAddGradeScreen(
@@ -466,7 +467,7 @@ fun QuickAddGradeScreen(
                                                 studentId = student.studentId,
                                                 subjectId = selectedSubjectId,
                                                 marks = marks,
-                                                gradeLetter = calculateGradeLetter(marks.toString()),
+                                                gradeLetter = GradeCalculator.gradeLetter(marks),
                                                 status = "Complete",
                                                 remarks = "",
                                                 createdByTeacherId = "",
@@ -547,7 +548,7 @@ fun QuickGradeStudentCard(
     val marksValue = marks.toDoubleOrNull()
 
     val gradeLetter = if (marksValue != null) {
-        calculateGradeLetter(marksValue.toString())
+        GradeCalculator.gradeLetter(marksValue)
     } else {
         "-"
     }

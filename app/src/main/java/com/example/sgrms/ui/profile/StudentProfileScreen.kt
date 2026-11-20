@@ -48,13 +48,13 @@ import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.grade.calculateGradeLetter
 import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.example.sgrms.utils.GradeCalculator
 
 @Composable
 fun StudentProfileScreen(
@@ -159,7 +159,7 @@ fun StudentProfileScreen(
     }
 
     val overallGrade = if (completedGrades.isNotEmpty()) {
-        calculateGradeLetter(averageMarks.toString())
+        GradeCalculator.gradeLetter(averageMarks)
     } else {
         "-"
     }

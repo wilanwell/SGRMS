@@ -44,6 +44,7 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModelFactory
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModelFactory
+import com.example.sgrms.utils.GradeCalculator
 
 @Composable
 fun EditGradeScreen(
@@ -320,7 +321,7 @@ fun EditGradeScreen(
 
                             if (marksValue == null || marksValue <= 100.0) {
                                 marks = value
-                                gradeLetter = calculateGradeLetter(value)
+                                gradeLetter = GradeCalculator.gradeLetter(value)
                                 marksError = false
                                 clearMessages()
                             }
@@ -427,7 +428,7 @@ fun EditGradeScreen(
                                 studentId = selectedStudentId,
                                 subjectId = selectedSubjectId,
                                 marks = marksValue,
-                                gradeLetter = calculateGradeLetter(marks),
+                                gradeLetter = GradeCalculator.gradeLetter(marks),
                                 status = selectedStatus,
                                 remarks = remarks.trim(),
                                 createdByTeacherId = selectedGrade?.createdByTeacherId ?: "",
