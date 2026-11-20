@@ -1,0 +1,473 @@
+package com.example.sgrms.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.sgrms.data.model.GradeModel
+import com.example.sgrms.data.model.NotificationModel
+import com.example.sgrms.data.repository.GradeFirebaseRepository
+import com.example.sgrms.data.repository.NotificationFirebaseRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+data class GradeFirebaseUiState(
+    val grades: List<GradeModel> = emptyList(),
+    val selectedGrade: GradeModel? = null,
+    val isLoading: Boolean = false,
+    val errorMessage: String = "",
+    val successMessage: String = ""
+)
+
+data class GradeBulkEntry(
+    val studentId: String,
+    val subjectId: String,
+    val marks: Double,
+    val gradeLetter: String,
+    val status: String,
+    val remarks: String = "",
+    val createdByTeacherId: String = "",
+    val subjectName: String = ""
+)
+
+class GradeFirebaseViewModel(
+    private val gradeRepository: GradeFirebaseRepository,
+    private val notificationRepository: NotificationFirebaseRepository? = null
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(GradeFirebaseUiState())
+    val uiState: StateFlow<GradeFirebaseUiState> = _uiState.asStateFlow()
+
+    fun loadGrades() {
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                val grades = gradeRepository.getAllGrades()
+
+                _uiState.value = _uiState.value.copy(
+                    grades = grades,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to load grades"
+                )
+            }
+        }
+    }
+
+    fun loadGradeById(
+        gradeId: String
+    ) {
+        if (gradeId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                selectedGrade = null,
+                errorMessage = "Invalid grade ID"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                val grade = gradeRepository.getGradeById(gradeId)
+
+                _uiState.value = _uiState.value.copy(
+                    selectedGrade = grade,
+                    isLoading = false,
+                    errorMessage = if (grade == null) {
+                        "Grade not found"
+                    } else {
+                        ""
+                    }
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to load grade"
+                )
+            }
+        }
+    }
+
+    fun loadGradesByStudentId(
+        studentId: String
+    ) {
+        if (studentId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                grades = emptyList(),
+                errorMessage = "Invalid student ID"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                val grades = gradeRepository.getGradesByStudentId(studentId)
+
+                _uiState.value = _uiState.value.copy(
+                    grades = grades,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to load student grades"
+                )
+            }
+        }
+    }
+
+    fun loadGradesBySubjectId(
+        subjectId: String
+    ) {
+        if (subjectId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                grades = emptyList(),
+                errorMessage = "Invalid subject ID"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                val grades = gradeRepository.getGradesBySubjectId(subjectId)
+
+                _uiState.value = _uiState.value.copy(
+                    grades = grades,
+                    isLoading = false
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to load subject grades"
+                )
+            }
+        }
+    }
+
+    fun addGrade(
+        grade: GradeModel,
+        onSuccess: () -> Unit = {}
+    ) {
+        if (grade.studentId.isBlank() || grade.subjectId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Student and subject are required"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                gradeRepository.addGrade(grade)
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Grade added successfully"
+                )
+
+                loadGrades()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to add grade"
+                )
+            }
+        }
+    }
+
+    fun saveBulkGrades(
+        gradeEntries: List<GradeBulkEntry>,
+        onSuccess: () -> Unit = {}
+    ) {
+        if (gradeEntries.isEmpty()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "No grades to save"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                gradeEntries.forEach { entry ->
+                    if (entry.studentId.isNotBlank() && entry.subjectId.isNotBlank()) {
+                        val existingGrade = gradeRepository.getGradeByStudentAndSubject(
+                            studentId = entry.studentId,
+                            subjectId = entry.subjectId
+                        )
+
+                        if (existingGrade == null) {
+                            val newGrade = GradeModel(
+                                studentId = entry.studentId,
+                                subjectId = entry.subjectId,
+                                marks = entry.marks,
+                                gradeLetter = entry.gradeLetter,
+                                status = entry.status,
+                                remarks = entry.remarks,
+                                createdByTeacherId = entry.createdByTeacherId,
+                                createdAt = System.currentTimeMillis()
+                            )
+
+                            gradeRepository.addGrade(newGrade)
+                        } else {
+                            val updatedGrade = existingGrade.copy(
+                                marks = entry.marks,
+                                gradeLetter = entry.gradeLetter,
+                                status = entry.status,
+                                remarks = entry.remarks,
+                                createdByTeacherId = entry.createdByTeacherId.ifBlank {
+                                    existingGrade.createdByTeacherId
+                                }
+                            )
+
+                            gradeRepository.updateGrade(updatedGrade)
+
+                            createGradeUpdatedNotification(
+                                grade = updatedGrade,
+                                subjectName = entry.subjectName
+                            )
+                        }
+                    }
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Grades saved successfully"
+                )
+
+                loadGrades()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to save grades"
+                )
+            }
+        }
+    }
+
+    fun addOrUpdateGradeByStudentAndSubject(
+        studentId: String,
+        subjectId: String,
+        marks: Double,
+        gradeLetter: String,
+        status: String,
+        remarks: String,
+        createdByTeacherId: String = "",
+        onSuccess: () -> Unit = {}
+    ) {
+        if (studentId.isBlank() || subjectId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Student and subject are required"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                val existingGrade = gradeRepository.getGradeByStudentAndSubject(
+                    studentId = studentId,
+                    subjectId = subjectId
+                )
+
+                if (existingGrade == null) {
+                    val newGrade = GradeModel(
+                        studentId = studentId,
+                        subjectId = subjectId,
+                        marks = marks,
+                        gradeLetter = gradeLetter,
+                        status = status,
+                        remarks = remarks,
+                        createdByTeacherId = createdByTeacherId,
+                        createdAt = System.currentTimeMillis()
+                    )
+
+                    gradeRepository.addGrade(newGrade)
+                } else {
+                    val updatedGrade = existingGrade.copy(
+                        marks = marks,
+                        gradeLetter = gradeLetter,
+                        status = status,
+                        remarks = remarks,
+                        createdByTeacherId = createdByTeacherId.ifBlank {
+                            existingGrade.createdByTeacherId
+                        }
+                    )
+
+                    gradeRepository.updateGrade(updatedGrade)
+
+                    createGradeUpdatedNotification(
+                        grade = updatedGrade,
+                        subjectName = ""
+                    )
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Grade saved successfully"
+                )
+
+                loadGrades()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to save grade"
+                )
+            }
+        }
+    }
+
+    fun updateGrade(
+        grade: GradeModel,
+        subjectName: String = "",
+        onSuccess: () -> Unit = {}
+    ) {
+        if (grade.studentId.isBlank() || grade.subjectId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Student and subject are required"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                gradeRepository.updateGrade(grade)
+
+                createGradeUpdatedNotification(
+                    grade = grade,
+                    subjectName = subjectName
+                )
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Grade updated successfully"
+                )
+
+                loadGrades()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to update grade"
+                )
+            }
+        }
+    }
+
+    fun deleteGrade(
+        gradeId: String,
+        onSuccess: () -> Unit = {}
+    ) {
+        if (gradeId.isBlank()) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "Invalid grade ID"
+            )
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = true,
+                    errorMessage = "",
+                    successMessage = ""
+                )
+
+                gradeRepository.deleteGrade(gradeId)
+
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    successMessage = "Grade deleted successfully"
+                )
+
+                loadGrades()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Failed to delete grade"
+                )
+            }
+        }
+    }
+
+    private suspend fun createGradeUpdatedNotification(
+        grade: GradeModel,
+        subjectName: String = ""
+    ) {
+        val repository = notificationRepository ?: return
+
+        val displaySubjectName = subjectName.ifBlank {
+            "your subject"
+        }
+
+        repository.addNotification(
+            NotificationModel(
+                studentId = grade.studentId,
+                title = "Subject Grade Updated",
+                message = "Your grade for $displaySubjectName has been updated. Marks: ${grade.marks}, Grade: ${grade.gradeLetter}.",
+                type = "GRADE_UPDATED",
+                relatedGradeId = grade.gradeId,
+                relatedSubjectId = grade.subjectId,
+                isRead = false,
+                createdAt = System.currentTimeMillis()
+            )
+        )
+    }
+
+    fun clearMessage() {
+        _uiState.value = _uiState.value.copy(
+            errorMessage = "",
+            successMessage = ""
+        )
+    }
+}

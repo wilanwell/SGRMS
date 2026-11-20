@@ -1,0 +1,28 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Node / Firebase
+node_modules/
+functions/lib/
+firebase-debug*.log
+firestore-debug.log
+ui-debug.log
+
+# Kotlin
+.kotlin/
+
+# Stray archives inside source
+app/src/main/java/**/*.zip

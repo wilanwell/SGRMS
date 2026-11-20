@@ -1,0 +1,170 @@
+rules_version = '2';
+
+// SGRMS Firestore Security Rules
+//
+// Roles come from users/{uid}.role ("Admin", "Teacher", "Student").
+// Nobody can change their own role from the app: login accounts and their
+// users / teachers / students documents are created and deleted only by the
+// Cloud Functions (createTeacherAccount, createStudentAccount,
+// deleteUserAccount), which use the Admin SDK and bypass these rules.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----- Helpers -------------------------------------------------------
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function profilePath() {
+      return /databases/$(database)/documents/users/$(request.auth.uid);
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(profilePath());
+    }
+
+    function me() {
+      return get(profilePath()).data;
+    }
+
+    function isAdmin() {
+      return hasProfile() && me().role == "Admin";
+    }
+
+    function isTeacher() {
+      return hasProfile() && me().role == "Teacher";
+    }
+
+    function isStaff() {
+      return isAdmin() || isTeacher();
+    }
+
+    function isStudent() {
+      return hasProfile() && me().role == "Student";
+    }
+
+    function myStudentId() {
+      return me().get("studentId", "");
+    }
+
+    function myTeacherId() {
+      return me().get("teacherId", "");
+    }
+
+    function isOwnStudent(studentId) {
+      return isStudent() && myStudentId() != "" && studentId == myStudentId();
+    }
+
+    // Only the listed fields are changed by this update.
+    function onlyChanges(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    // The given field keeps its current value.
+    function unchanged(field) {
+      return request.resource.data.get(field, null) == resource.data.get(field, null);
+    }
+
+    // ----- users ---------------------------------------------------------
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isStaff());
+
+      // Created / deleted only by Cloud Functions.
+      allow create, delete: if false;
+
+      allow update: if
+        // Admin may edit profiles but never change a role or a linked id.
+        (isAdmin() && unchanged("role") && unchanged("userId")
+          && unchanged("studentId") && unchanged("teacherId"))
+        // Everyone may edit the personal fields of their own profile.
+        || (request.auth.uid == userId && onlyChanges([
+              "fullName", "username", "phoneNumber", "address",
+              "profileNote", "profileImageBase64", "updatedAt"
+            ]))
+        // A teacher may keep a student's name / email in sync.
+        || (isTeacher() && resource.data.role == "Student"
+            && onlyChanges(["fullName", "email", "updatedAt"]));
+    }
+
+    // ----- teachers ------------------------------------------------------
+
+    match /teachers/{teacherId} {
+      allow read: if signedIn();
+      allow create, delete: if false;
+
+      allow update: if
+        (isAdmin() && unchanged("userId") && unchanged("teacherId"))
+        || (isTeacher() && teacherId == myTeacherId() && onlyChanges([
+              "phoneNumber", "department", "position", "officeLocation",
+              "qualification", "specialization", "address", "profileNote",
+              "profileImageBase64", "updatedAt"
+            ]));
+    }
+
+    // ----- students ------------------------------------------------------
+
+    match /students/{studentId} {
+      allow read: if isStaff() || isOwnStudent(studentId);
+      allow create, delete: if false;
+
+      allow update: if
+        (isStaff() && unchanged("userId") && unchanged("studentId"))
+        || (isOwnStudent(studentId) && onlyChanges([
+              "phoneNumber", "dateOfBirth", "address", "guardianName",
+              "guardianPhone", "emergencyContact", "profileNote",
+              "profileImageBase64", "fcmToken", "updatedAt"
+            ]));
+    }
+
+    // ----- classes & subjects -------------------------------------------
+
+    match /classes/{classId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if signedIn();
+      allow write: if isStaff();
+    }
+
+    // ----- grades --------------------------------------------------------
+
+    match /grades/{gradeId} {
+      // A student can only read (and query) their own grades:
+      // the app must filter with whereEqualTo("studentId", <own id>).
+      allow read: if isStaff() || isOwnStudent(resource.data.studentId);
+      allow write: if isStaff();
+    }
+
+    // ----- notifications -------------------------------------------------
+
+    match /notifications/{notificationId} {
+      allow read: if isStaff() || isOwnStudent(resource.data.studentId);
+      allow create: if isStaff();
+
+      allow update: if isStaff()
+        || (isOwnStudent(resource.data.studentId)
+            && onlyChanges(["isRead", "read"]));
+
+      allow delete: if isStaff() || isOwnStudent(resource.data.studentId);
+    }
+
+    // ----- reports -------------------------------------------------------
+
+    match /reportRemarks/{studentId} {
+      allow read: if isStaff() || isOwnStudent(studentId);
+      allow write: if isStaff();
+    }
+
+    match /reports/{reportId} {
+      allow read: if isStaff() || isOwnStudent(resource.data.studentId);
+      allow write: if isStaff();
+    }
+
+    // Everything else is denied by default.
+  }
+}

@@ -1,0 +1,13 @@
+package com.example.sgrms.data.model
+
+data class ReportModel(
+    val reportId: String = "",
+    val studentId: String = "",
+    val userId: String = "",
+    val totalMarks: Double = 0.0,
+    val averageMarks: Double = 0.0,
+    val overallGrade: String = "",
+    val remarks: String = "",
+    val generatedDate: String = "",
+    val createdAt: Long = System.currentTimeMillis()
+)
