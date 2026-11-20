@@ -48,10 +48,8 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.Locale
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.StudentProfileViewModel
@@ -582,39 +580,5 @@ fun EditStudentProfileScreen(
                 }
             }
         }
-    }
-}
-
-private fun formatStudentDateOfBirth(
-    day: Int,
-    month: Int,
-    year: Int
-): String {
-    return String.format(
-        Locale.getDefault(),
-        "%02d/%02d/%04d",
-        day,
-        month + 1,
-        year
-    )
-}
-
-private fun parseStudentDateOfBirth(
-    value: String
-): Date? {
-    return try {
-        if (value.isBlank()) {
-            null
-        } else {
-            val formatter = SimpleDateFormat(
-                "dd/MM/yyyy",
-                Locale.getDefault()
-            )
-
-            formatter.isLenient = false
-            formatter.parse(value)
-        }
-    } catch (exception: Exception) {
-        null
     }
 }

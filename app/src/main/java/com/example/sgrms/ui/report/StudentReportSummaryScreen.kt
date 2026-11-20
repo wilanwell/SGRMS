@@ -2,61 +2,40 @@ package com.example.sgrms.ui.report
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.data.model.GradeModel
-import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.TopBar
 import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
 import com.example.sgrms.utils.ReportPdfData
@@ -64,21 +43,10 @@ import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.ReportRemarksViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import com.example.sgrms.utils.GradeCalculator
-import com.example.sgrms.ui.theme.markColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.utils.ReportCalculator
-
-data class StudentReportSubjectItem(
-    val grade: GradeModel,
-    val subjectName: String,
-    val subjectCode: String
-)
 
 @Composable
 fun StudentReportSummaryScreen(
@@ -327,437 +295,3 @@ fun StudentReportSummaryScreen(
         }
     }
 }
-
-@Composable
-fun StudentReportHeaderCard(
-    student: StudentModel?,
-    reportDate: String
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(58.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.18f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Student",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(14.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = student?.studentName?.ifBlank { "Unknown Student" }
-                            ?: "Unknown Student",
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-
-                    Text(
-                        text = "${student?.studentCode?.ifBlank { "-" } ?: "-"} • ${student?.className?.ifBlank { "Not assigned" } ?: "Not assigned"}",
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.88f)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarMonth,
-                    contentDescription = "Report Date",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Report Date: $reportDate",
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StudentMainPerformanceCard(
-    averageMarks: Double,
-    overallGrade: String,
-    totalSubjects: Int,
-    totalMarks: Double,
-    performanceStatus: String
-) {
-    val progress = (averageMarks / 100.0).toFloat().coerceIn(0f, 1f)
-    val gradeColor = markColor(averageMarks)
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(18.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.TrendingUp,
-                    contentDescription = "Performance",
-                    tint = PrimaryBlue,
-                    modifier = Modifier.size(28.dp)
-                )
-
-                Spacer(modifier = Modifier.size(10.dp))
-
-                Column {
-                    Text(
-                        text = "Academic Performance",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "Summary based on completed subjects",
-                        fontSize = 13.sp,
-                        color = TextGrey
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Column {
-                    Text(
-                        text = "%.1f%%".format(averageMarks),
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = gradeColor
-                    )
-
-                    Text(
-                        text = "Average Marks",
-                        fontSize = 13.sp,
-                        color = TextGrey
-                    )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = overallGrade,
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = gradeColor
-                    )
-
-                    Text(
-                        text = "Overall Grade",
-                        fontSize = 13.sp,
-                        color = TextGrey
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LinearProgressIndicator(
-                progress = {
-                    progress
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(9.dp),
-                color = gradeColor,
-                trackColor = BackgroundGrey
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                StudentReportMiniInfo(
-                    label = "Subjects",
-                    value = totalSubjects.toString()
-                )
-
-                StudentReportMiniInfo(
-                    label = "Total Marks",
-                    value = "%.0f".format(totalMarks)
-                )
-
-                StudentReportMiniInfo(
-                    label = "Status",
-                    value = performanceStatus
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StudentReportSummaryCard(
-    title: String,
-    value: String,
-    icon: ImageVector,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.height(108.dp),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = PrimaryBlue,
-                modifier = Modifier.size(26.dp)
-            )
-
-            Column {
-                Text(
-                    text = value,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = title,
-                    fontSize = 13.sp,
-                    color = TextGrey
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StudentReportRemarksCard(
-    remarks: String
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Remarks",
-                    tint = PrimaryBlue,
-                    modifier = Modifier.size(24.dp)
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Report Remarks",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = remarks.ifBlank { "No remarks available." },
-                fontSize = 14.sp,
-                color = TextGrey,
-                lineHeight = 20.sp
-            )
-        }
-    }
-}
-
-@Composable
-fun StudentReportSubjectCard(
-    item: StudentReportSubjectItem
-) {
-    val markColor = markColor(item.grade.marks)
-    val progress = (item.grade.marks / 100.0).toFloat().coerceIn(0f, 1f)
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.MenuBook,
-                        contentDescription = "Subject",
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(26.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(12.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = item.subjectName.ifBlank { "Unknown Subject" },
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = item.subjectCode.ifBlank { "-" },
-                        fontSize = 13.sp,
-                        color = TextGrey
-                    )
-                }
-
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = item.grade.gradeLetter.ifBlank { "-" },
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = markColor
-                    )
-
-                    Text(
-                        text = "${item.grade.marks.roundToInt()}%",
-                        fontSize = 14.sp,
-                        color = TextGrey
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            LinearProgressIndicator(
-                progress = {
-                    progress
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp),
-                color = markColor,
-                trackColor = BackgroundGrey
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            HorizontalDivider(color = BackgroundGrey)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                StudentReportMiniInfo(
-                    label = "Marks",
-                    value = "%.1f".format(item.grade.marks)
-                )
-
-                StudentReportMiniInfo(
-                    label = "Grade",
-                    value = item.grade.gradeLetter.ifBlank { "-" }
-                )
-
-                StudentReportMiniInfo(
-                    label = "Status",
-                    value = item.grade.status.ifBlank { "Pending" }
-                )
-            }
-
-            if (item.grade.remarks.isNotBlank()) {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "Remarks: ${item.grade.remarks}",
-                    fontSize = 13.sp,
-                    color = TextGrey
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StudentReportMiniInfo(
-    label: String,
-    value: String
-) {
-    Column {
-        Text(
-            text = value,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = PrimaryBlue
-        )
-
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            color = TextGrey
-        )
-    }
-}
-
