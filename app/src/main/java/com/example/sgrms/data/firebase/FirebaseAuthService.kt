@@ -64,6 +64,11 @@ class FirebaseAuthService @Inject constructor(
         firebaseAuth.signOut()
     }
 
+    /** Asks Firebase Auth to e-mail a password reset link. */
+    suspend fun sendPasswordResetEmail(email: String) {
+        firebaseAuth.sendPasswordResetEmail(email).await()
+    }
+
     /** Re-authenticates with the current password, then sets a new one. */
     suspend fun changePassword(
         currentPassword: String,

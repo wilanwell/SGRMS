@@ -35,6 +35,10 @@ class AuthRepository @Inject constructor(
         firebaseAuthService.logoutUser()
     }
 
+    suspend fun sendPasswordResetEmail(email: String) {
+        firebaseAuthService.sendPasswordResetEmail(email)
+    }
+
     suspend fun changePassword(
         currentPassword: String,
         newPassword: String

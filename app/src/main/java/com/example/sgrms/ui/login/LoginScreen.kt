@@ -16,7 +16,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -48,11 +47,15 @@ import com.example.sgrms.ui.theme.BackgroundGrey
 import com.example.sgrms.ui.theme.CardWhite
 import com.example.sgrms.ui.theme.PrimaryBlue
 import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.components.DarkStatusBarIcons
+import com.example.sgrms.utils.isValidEmail
 import com.example.sgrms.viewmodel.AuthViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 @Composable
 fun LoginScreen() {
+    DarkStatusBarIcons()
+
     val authViewModel: AuthViewModel = hiltViewModel()
 
     val authUiState by authViewModel.loginUiState.collectAsState()
@@ -67,36 +70,9 @@ fun LoginScreen() {
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
 
     if (showForgotPasswordDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showForgotPasswordDialog = false
-            },
-            title = {
-                Text(
-                    text = "Forgot Password",
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "Please contact the administrator to reset your password.",
-                    fontSize = 14.sp,
-                    color = TextGrey
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showForgotPasswordDialog = false
-                    }
-                ) {
-                    Text(
-                        text = "OK",
-                        color = PrimaryBlue,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+        ForgotPasswordDialog(
+            initialEmail = email,
+            onDismiss = { showForgotPasswordDialog = false }
         )
     }
 
@@ -190,7 +166,10 @@ fun LoginScreen() {
                         isError = emailError,
                         supportingText = {
                             if (emailError) {
-                                Text("Email is required")
+                                Text(
+                                    if (email.isBlank()) "Email is required"
+                                    else "Enter a valid email address"
+                                )
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
@@ -274,7 +253,7 @@ fun LoginScreen() {
 
                     Button(
                         onClick = {
-                            emailError = email.isBlank()
+                            emailError = !isValidEmail(email)
                             passwordError = password.isBlank()
 
                             val isValid = !emailError && !passwordError
