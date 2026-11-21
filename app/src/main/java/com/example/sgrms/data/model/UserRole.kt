@@ -2,7 +2,7 @@ package com.example.sgrms.data.model
 
 /**
  * Account roles. [value] is the exact string stored in users/{uid}.role and
- * checked by firestore.rules and the Cloud Functions, so never rename it.
+ * checked by firestore.rules, so never rename it.
  */
 enum class UserRole(val value: String) {
     ADMIN("Admin"),

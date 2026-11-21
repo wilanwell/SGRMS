@@ -1,15 +1,8 @@
 package com.example.sgrms.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import com.example.sgrms.MainActivity
-import com.example.sgrms.R
 import com.example.sgrms.data.repository.DeviceTokenRepository
 import com.example.sgrms.data.session.SessionManager
+import com.example.sgrms.notifications.GradeNotifications
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,56 +51,12 @@ class SgrmsFirebaseMessagingService : FirebaseMessagingService() {
             ?: message.data["body"]
             ?: "You have a new notification."
 
-        showNotification(
+        GradeNotifications.show(
+            context = this,
             title = title,
-            body = body
+            body = body,
+            notificationKey = message.data["notificationId"] ?: message.messageId.orEmpty()
         )
     }
 
-    private fun showNotification(
-        title: String,
-        body: String
-    ) {
-        val channelId = "sgrms_grade_notifications"
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Grade Notifications",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(body)
-            )
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .build()
-
-        notificationManager.notify(
-            System.currentTimeMillis().toInt(),
-            notification
-        )
-    }
 }

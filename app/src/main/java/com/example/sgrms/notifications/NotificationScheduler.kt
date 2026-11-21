@@ -1,0 +1,44 @@
+package com.example.sgrms.notifications
+
+import android.content.Context
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/** Starts / stops the periodic [NotificationCheckWorker] for a student session. */
+@Singleton
+class NotificationScheduler @Inject constructor(
+    @param:ApplicationContext private val context: Context
+) {
+
+    fun startForStudent() {
+        val request = PeriodicWorkRequestBuilder<NotificationCheckWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            WORK_NAME,
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
+    }
+
+    fun stop() {
+        WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
+        NotificationCheckStore(context).clear()
+    }
+
+    private companion object {
+        const val WORK_NAME = "sgrms-notification-check"
+    }
+}

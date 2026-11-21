@@ -1,6 +1,6 @@
 package com.example.sgrms.data.repository
 
-import com.example.sgrms.data.firebase.AccountFunctionsService
+import com.example.sgrms.data.firebase.AccountService
 import com.example.sgrms.data.model.UserModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -19,7 +19,7 @@ data class UserProfileUpdate(
 @Singleton
 class UserFirebaseRepository @Inject constructor(
     firestore: FirebaseFirestore,
-    private val accountFunctions: AccountFunctionsService
+    private val accountService: AccountService
 ) {
     private val usersCollection = firestore.collection("users")
 
@@ -34,9 +34,9 @@ class UserFirebaseRepository @Inject constructor(
             .sortedBy { it.fullName.lowercase() }
     }
 
-    /** Deletes the login account, profile and related records (Cloud Function). */
+    /** Deletes the profile and related records (see AccountService.deleteAccount). */
     suspend fun deleteAccount(userId: String) {
-        accountFunctions.deleteAccount(userId = userId)
+        accountService.deleteAccount(userId = userId)
     }
 
     suspend fun getUser(userId: String): UserModel? {

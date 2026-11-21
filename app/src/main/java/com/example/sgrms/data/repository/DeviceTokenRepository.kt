@@ -7,7 +7,8 @@ import javax.inject.Singleton
 
 /**
  * Keeps the student's FCM token on students/{studentId}.fcmToken so the
- * Cloud Function sendNotificationPush can reach this phone.
+ * optional Cloud Function sendNotificationPush (Blaze plan only) can reach
+ * this phone. On Spark, NotificationCheckWorker shows notifications instead.
  */
 @Singleton
 class DeviceTokenRepository @Inject constructor(

@@ -66,8 +66,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
     implementation("com.google.firebase:firebase-messaging")
-    implementation("com.google.firebase:firebase-functions")
-    implementation("com.google.firebase:firebase-storage")
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)

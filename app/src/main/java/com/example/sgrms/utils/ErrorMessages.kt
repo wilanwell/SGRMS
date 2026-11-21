@@ -6,9 +6,9 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestoreException
-import com.google.firebase.functions.FirebaseFunctionsException
 
 /**
  * Turns an exception into a message that is safe and useful to show to the
@@ -32,6 +32,9 @@ fun Throwable.toUserMessage(fallback: String = "Something went wrong. Please try
         is FirebaseAuthWeakPasswordException ->
             "Password is too weak. Use at least 6 characters."
 
+        is FirebaseAuthUserCollisionException ->
+            "This email is already used by another account."
+
         is FirebaseAuthInvalidUserException ->
             "This account does not exist or has been disabled."
 
@@ -49,17 +52,6 @@ fun Throwable.toUserMessage(fallback: String = "Something went wrong. Please try
             FirebaseFirestoreException.Code.NOT_FOUND ->
                 "The record no longer exists."
             else -> fallback
-        }
-
-        // HttpsError messages from our Cloud Functions are already readable.
-        is FirebaseFunctionsException -> when (error.code) {
-            FirebaseFunctionsException.Code.UNAVAILABLE ->
-                "Service is unavailable. Please check your connection."
-            FirebaseFunctionsException.Code.NOT_FOUND,
-            FirebaseFunctionsException.Code.INTERNAL ->
-                error.message?.takeIf { it.isNotBlank() && it != "INTERNAL" && it != "NOT_FOUND" }
-                    ?: fallback
-            else -> error.message?.takeIf { it.isNotBlank() } ?: fallback
         }
 
         // Messages we throw ourselves are written for users.

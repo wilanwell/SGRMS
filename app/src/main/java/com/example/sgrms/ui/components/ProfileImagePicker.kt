@@ -56,6 +56,13 @@ import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.utils.decodeBase64ToImageBytes
 import coil.compose.AsyncImage
 import java.io.File
+import android.graphics.Bitmap
+import androidx.compose.runtime.produceState
+import com.example.sgrms.data.repository.ProfileImageRepository
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
 @Composable
 fun ProfileImagePicker(
@@ -328,9 +335,16 @@ fun ProfileImageView(
     }
 }
 
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+internal interface ProfileImageEntryPoint {
+    fun profileImageRepository(): ProfileImageRepository
+}
+
 /**
- * Shows the Firebase Storage photo when there is one, otherwise a photo
- * still stored the old way (Base64 in Firestore), otherwise a placeholder.
+ * Shows, in order of preference: a photo saved in profileImages/{uid}
+ * (`firestore://` reference), a photo URL, a photo still stored the old way
+ * (Base64 on the profile document), or a placeholder.
  */
 @Composable
 private fun ProfilePhoto(
@@ -338,6 +352,22 @@ private fun ProfilePhoto(
     legacyImageBase64: String,
     size: Int
 ) {
+    val context = LocalContext.current
+
+    val firestoreBitmap by produceState<Bitmap?>(initialValue = null, imageUrl) {
+        value = if (ProfileImageRepository.isFirestoreReference(imageUrl)) {
+            runCatching {
+                EntryPointAccessors
+                    .fromApplication(context.applicationContext, ProfileImageEntryPoint::class.java)
+                    .profileImageRepository()
+                    .loadImage(imageUrl)
+                    ?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+            }.getOrNull()
+        } else {
+            null
+        }
+    }
+
     val legacyBitmap = remember(legacyImageBase64) {
         if (legacyImageBase64.isBlank()) {
             null
@@ -349,9 +379,11 @@ private fun ProfilePhoto(
         }
     }
 
+    val bitmap = firestoreBitmap ?: legacyBitmap
+
     when {
-        imageUrl.isNotBlank() -> AsyncImage(
-            model = imageUrl,
+        bitmap != null -> Image(
+            bitmap = bitmap.asImageBitmap(),
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(size.dp)
@@ -359,8 +391,8 @@ private fun ProfilePhoto(
             contentScale = ContentScale.Crop
         )
 
-        legacyBitmap != null -> Image(
-            bitmap = legacyBitmap.asImageBitmap(),
+        imageUrl.isNotBlank() && !ProfileImageRepository.isFirestoreReference(imageUrl) -> AsyncImage(
+            model = imageUrl,
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(size.dp)

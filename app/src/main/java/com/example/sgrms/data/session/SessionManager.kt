@@ -5,6 +5,7 @@ import com.example.sgrms.data.model.UserRole
 import com.example.sgrms.data.model.userRole
 import com.example.sgrms.data.repository.AuthRepository
 import com.example.sgrms.data.repository.DeviceTokenRepository
+import com.example.sgrms.notifications.NotificationScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +34,8 @@ sealed interface SessionState {
 @Singleton
 class SessionManager @Inject constructor(
     private val authRepository: AuthRepository,
-    private val deviceTokenRepository: DeviceTokenRepository
+    private val deviceTokenRepository: DeviceTokenRepository,
+    private val notificationScheduler: NotificationScheduler
 ) {
     private val _state = MutableStateFlow<SessionState>(SessionState.Loading)
     val state: StateFlow<SessionState> = _state.asStateFlow()
@@ -90,12 +92,16 @@ class SessionManager @Inject constructor(
     }
 
     fun logout() {
+        notificationScheduler.stop()
         _state.value = signOutAndReturn()
     }
 
     /** Students receive grade notifications on this phone. */
     private suspend fun registerDeviceForPush() {
         if (currentRole != UserRole.STUDENT) return
+
+        // Spark plan: the phone checks for new notifications itself.
+        notificationScheduler.startForStudent()
 
         try {
             deviceTokenRepository.registerCurrentDevice(currentStudentId)

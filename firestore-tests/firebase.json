@@ -2,22 +2,16 @@
   "firestore": {
     "rules": ".rules/firestore.rules"
   },
-  "storage": {
-    "rules": ".rules/storage.rules"
-  },
   "emulators": {
     "hub": {
-      "port": 4410
+      "port": 4420
     },
     "logging": {
-      "port": 4510
+      "port": 4520
     },
     "firestore": {
-      "port": 8180,
-      "websocketPort": 9160
-    },
-    "storage": {
-      "port": 9299
+      "port": 8280,
+      "websocketPort": 9260
     },
     "ui": {
       "enabled": false

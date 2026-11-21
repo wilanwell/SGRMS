@@ -15,14 +15,14 @@ import javax.inject.Singleton
 @Singleton
 class StudentFirebaseService @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val accountFunctions: AccountFunctionsService
+    private val accountService: AccountService
 ) {
     private val studentsCollection = firestore.collection("students")
     private val usersCollection = firestore.collection("users")
 
     /**
      * Creates the login account and the student profile on the server
-     * (Cloud Function `createStudentAccount`), so the admin stays signed in.
+     * (AccountService, on a second FirebaseApp), so the admin stays signed in.
      */
     suspend fun addStudentWithAccount(
         studentCode: String,
@@ -35,7 +35,7 @@ class StudentFirebaseService @Inject constructor(
         status: String,
         password: String
     ): StudentModel {
-        val studentId = accountFunctions.createStudentAccount(
+        val studentId = accountService.createStudentAccount(
             studentCode = studentCode,
             studentName = studentName,
             email = email,
@@ -97,12 +97,12 @@ class StudentFirebaseService @Inject constructor(
 
     /**
      * Deletes the login account, the profile documents, grades,
-     * notifications and report remarks (Cloud Function `deleteUserAccount`).
+     * notifications and report remarks (AccountService.deleteAccount).
      */
     suspend fun deleteStudent(
         studentId: String
     ) {
-        accountFunctions.deleteAccount(studentId = studentId)
+        accountService.deleteAccount(studentId = studentId)
     }
 
     suspend fun updateOwnProfile(

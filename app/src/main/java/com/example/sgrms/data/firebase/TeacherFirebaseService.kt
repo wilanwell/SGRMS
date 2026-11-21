@@ -12,14 +12,14 @@ import javax.inject.Singleton
 @Singleton
 class TeacherFirebaseService @Inject constructor(
     private val firestore: FirebaseFirestore,
-    private val accountFunctions: AccountFunctionsService
+    private val accountService: AccountService
 ) {
     private val teachersCollection = firestore.collection("teachers")
     private val usersCollection = firestore.collection("users")
 
     /**
      * Creates the login account and the teacher profile on the server
-     * (Cloud Function `createTeacherAccount`), so the admin stays signed in.
+     * (AccountService, on a second FirebaseApp), so the admin stays signed in.
      */
     suspend fun addTeacherWithAccount(
         staffId: String,
@@ -30,7 +30,7 @@ class TeacherFirebaseService @Inject constructor(
         position: String,
         password: String
     ): TeacherModel {
-        val teacherId = accountFunctions.createTeacherAccount(
+        val teacherId = accountService.createTeacherAccount(
             staffId = staffId,
             teacherName = teacherName,
             email = email,
@@ -89,12 +89,12 @@ class TeacherFirebaseService @Inject constructor(
 
     /**
      * Deletes the login account, the profile documents and unassigns the
-     * teacher's subjects and classes (Cloud Function `deleteUserAccount`).
+     * teacher's subjects and classes (AccountService.deleteAccount).
      */
     suspend fun deleteTeacher(
         teacherId: String
     ) {
-        accountFunctions.deleteAccount(teacherId = teacherId)
+        accountService.deleteAccount(teacherId = teacherId)
     }
 
     /** Finds the teacher profile linked to a login account. */

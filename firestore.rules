@@ -3,10 +3,10 @@ rules_version = '2';
 // SGRMS Firestore Security Rules
 //
 // Roles come from users/{uid}.role ("Admin", "Teacher", "Student").
-// Nobody can change their own role from the app: login accounts and their
-// users / teachers / students documents are created and deleted only by the
-// Cloud Functions (createTeacherAccount, createStudentAccount,
-// deleteUserAccount), which use the Admin SDK and bypass these rules.
+// Nobody can change their own role. SGRMS runs on the free Spark plan, so the
+// Admin's phone creates and deletes accounts itself (AccountService); these
+// rules make sure only an Admin can do that, only for the Teacher / Student
+// roles, and never for an Admin account.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -62,6 +62,11 @@ service cloud.firestore {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
     }
 
+    // A new account profile written by an Admin (AccountService).
+    function isNewAccountBy(docIdField, docId) {
+      return isAdmin() && request.resource.data.get(docIdField, "") == docId;
+    }
+
     // The given field keeps its current value.
     function unchanged(field) {
       return request.resource.data.get(field, null) == resource.data.get(field, null);
@@ -72,8 +77,13 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if signedIn() && (request.auth.uid == userId || isStaff());
 
-      // Created / deleted only by Cloud Functions.
-      allow create, delete: if false;
+      // Only an Admin creates accounts, only for teachers and students,
+      // and the document id must be the new login's uid.
+      allow create: if isNewAccountBy("userId", userId)
+        && request.resource.data.role in ["Teacher", "Student"];
+
+      // Admin accounts cannot be deleted from the app.
+      allow delete: if isAdmin() && resource.data.role != "Admin";
 
       allow update: if
         // Admin may edit profiles but never change a role or a linked id.
@@ -93,7 +103,8 @@ service cloud.firestore {
 
     match /teachers/{teacherId} {
       allow read: if signedIn();
-      allow create, delete: if false;
+      allow create: if isNewAccountBy("teacherId", teacherId);
+      allow delete: if isAdmin();
 
       allow update: if
         (isAdmin() && unchanged("userId") && unchanged("teacherId"))
@@ -108,7 +119,8 @@ service cloud.firestore {
 
     match /students/{studentId} {
       allow read: if isStaff() || isOwnStudent(studentId);
-      allow create, delete: if false;
+      allow create: if isNewAccountBy("studentId", studentId);
+      allow delete: if isAdmin();
 
       allow update: if
         (isStaff() && unchanged("userId") && unchanged("studentId"))
@@ -117,6 +129,21 @@ service cloud.firestore {
               "guardianPhone", "emergencyContact", "profileNote",
               "profileImageUrl", "profileImageBase64", "fcmToken", "updatedAt"
             ]));
+    }
+
+    // ----- profile photos ------------------------------------------------
+    // Small JPEGs as Base64 (Spark plan has no Cloud Storage), one per user.
+
+    match /profileImages/{userId} {
+      allow read: if signedIn();
+
+      allow create, update: if signedIn() && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(["userId", "data", "updatedAt"])
+        && request.resource.data.userId == userId
+        && request.resource.data.data is string
+        && request.resource.data.data.size() < 300000;
+
+      allow delete: if signedIn() && (request.auth.uid == userId || isAdmin());
     }
 
     // ----- classes & subjects -------------------------------------------

@@ -271,7 +271,7 @@ fun StudentManagementScreen(
             )
         },
         floatingActionButton = {
-            // Only an Admin can create login accounts (Cloud Function).
+            // Only an Admin can create login accounts (see firestore.rules).
             if (canAddStudent) FloatingActionButton(
                 onClick = onAddStudentClick,
                 containerColor = PrimaryBlue,

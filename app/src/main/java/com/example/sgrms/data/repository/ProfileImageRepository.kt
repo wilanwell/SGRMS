@@ -2,10 +2,10 @@ package com.example.sgrms.data.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Base64
+import android.util.LruCache
 import com.example.sgrms.utils.compressImageUri
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageException
-import com.google.firebase.storage.StorageMetadata
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -14,17 +14,23 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Stores profile photos in Firebase Storage at
- * `profile_images/{userId}.jpg` (see storage.rules). Firestore keeps only
- * the download URL, instead of the whole image as Base64.
+ * Profile photos on the free Spark plan (no Cloud Storage).
+ *
+ * The photo is shrunk to a small JPEG (~15-30 KB) and kept in its own
+ * document, profileImages/{userId}, so the student / teacher / user
+ * documents that lists load stay small. The profile document stores only a
+ * reference, `firestore://profileImages/{userId}?v=<time>`; the version
+ * changes on every upload so cached copies are refreshed.
  */
 @Singleton
 class ProfileImageRepository @Inject constructor(
     @param:ApplicationContext private val context: Context,
-    private val storage: FirebaseStorage
+    firestore: FirebaseFirestore
 ) {
+    private val images = firestore.collection(COLLECTION)
+    private val cache = LruCache<String, ByteArray>(CACHE_ENTRIES)
 
-    /** Compresses and uploads the photo; returns its download URL. */
+    /** Compresses and saves the photo; returns the reference to store on the profile. */
     suspend fun uploadProfileImage(
         userId: String,
         imageUri: Uri
@@ -32,28 +38,57 @@ class ProfileImageRepository @Inject constructor(
         require(userId.isNotBlank()) { "User account is not linked." }
 
         val bytes = withContext(Dispatchers.IO) {
-            compressImageUri(context = context, imageUri = imageUri)
+            compressImageUri(context = context, imageUri = imageUri, maxSize = MAX_SIZE_PX, quality = JPEG_QUALITY)
         }
+        val version = System.currentTimeMillis()
 
-        val reference = storage.reference.child(pathFor(userId))
-        val metadata = StorageMetadata.Builder()
-            .setContentType("image/jpeg")
-            .build()
+        images.document(userId)
+            .set(
+                mapOf(
+                    "userId" to userId,
+                    "data" to Base64.encodeToString(bytes, Base64.NO_WRAP),
+                    "updatedAt" to version
+                )
+            )
+            .await()
 
-        reference.putBytes(bytes, metadata).await()
-
-        return reference.downloadUrl.await().toString()
+        val reference = referenceFor(userId, version)
+        cache.put(reference, bytes)
+        return reference
     }
 
     suspend fun deleteProfileImage(userId: String) {
         if (userId.isBlank()) return
-
-        try {
-            storage.reference.child(pathFor(userId)).delete().await()
-        } catch (e: StorageException) {
-            if (e.errorCode != StorageException.ERROR_OBJECT_NOT_FOUND) throw e
-        }
+        images.document(userId).delete().await()
     }
 
-    private fun pathFor(userId: String) = "profile_images/$userId.jpg"
+    /** JPEG bytes for a reference made by [uploadProfileImage], or null. */
+    suspend fun loadImage(reference: String): ByteArray? {
+        cache.get(reference)?.let { return it }
+
+        val userId = userIdOf(reference) ?: return null
+        val data = images.document(userId).get().await().getString("data") ?: return null
+        val bytes = withContext(Dispatchers.Default) { Base64.decode(data, Base64.NO_WRAP) }
+
+        cache.put(reference, bytes)
+        return bytes
+    }
+
+    companion object {
+        const val COLLECTION = "profileImages"
+        private const val SCHEME = "firestore://$COLLECTION/"
+        private const val MAX_SIZE_PX = 320
+        private const val JPEG_QUALITY = 72
+        private const val CACHE_ENTRIES = 30
+
+        fun isFirestoreReference(reference: String) = reference.startsWith(SCHEME)
+
+        fun referenceFor(userId: String, version: Long) = "$SCHEME$userId?v=$version"
+
+        fun userIdOf(reference: String): String? =
+            reference.takeIf(::isFirestoreReference)
+                ?.removePrefix(SCHEME)
+                ?.substringBefore('?')
+                ?.takeIf { it.isNotBlank() }
+    }
 }

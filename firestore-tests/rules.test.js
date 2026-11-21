@@ -20,7 +20,6 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import {deleteObject, ref, uploadBytes} from "firebase/storage";
 
 let env;
 
@@ -35,9 +34,6 @@ before(async () => {
     firestore: {
       rules: readFileSync(new URL("../firestore.rules", import.meta.url), "utf8"),
     },
-    storage: {
-      rules: readFileSync(new URL("../storage.rules", import.meta.url), "utf8"),
-    },
   });
 });
 
@@ -47,7 +43,6 @@ after(async () => {
 
 beforeEach(async () => {
   await env.clearFirestore();
-  await env.clearStorage();
 
   await env.withSecurityRulesDisabled(async (ctx) => {
     const db = ctx.firestore();
@@ -123,8 +118,22 @@ describe("not signed in", () => {
 });
 
 describe("users", () => {
-  test("nobody can create a users profile from the app", async () => {
-    await assertFails(setDoc(doc(as(ADMIN), "users", "new"), {role: "Student"}));
+  test("an admin can create teacher and student profiles", async () => {
+    await assertSucceeds(setDoc(doc(as(ADMIN), "users", "new-t"), {userId: "new-t", role: "Teacher"}));
+    await assertSucceeds(setDoc(doc(as(ADMIN), "users", "new-s"), {userId: "new-s", role: "Student"}));
+  });
+
+  test("nobody can create an Admin profile from the app", async () => {
+    await assertFails(setDoc(doc(as(ADMIN), "users", "new-a"), {userId: "new-a", role: "Admin"}));
+  });
+
+  test("the profile id must match its userId", async () => {
+    await assertFails(setDoc(doc(as(ADMIN), "users", "new-x"), {userId: "other", role: "Student"}));
+  });
+
+  test("teachers and students cannot create profiles", async () => {
+    await assertFails(setDoc(doc(as(TEACHER), "users", "n1"), {userId: "n1", role: "Student"}));
+    await assertFails(setDoc(doc(as(STUDENT), "users", "n2"), {userId: "n2", role: "Student"}));
   });
 
   test("a student cannot make themselves Admin", async () => {
@@ -163,8 +172,14 @@ describe("users", () => {
     await assertFails(updateDoc(doc(as(TEACHER), "users", STUDENT), {role: "Teacher"}));
   });
 
-  test("nobody can delete a users profile from the app", async () => {
-    await assertFails(deleteDoc(doc(as(ADMIN), "users", STUDENT)));
+  test("an admin can delete teacher / student profiles but not an Admin", async () => {
+    await assertSucceeds(deleteDoc(doc(as(ADMIN), "users", STUDENT)));
+    await assertFails(deleteDoc(doc(as(ADMIN), "users", ADMIN)));
+  });
+
+  test("teachers and students cannot delete profiles", async () => {
+    await assertFails(deleteDoc(doc(as(TEACHER), "users", STUDENT)));
+    await assertFails(deleteDoc(doc(as(STUDENT), "users", STUDENT)));
   });
 });
 
@@ -183,8 +198,12 @@ describe("teachers", () => {
     await assertFails(updateDoc(doc(as(STUDENT), "teachers", "t1"), {phoneNumber: "1"}));
   });
 
-  test("teacher documents can only be created by Cloud Functions", async () => {
-    await assertFails(setDoc(doc(as(ADMIN), "teachers", "t9"), {teacherId: "t9"}));
+  test("only an admin creates or deletes teacher documents", async () => {
+    await assertSucceeds(setDoc(doc(as(ADMIN), "teachers", "t9"), {teacherId: "t9"}));
+    await assertFails(setDoc(doc(as(ADMIN), "teachers", "t8"), {teacherId: "wrong"}));
+    await assertFails(setDoc(doc(as(TEACHER), "teachers", "t7"), {teacherId: "t7"}));
+    await assertFails(deleteDoc(doc(as(TEACHER), "teachers", "t1")));
+    await assertSucceeds(deleteDoc(doc(as(ADMIN), "teachers", "t1")));
   });
 });
 
@@ -216,9 +235,11 @@ describe("students", () => {
     }, {merge: true}));
   });
 
-  test("students cannot be created or deleted from the app", async () => {
-    await assertFails(setDoc(doc(as(ADMIN), "students", "s9"), {studentId: "s9"}));
-    await assertFails(deleteDoc(doc(as(ADMIN), "students", "s1")));
+  test("only an admin creates or deletes student documents", async () => {
+    await assertSucceeds(setDoc(doc(as(ADMIN), "students", "s9"), {studentId: "s9"}));
+    await assertFails(setDoc(doc(as(TEACHER), "students", "s8"), {studentId: "s8"}));
+    await assertFails(deleteDoc(doc(as(TEACHER), "students", "s1")));
+    await assertSucceeds(deleteDoc(doc(as(ADMIN), "students", "s1")));
   });
 });
 
@@ -312,35 +333,32 @@ describe("profile photos (Firestore URL fields)", () => {
   });
 });
 
-describe("storage: profile_images", () => {
-  const jpeg = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
-  const meta = {contentType: "image/jpeg"};
-  const storageAs = (uid) => env.authenticatedContext(uid).storage();
+describe("profileImages (photos on the Spark plan)", () => {
+  const photo = (uid, size = 100) => ({userId: uid, data: "x".repeat(size), updatedAt: 1});
 
-  test("a user can upload and delete their own photo", async () => {
-    const file = ref(storageAs(STUDENT), `profile_images/${STUDENT}.jpg`);
-    await assertSucceeds(uploadBytes(file, jpeg, meta));
-    await assertSucceeds(deleteObject(file));
+  test("a user can save, replace and delete their own photo", async () => {
+    await assertSucceeds(setDoc(doc(as(STUDENT), "profileImages", STUDENT), photo(STUDENT)));
+    await assertSucceeds(setDoc(doc(as(STUDENT), "profileImages", STUDENT), photo(STUDENT, 200)));
+    await assertSucceeds(deleteDoc(doc(as(STUDENT), "profileImages", STUDENT)));
   });
 
-  test("a user cannot overwrite someone else's photo", async () => {
-    const file = ref(storageAs(STUDENT), `profile_images/${OTHER_STUDENT}.jpg`);
-    await assertFails(uploadBytes(file, jpeg, meta));
+  test("a user cannot write someone else's photo", async () => {
+    await assertFails(setDoc(doc(as(STUDENT), "profileImages", OTHER_STUDENT), photo(OTHER_STUDENT)));
+    await assertFails(setDoc(doc(as(STUDENT), "profileImages", STUDENT), photo(OTHER_STUDENT)));
   });
 
-  test("only images are accepted", async () => {
-    const file = ref(storageAs(STUDENT), `profile_images/${STUDENT}.jpg`);
-    await assertFails(uploadBytes(file, jpeg, {contentType: "application/pdf"}));
+  test("photos must be small and have no extra fields", async () => {
+    await assertFails(setDoc(doc(as(STUDENT), "profileImages", STUDENT), photo(STUDENT, 300001)));
+    await assertFails(setDoc(doc(as(STUDENT), "profileImages", STUDENT), {...photo(STUDENT), role: "Admin"}));
   });
 
-  test("not signed in cannot upload", async () => {
-    const file = ref(env.unauthenticatedContext().storage(), `profile_images/${STUDENT}.jpg`);
-    await assertFails(uploadBytes(file, jpeg, meta));
-  });
-
-  test("files outside profile_images are denied", async () => {
-    const file = ref(storageAs(ADMIN), "other/file.jpg");
-    await assertFails(uploadBytes(file, jpeg, meta));
+  test("signed-in users can view photos; an admin can remove one", async () => {
+    await env.withSecurityRulesDisabled((ctx) =>
+      setDoc(doc(ctx.firestore(), "profileImages", STUDENT), photo(STUDENT)));
+    await assertSucceeds(getDoc(doc(as(TEACHER), "profileImages", STUDENT)));
+    await assertFails(getDoc(doc(anon(), "profileImages", STUDENT)));
+    await assertFails(deleteDoc(doc(as(TEACHER), "profileImages", STUDENT)));
+    await assertSucceeds(deleteDoc(doc(as(ADMIN), "profileImages", STUDENT)));
   });
 });
 
