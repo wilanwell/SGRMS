@@ -31,6 +31,10 @@ import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.SgrmsRadius
 import com.example.sgrms.ui.theme.SgrmsSpacing
 import com.example.sgrms.ui.theme.markColor
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Template for detail screens: back header, scrolling [content], and an
@@ -177,4 +181,31 @@ fun SgrmsMarkRow(
         SgrmsStatusChip(grade.ifBlank { "-" }, if (marks == null) ChipTone.Warning else toneForGrade(grade))
         Row(verticalAlignment = Alignment.CenterVertically, content = trailing)
     }
+}
+
+/** Settings-style row: icon tile, title, chevron; red when [destructive]. */
+@Composable
+fun SgrmsSettingsRow(
+    title: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    destructive: Boolean = false
+) {
+    val tint = if (destructive) SgrmsColors.Error else MaterialTheme.colorScheme.primary
+    val container = if (destructive) SgrmsColors.ErrorContainer else MaterialTheme.colorScheme.primaryContainer
+    SgrmsListRow(
+        title = title,
+        subtitle = null,
+        leading = { SgrmsIconTile(icon = icon, tint = tint, container = container) },
+        trailing = {
+            if (!destructive) {
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        onClick = onClick
+    )
 }
