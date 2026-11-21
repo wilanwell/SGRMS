@@ -36,6 +36,9 @@ import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.ForgotPasswordViewModel
 import com.example.sgrms.viewmodel.PasswordResetState
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 /**
  * Sends a Firebase password reset link to the entered email.
@@ -108,6 +111,8 @@ fun ForgotPasswordDialog(
                         keyboardActions = KeyboardActions(
                             onSend = { viewModel.sendResetEmail(email) }
                         ),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
+                        colors = sgrmsFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -122,7 +127,8 @@ fun ForgotPasswordDialog(
                 Button(
                     onClick = { viewModel.sendResetEmail(email) },
                     enabled = !isSending,
-                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary)
+                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
+                    shape = RoundedCornerShape(SgrmsRadius.Field)
                 ) {
                     if (isSending) {
                         CircularProgressIndicator(
