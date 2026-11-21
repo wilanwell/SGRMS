@@ -50,7 +50,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.sgrms.ui.components.DarkStatusBarIcons
 import com.example.sgrms.ui.components.sgrmsFieldColors
 import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.SgrmsRadius
@@ -59,7 +58,6 @@ import com.example.sgrms.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen() {
-    DarkStatusBarIcons()
 
     val authViewModel: AuthViewModel = hiltViewModel()
     val authUiState by authViewModel.loginUiState.collectAsState()
