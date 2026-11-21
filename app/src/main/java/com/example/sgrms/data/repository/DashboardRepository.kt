@@ -1,9 +1,11 @@
 package com.example.sgrms.data.repository
 
 import com.example.sgrms.data.model.ClassModel
+import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.SubjectModel
 import com.example.sgrms.data.model.TeacherModel
 import com.example.sgrms.data.model.UserRole
+import com.example.sgrms.utils.ReportCalculator
 import com.google.firebase.firestore.AggregateField
 import com.google.firebase.firestore.AggregateSource
 import com.google.firebase.firestore.FirebaseFirestore
@@ -84,8 +86,9 @@ class DashboardRepository @Inject constructor(
         val grades = firestore.collection("grades")
 
         val students = async { count(firestore.collection("students")) }
-        val gradeCount = async { count(grades) }
-        val reports = async { count(firestore.collection("reports")) }
+        // Reports are built live from grades (nothing is stored in "reports"),
+        // so the ready count comes from the grade statuses.
+        val gradeList = async { grades.get().await().documents.mapNotNull { it.toObject(GradeModel::class.java) } }
 
         val subjectList = firestore.collection("subjects")
             .get()
@@ -110,8 +113,8 @@ class DashboardRepository @Inject constructor(
         TeacherDashboardSummary(
             students = students.await(),
             subjects = subjectList.size,
-            grades = gradeCount.await(),
-            reports = reports.await(),
+            grades = gradeList.await().size,
+            reports = ReportCalculator.readyReportCount(gradeList.await()),
             subjectAverages = averages.sortedByDescending { it.averageMarks }
         )
     }
@@ -151,9 +154,17 @@ class DashboardRepository @Inject constructor(
             }
         }.awaitAll().flatten()
 
-        val reportCount = studentIds.chunked(30).map { chunk ->
-            async { count(firestore.collection("reports").whereIn("studentId", chunk)) }
-        }.awaitAll().sum()
+        val studentGrades = studentIds.chunked(30).map { chunk ->
+            async {
+                firestore.collection("grades")
+                    .whereIn("studentId", chunk)
+                    .get()
+                    .await()
+                    .documents
+                    .mapNotNull { it.toObject(GradeModel::class.java) }
+            }
+        }.awaitAll().flatten()
+        val reportCount = ReportCalculator.readyReportCount(studentGrades)
 
         TeacherAssignments(
             classes = classes.sortedBy { it.className },

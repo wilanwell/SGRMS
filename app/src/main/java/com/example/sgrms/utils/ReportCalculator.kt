@@ -45,6 +45,13 @@ object ReportCalculator {
         return lines.joinToString(separator = "\n").ifBlank { NO_REMARKS }
     }
 
+    /**
+     * Students whose report is ready: at least one grade and none pending.
+     * Same rule as the "Generated" status on the report list.
+     */
+    fun readyReportCount(grades: List<GradeModel>): Int =
+        grades.groupBy { it.studentId }.count { (_, studentGrades) -> studentGrades.all { it.isComplete } }
+
     /** Date printed on reports, e.g. 21/11/2026. */
     fun todayText(now: Date = Date()): String =
         SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(now)
