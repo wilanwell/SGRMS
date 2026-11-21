@@ -319,7 +319,7 @@ fun StudentManagementScreen(
                     )
 
                     Text(
-                        text = "Total Students: ${students.size}",
+                        text = "Students loaded: ${students.size}${if (uiState.hasMore) "+" else ""}",
                         fontSize = 13.sp,
                         color = TextGrey
                     )

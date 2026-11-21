@@ -1,5 +1,8 @@
 package com.example.sgrms.data.model
 
+import com.google.firebase.firestore.IgnoreExtraProperties
+
+@IgnoreExtraProperties
 data class NotificationModel(
     val notificationId: String = "",
     val studentId: String = "",

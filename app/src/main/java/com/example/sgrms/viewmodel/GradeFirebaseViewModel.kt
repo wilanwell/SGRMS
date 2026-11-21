@@ -63,7 +63,9 @@ class GradeFirebaseViewModel @Inject constructor(
                 nextCursor = page.nextCursor
                 _uiState.update { it.copy(grades = page.items, hasMore = page.hasMore, isLoading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load grades")) }
+                _uiState.update {
+                    it.copy(grades = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage("Failed to load grades"))
+                }
             }
         }
     }

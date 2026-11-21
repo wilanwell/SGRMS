@@ -1,5 +1,6 @@
 package com.example.sgrms.utils
 
+import android.util.Log
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -16,6 +17,10 @@ import com.google.firebase.functions.FirebaseFunctionsException
  */
 fun Throwable.toUserMessage(fallback: String = "Something went wrong. Please try again."): String {
     val error = if (this is IllegalStateException && cause != null) cause!! else this
+
+    // The user sees a friendly message; logcat keeps the real cause
+    // (e.g. FAILED_PRECONDITION "The query requires an index").
+    Log.w("SGRMS", fallback, this)
 
     return when (error) {
         is FirebaseNetworkException ->

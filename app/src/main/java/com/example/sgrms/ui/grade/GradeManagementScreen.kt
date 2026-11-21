@@ -476,7 +476,7 @@ fun GradeManagementScreen(
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Grade Records (${filteredRecords.size})",
+                text = "Grade Records (${filteredRecords.size}${if (gradeUiState.hasMore) "+" else ""})",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )

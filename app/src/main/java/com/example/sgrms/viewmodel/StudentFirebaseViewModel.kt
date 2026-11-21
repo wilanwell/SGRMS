@@ -49,7 +49,9 @@ class StudentFirebaseViewModel @Inject constructor(
                 nextCursor = page.nextCursor
                 _uiState.update { it.copy(students = page.items, hasMore = page.hasMore, isLoading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load students")) }
+                _uiState.update {
+                    it.copy(students = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage("Failed to load students"))
+                }
             }
         }
     }

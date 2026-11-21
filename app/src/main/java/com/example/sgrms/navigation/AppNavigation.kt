@@ -68,6 +68,12 @@ import com.example.sgrms.data.model.UserModel
 import com.example.sgrms.data.model.UserRole
 import com.example.sgrms.data.session.SessionState
 import com.example.sgrms.viewmodel.AuthViewModel
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
+import com.example.sgrms.ui.theme.BackgroundGrey
 
 private val AdminOnly = setOf(UserRole.ADMIN)
 private val TeacherOnly = setOf(UserRole.TEACHER)
@@ -182,6 +188,11 @@ fun AppNavigation() {
     }
 
     Scaffold(
+        // Keep content clear of the navigation bar / camera cutout at the
+        // sides in landscape; top and bottom insets are handled per screen.
+        modifier = Modifier
+            .background(BackgroundGrey)
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
