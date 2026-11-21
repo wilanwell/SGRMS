@@ -1,61 +1,57 @@
 package com.example.sgrms.ui.dashboard
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Assessment
-import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
-import com.example.sgrms.ui.theme.ColorPrimary
-import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.runtime.collectAsState
-import com.example.sgrms.viewmodel.TeacherDashboardViewModel
+import com.example.sgrms.ui.admin.greetingFor
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import com.example.sgrms.ui.components.SgrmsGroupedCard
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsPageHeader
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsSectionTitle
+import com.example.sgrms.ui.components.SgrmsStatCard
 import com.example.sgrms.ui.theme.SgrmsColors
-
-data class ClassAverageItem(
-    val subjectName: String,
-    val progress: Float,
-    val percentage: String
-)
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.SgrmsSpacing
+import com.example.sgrms.ui.theme.markColor
+import com.example.sgrms.viewmodel.TeacherDashboardViewModel
+import java.util.Calendar
 
 @Composable
 fun TeacherDashboardScreen(
@@ -67,43 +63,19 @@ fun TeacherDashboardScreen(
 ) {
     val viewModel: TeacherDashboardViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-
-    val teacherName = uiState.teacherName
-    val studentCount = uiState.summary.students
-    val subjectCount = uiState.summary.subjects
-    val gradeCount = uiState.summary.grades
-    val reportCount = uiState.summary.reports
-
-    val isLoading = uiState.isLoading
-    val errorMessage = uiState.errorMessage
-
-    val classAverageList = uiState.summary.subjectAverages.map { item ->
-        ClassAverageItem(
-            subjectName = item.subjectName,
-            progress = (item.averageMarks / 100.0)
-                .toFloat()
-                .coerceIn(0f, 1f),
-            percentage = "%.1f%%".format(item.averageMarks)
-        )
-    }
+    val summary = uiState.summary
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorBackground)
+            .background(MaterialTheme.colorScheme.background)
     ) {
-        TopBar(
-            title = "SGRMS",
-            showBack = false,
-            showIcon = true,
-            actions = {
+        SgrmsPageHeader(
+            title = uiState.teacherName,
+            subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
+            trailing = {
                 IconButton(onClick = onProfileClick) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Profile",
-                        tint = Color.White,
-                        modifier = Modifier.size(30.dp)
-                    )
+                    SgrmsAvatar(name = uiState.teacherName, size = 44.dp)
                 }
             }
         )
@@ -111,182 +83,98 @@ fun TeacherDashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(
-                    start = 18.dp,
-                    end = 18.dp,
-                    top = 18.dp,
-                    bottom = 8.dp
-                )
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = SgrmsSpacing.ScreenPadding)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(
-                text = "Welcome, ${teacherName.ifBlank { "Teacher" }}",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
+            if (uiState.errorMessage.isNotBlank()) {
+                Text(uiState.errorMessage, color = SgrmsColors.Error, style = MaterialTheme.typography.bodyMedium)
+            }
 
-            Text(
-                text = "Overview of student grades and academic records",
-                fontSize = 14.sp,
-                color = ColorOnSurfaceVariant
-            )
-
-            if (isLoading) {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = ColorPrimary,
-                        strokeWidth = 2.dp
-                    )
-
-                    Spacer(modifier = Modifier.size(8.dp))
-
+            Surface(
+                shape = RoundedCornerShape(SgrmsRadius.Hero),
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("Students you teach", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
+                    Text(summary.students.toString(), style = MaterialTheme.typography.displayMedium, color = Color.White)
                     Text(
-                        text = "Loading dashboard data...",
-                        fontSize = 14.sp,
-                        color = ColorOnSurfaceVariant
+                        text = "across ${summary.subjects} subjects · ${summary.grades} grade records",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFFE0E7FF)
                     )
                 }
             }
 
-            if (errorMessage.isNotBlank()) {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = errorMessage,
-                    fontSize = 14.sp,
-                    color = SgrmsColors.Error,
-                    fontWeight = FontWeight.Bold
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SgrmsStatCard(
+                        value = summary.students.toString(), label = "Students", icon = Icons.Default.Group,
+                        tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer,
+                        onClick = onStudentClick, modifier = Modifier.weight(1f)
+                    )
+                    SgrmsStatCard(
+                        value = summary.subjects.toString(), label = "Subjects", icon = Icons.AutoMirrored.Filled.MenuBook,
+                        tint = SgrmsColors.Orange, container = SgrmsColors.OrangeContainer,
+                        onClick = onSubjectClick, modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SgrmsStatCard(
+                        value = summary.grades.toString(), label = "Grades", icon = Icons.Default.Assessment,
+                        tint = SgrmsColors.Success, container = SgrmsColors.SuccessContainer,
+                        onClick = onGradeClick, modifier = Modifier.weight(1f)
+                    )
+                    SgrmsStatCard(
+                        value = summary.reports.toString(), label = "Reports", icon = Icons.Default.Summarize,
+                        tint = SgrmsColors.Pink, container = SgrmsColors.PinkContainer,
+                        onClick = onReportClick, modifier = Modifier.weight(1f)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                DashboardSummaryCard(
-                    title = "Students",
-                    value = studentCount.toString(),
-                    icon = Icons.Default.Group,
-                    modifier = Modifier.weight(1f),
-                    onClick = onStudentClick
-                )
-
-                DashboardSummaryCard(
-                    title = "Subjects",
-                    value = subjectCount.toString(),
-                    icon = Icons.Default.MenuBook,
-                    modifier = Modifier.weight(1f),
-                    onClick = onSubjectClick
-                )
+            SgrmsSectionTitle("Quick actions")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                QuickAction("Add grades", Icons.Default.EditNote, onGradeClick, Modifier.weight(1f))
+                QuickAction("Reports", Icons.Default.Summarize, onReportClick, Modifier.weight(1f))
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            SgrmsSectionTitle("Subject averages")
+            when {
+                uiState.isLoading && summary.subjectAverages.isEmpty() ->
+                    Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                DashboardSummaryCard(
-                    title = "Grades",
-                    value = gradeCount.toString(),
-                    icon = Icons.Default.Assessment,
-                    modifier = Modifier.weight(1f),
-                    onClick = onGradeClick
+                summary.subjectAverages.isEmpty() -> SgrmsEmptyState(
+                    title = "No averages yet",
+                    message = "Add subjects and grades to see how each subject is doing.",
+                    icon = Icons.Default.Assessment
                 )
 
-                DashboardSummaryCard(
-                    title = "Reports",
-                    value = reportCount.toString(),
-                    icon = Icons.Default.Summarize,
-                    modifier = Modifier.weight(1f),
-                    onClick = onReportClick
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BarChart,
-                            contentDescription = "Class Averages",
-                            tint = ColorPrimary
-                        )
-
-                        Spacer(modifier = Modifier.size(10.dp))
-
-                        Text(
-                            text = "Class Averages",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    if (classAverageList.isEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.BarChart,
-                                contentDescription = "No Average Data",
-                                tint = ColorOnSurfaceVariant,
-                                modifier = Modifier.size(42.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "No class average available",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "Add subjects and grades to show average performance",
-                                fontSize = 14.sp,
-                                color = ColorOnSurfaceVariant
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                bottom = 8.dp
-                            )
-                        ) {
-                            items(classAverageList) { item ->
-                                SubjectAverageItem(
-                                    subjectName = item.subjectName,
-                                    progress = item.progress,
-                                    percentage = item.percentage
+                else -> SgrmsGroupedCard {
+                    summary.subjectAverages.forEachIndexed { index, item ->
+                        if (index > 0) SgrmsRowDivider()
+                        Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row {
+                                Text(
+                                    item.subjectName.ifBlank { "Unnamed subject" },
+                                    style = MaterialTheme.typography.titleSmall,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.weight(1f)
                                 )
+                                Text("%.1f%%".format(item.averageMarks), style = MaterialTheme.typography.titleSmall)
                             }
+                            LinearProgressIndicator(
+                                progress = { (item.averageMarks / 100.0).toFloat().coerceIn(0f, 1f) },
+                                color = markColor(item.averageMarks),
+                                trackColor = MaterialTheme.colorScheme.outlineVariant,
+                                strokeCap = StrokeCap.Round,
+                                gapSize = 0.dp,
+                                drawStopIndicator = {},
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(3.dp))
+                            )
                         }
                     }
                 }
@@ -296,97 +184,25 @@ fun TeacherDashboardScreen(
 }
 
 @Composable
-fun DashboardSummaryCard(
-    title: String,
-    value: String,
+private fun QuickAction(
+    text: String,
     icon: ImageVector,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .height(130.dp)
-            .clickable {
-                onClick()
-            },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ColorPrimary),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = Color.White,
-                    modifier = Modifier.size(26.dp)
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = title,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Text(
-                text = value,
-                color = Color.White,
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-fun SubjectAverageItem(
-    subjectName: String,
-    progress: Float,
-    percentage: String
-) {
-    Column(
-        modifier = Modifier.padding(vertical = 10.dp)
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier.height(56.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                text = subjectName,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            Text(
-                text = percentage,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = ColorPrimary
-            )
+            SgrmsIconTile(icon = icon, tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer, size = 32.dp)
+            Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        LinearProgressIndicator(
-            progress = {
-                progress
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(8.dp),
-            color = ColorPrimary,
-            trackColor = ColorBackground
-        )
     }
 }
