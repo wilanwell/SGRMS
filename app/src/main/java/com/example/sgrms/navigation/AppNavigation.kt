@@ -272,6 +272,9 @@ fun AppNavigation() {
                     },
                     onProfileClick = {
                         navController.navigate(Screen.AdminProfile.route)
+                    },
+                    onTeacherManagementClick = {
+                        navController.navigate(Screen.TeacherManagement.route)
                     }
                 )
             }

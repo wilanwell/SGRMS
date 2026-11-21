@@ -6,6 +6,11 @@ import com.example.sgrms.data.repository.AdminSummary
 import com.example.sgrms.data.repository.DashboardRepository
 import com.example.sgrms.data.repository.TeacherDashboardSummary
 import com.example.sgrms.data.repository.TeacherFirebaseRepository
+import com.example.sgrms.data.repository.UserFirebaseRepository
+import com.example.sgrms.data.model.UserModel
+import com.example.sgrms.data.model.UserRole
+import com.example.sgrms.data.model.userRole
+import kotlinx.coroutines.async
 import com.example.sgrms.data.session.SessionManager
 import com.example.sgrms.utils.toUserMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,13 +23,22 @@ import javax.inject.Inject
 
 data class AdminDashboardUiState(
     val summary: AdminSummary = AdminSummary(),
+    val recentAccounts: List<UserModel> = emptyList(),
     val isLoading: Boolean = true,
     val errorMessage: String = ""
 )
 
+/** The [limit] newest teacher / student accounts, newest first. */
+fun recentAccounts(users: List<UserModel>, limit: Int = 3): List<UserModel> =
+    users
+        .filter { it.userRole != UserRole.ADMIN }
+        .sortedByDescending { it.createdAt }
+        .take(limit)
+
 @HiltViewModel
 class AdminDashboardViewModel @Inject constructor(
-    private val dashboardRepository: DashboardRepository
+    private val dashboardRepository: DashboardRepository,
+    private val userRepository: UserFirebaseRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AdminDashboardUiState())
@@ -39,8 +53,14 @@ class AdminDashboardViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = "") }
 
             try {
+                // The recent list is a nice-to-have: its failure never fails the dashboard.
+                val recent = async { runCatching { recentAccounts(userRepository.getAllUsers()) }.getOrDefault(emptyList()) }
                 val summary = dashboardRepository.getAdminSummary()
-                _uiState.value = AdminDashboardUiState(summary = summary, isLoading = false)
+                _uiState.value = AdminDashboardUiState(
+                    summary = summary,
+                    recentAccounts = recent.await(),
+                    isLoading = false
+                )
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load dashboard data."))

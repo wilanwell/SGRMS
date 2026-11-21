@@ -1,13 +1,10 @@
 package com.example.sgrms.ui.admin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,47 +15,56 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AdminPanelSettings
-import androidx.compose.material.icons.filled.Assessment
-import androidx.compose.material.icons.filled.Class
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.ManageAccounts
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material.icons.filled.SupervisorAccount
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
-import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
-import com.example.sgrms.ui.theme.ColorPrimary
-import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.compose.runtime.collectAsState
-import com.example.sgrms.viewmodel.AdminDashboardViewModel
+import com.example.sgrms.data.model.UserRole
+import com.example.sgrms.data.model.userRole
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsGroupedCard
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsListRow
+import com.example.sgrms.ui.components.SgrmsPageHeader
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsSectionTitle
+import com.example.sgrms.ui.components.SgrmsStatCard
+import com.example.sgrms.ui.components.SgrmsStatusChip
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.SgrmsSpacing
+import com.example.sgrms.viewmodel.AdminDashboardViewModel
+import java.util.Calendar
+
+/** "Good morning / afternoon / evening" from the phone's clock. */
+fun greetingFor(hourOfDay: Int): String = when (hourOfDay) {
+    in 5..11 -> "Good morning"
+    in 12..17 -> "Good afternoon"
+    else -> "Good evening"
+}
 
 @Composable
 fun AdminDashboardScreen(
@@ -70,318 +76,225 @@ fun AdminDashboardScreen(
     onSubjectManagementClick: () -> Unit = {},
     onClassManagementClick: () -> Unit = {},
     onReportClick: () -> Unit = {},
-    onProfileClick: () -> Unit = {}
+    onProfileClick: () -> Unit = {},
+    onTeacherManagementClick: () -> Unit = {}
 ) {
     val viewModel: AdminDashboardViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
-
     val summary = uiState.summary
-    val totalAccounts = summary.totalAccounts
-    val adminCount = summary.adminAccounts
-    val teacherAccountCount = summary.teacherAccounts
-    val studentAccountCount = summary.studentAccounts
-    val teacherCount = summary.teachers
-    val studentCount = summary.students
-    val subjectCount = summary.subjects
-    val classCount = summary.classes
+    val name = adminName.ifBlank { "Admin" }
 
-    val isLoading = uiState.isLoading
-    val errorMessage = uiState.errorMessage
-
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "SGRMS Admin",
-                showBack = false,
-                showIcon = true,
-                actions = {
-                    IconButton(onClick = onProfileClick) {
-                        Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile",
-                            tint = Color.White,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        SgrmsPageHeader(
+            title = name,
+            subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
+            trailing = {
+                IconButton(onClick = onProfileClick) {
+                    SgrmsAvatar(name = name, size = 44.dp)
                 }
-            )
-        }
-    ) { paddingValues ->
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ColorBackground)
-                .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(
-                    start = 18.dp,
-                    end = 18.dp,
-                    top = 18.dp,
-                    bottom = 8.dp
-                )
+                .padding(horizontal = SgrmsSpacing.ScreenPadding)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(
-                text = "Welcome, ${adminName.ifBlank { "Admin" }}",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "Manage user accounts and monitor school records",
-                fontSize = 14.sp,
-                color = ColorOnSurfaceVariant
-            )
-
-            if (isLoading) {
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        color = ColorPrimary,
-                        strokeWidth = 2.dp
-                    )
-
-                    Spacer(modifier = Modifier.size(8.dp))
-
-                    Text(
-                        text = "Loading dashboard data...",
-                        fontSize = 14.sp,
-                        color = ColorOnSurfaceVariant
-                    )
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
             }
 
-            if (errorMessage.isNotBlank()) {
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Text(
-                    text = errorMessage,
-                    fontSize = 14.sp,
-                    color = SgrmsColors.Error,
-                    fontWeight = FontWeight.Bold
-                )
+            if (uiState.errorMessage.isNotBlank()) {
+                Text(uiState.errorMessage, color = SgrmsColors.Error, style = MaterialTheme.typography.bodyMedium)
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            AccountsHeroCard(
+                total = summary.totalAccounts,
+                admins = summary.adminAccounts,
+                teachers = summary.teacherAccounts,
+                students = summary.studentAccounts,
+                classes = summary.classes
+            )
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = ColorPrimary),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(18.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(62.dp)
-                            .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.18f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AdminPanelSettings,
-                            contentDescription = "Admin",
-                            tint = Color.White,
-                            modifier = Modifier.size(34.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.size(14.dp))
-
-                    Column(
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SgrmsStatCard(
+                        value = summary.students.toString(),
+                        label = "Students",
+                        icon = Icons.Default.Group,
+                        tint = MaterialTheme.colorScheme.primary,
+                        container = MaterialTheme.colorScheme.primaryContainer,
+                        onClick = onStudentManagementClick,
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "System Overview",
-                            color = Color.White,
-                            fontSize = 16.sp
-                        )
+                    )
+                    SgrmsStatCard(
+                        value = summary.teachers.toString(),
+                        label = "Teachers",
+                        icon = Icons.Default.SupervisorAccount,
+                        tint = SgrmsColors.Success,
+                        container = SgrmsColors.SuccessContainer,
+                        onClick = onTeacherManagementClick,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SgrmsStatCard(
+                        value = summary.subjects.toString(),
+                        label = "Subjects",
+                        icon = Icons.AutoMirrored.Filled.MenuBook,
+                        tint = SgrmsColors.Orange,
+                        container = SgrmsColors.OrangeContainer,
+                        onClick = onSubjectManagementClick,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SgrmsStatCard(
+                        value = summary.classes.toString(),
+                        label = "Classes",
+                        icon = Icons.Default.School,
+                        tint = SgrmsColors.Pink,
+                        container = SgrmsColors.PinkContainer,
+                        onClick = onClassManagementClick,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
 
-                        Text(
-                            text = "$totalAccounts Accounts",
-                            color = Color.White,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+            SgrmsSectionTitle("Quick actions")
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                QuickAction(text = "Add teacher", icon = Icons.Default.PersonAdd, onClick = onAddTeacherClick, modifier = Modifier.weight(1f))
+                QuickAction(text = "Add student", icon = Icons.Default.PersonAdd, onClick = onAddStudentAccountClick, modifier = Modifier.weight(1f))
+            }
 
-                        Text(
-                            text = "$adminCount Admin • $teacherAccountCount Teacher • $studentAccountCount Student",
-                            color = Color.White.copy(alpha = 0.88f),
-                            fontSize = 13.sp
+            SgrmsGroupedCard {
+                NavRow(title = "User management", subtitle = "All login accounts and roles", icon = Icons.Default.ManageAccounts, onClick = onUserManagementClick)
+                SgrmsRowDivider()
+                NavRow(title = "Reports", subtitle = "Student results and PDF reports", icon = Icons.Default.Summarize, onClick = onReportClick)
+            }
+
+            if (uiState.recentAccounts.isNotEmpty()) {
+                SgrmsSectionTitle("Recent accounts")
+                SgrmsGroupedCard {
+                    uiState.recentAccounts.forEachIndexed { index, user ->
+                        if (index > 0) SgrmsRowDivider()
+                        val role = user.userRole
+                        SgrmsListRow(
+                            title = user.fullName.ifBlank { user.email },
+                            subtitle = user.email,
+                            leading = { SgrmsAvatar(name = user.fullName.ifBlank { user.email }, size = 40.dp) },
+                            trailing = {
+                                SgrmsStatusChip(
+                                    text = user.role.ifBlank { "User" },
+                                    tone = if (role == UserRole.TEACHER) ChipTone.Success else ChipTone.Primary
+                                )
+                            }
                         )
                     }
                 }
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(18.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                SgrmsDashboardSummaryCard(
-                    title = "Teachers",
-                    value = teacherCount.toString(),
-                    icon = Icons.Default.SupervisorAccount,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp,
-                    onClick = onUserManagementClick
-                )
-
-                SgrmsDashboardSummaryCard(
-                    title = "Students",
-                    value = studentCount.toString(),
-                    icon = Icons.Default.Group,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp,
-                    onClick = onStudentManagementClick
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                SgrmsDashboardSummaryCard(
-                    title = "Subjects",
-                    value = subjectCount.toString(),
-                    icon = Icons.Default.MenuBook,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp,
-                    onClick = onSubjectManagementClick
-                )
-
-                SgrmsDashboardSummaryCard(
-                    title = "Classes",
-                    value = classCount.toString(),
-                    icon = Icons.Default.Class,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp,
-                    onClick = onClassManagementClick
+/** Indigo hero card: total accounts, a split bar and the role breakdown. */
+@Composable
+private fun AccountsHeroCard(
+    total: Int,
+    admins: Int,
+    teachers: Int,
+    students: Int,
+    classes: Int
+) {
+    Surface(
+        shape = RoundedCornerShape(SgrmsRadius.Hero),
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Total accounts", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
+                    Text(total.toString(), style = MaterialTheme.typography.displayMedium, color = Color.White)
+                }
+                Text(
+                    text = if (classes == 1) "1 class" else "$classes classes",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .padding(horizontal = 10.dp, vertical = 6.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            if (total > 0) {
+                Row(modifier = Modifier.fillMaxWidth().height(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    if (admins > 0) Box(Modifier.weight(admins.toFloat()).fillMaxSize().clip(RoundedCornerShape(4.dp)).background(Color(0xFFFBBF24)))
+                    if (teachers > 0) Box(Modifier.weight(teachers.toFloat()).fillMaxSize().clip(RoundedCornerShape(4.dp)).background(Color(0xFFA5B4FC)))
+                    if (students > 0) Box(Modifier.weight(students.toFloat()).fillMaxSize().clip(RoundedCornerShape(4.dp)).background(Color.White))
+                }
+            }
 
-            Text(
-                text = "Admin Actions",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AdminActionCard(
-                title = "User Management",
-                description = "View, manage, and update user accounts",
-                icon = Icons.Default.ManageAccounts,
-                onClick = onUserManagementClick
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AdminActionCard(
-                title = "Add Teacher Account",
-                description = "Create a new teacher profile and login account",
-                icon = Icons.Default.PersonAdd,
-                onClick = onAddTeacherClick
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            AdminActionCard(
-                title = "Add Student Account",
-                description = "Create a student profile and linked login account",
-                icon = Icons.Default.Group,
-                onClick = onAddStudentAccountClick
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text("$admins Admin", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text("$teachers Teachers", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text("$students Students", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+            }
         }
     }
 }
 
 @Composable
-fun AdminActionCard(
-    title: String,
-    description: String,
+private fun QuickAction(
+    text: String,
     icon: ImageVector,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .clickable {
-                onClick()
-            },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = ColorSurface
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = modifier.height(56.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .background(ColorPrimary.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = ColorPrimary,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.size(14.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = description,
-                    fontSize = 13.sp,
-                    color = ColorOnSurfaceVariant
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.Assessment,
-                contentDescription = "Open",
-                tint = ColorOnSurfaceVariant,
-                modifier = Modifier.size(22.dp)
-            )
+            SgrmsIconTile(icon = icon, tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer, size = 32.dp)
+            Text(text, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
+}
+
+@Composable
+private fun NavRow(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    onClick: () -> Unit
+) {
+    SgrmsListRow(
+        title = title,
+        subtitle = subtitle,
+        leading = { SgrmsIconTile(icon = icon, tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer) },
+        trailing = {
+            Icon(
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp)
+            )
+        },
+        onClick = onClick
+    )
 }
