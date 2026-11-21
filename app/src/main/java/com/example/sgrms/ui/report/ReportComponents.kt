@@ -53,12 +53,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGradeItem
 import java.util.Date
@@ -84,7 +83,7 @@ fun ReportSummaryCard(
     Card(
         modifier = modifier.height(112.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+        colors = CardDefaults.cardColors(containerColor = ColorPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -133,9 +132,9 @@ fun ReportCard(
     }
 
     val statusColor = if (item.status == "Generated") {
-        SuccessGreen
+        SgrmsColors.Success
     } else {
-        WarningOrange
+        SgrmsColors.WarningBar
     }
 
     Card(
@@ -145,7 +144,7 @@ fun ReportCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -159,13 +158,13 @@ fun ReportCard(
                     modifier = Modifier
                         .size(52.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Description,
                         contentDescription = "Report",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(29.dp)
                     )
                 }
@@ -184,7 +183,7 @@ fun ReportCard(
                     Text(
                         text = "${item.studentCode} • ${item.className}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -201,14 +200,14 @@ fun ReportCard(
                     Text(
                         text = "%.2f%%".format(item.report.averageMarks),
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -223,7 +222,7 @@ fun ReportCard(
                     Icon(
                         imageVector = Icons.Default.CalendarMonth,
                         contentDescription = "Date",
-                        tint = TextGrey,
+                        tint = ColorOnSurfaceVariant,
                         modifier = Modifier.size(18.dp)
                     )
 
@@ -232,7 +231,7 @@ fun ReportCard(
                     Text(
                         text = item.report.generatedDate,
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -263,7 +262,7 @@ fun ReportCard(
                 Text(
                     text = "Remarks: ${item.report.remarks}",
                     fontSize = 14.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -281,7 +280,7 @@ fun ReportCard(
                     Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "View Report",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -293,7 +292,7 @@ fun ReportCard(
                     Icon(
                         imageVector = Icons.Default.Download,
                         contentDescription = "Download PDF",
-                        tint = SuccessGreen
+                        tint = SgrmsColors.Success
                     )
                 }
 
@@ -305,7 +304,7 @@ fun ReportCard(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Update Report",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -317,7 +316,7 @@ fun ReportCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Remove Report",
-                        tint = Color.Red
+                        tint = SgrmsColors.Error
                     )
                 }
             }
@@ -404,7 +403,7 @@ fun ReportFilterDialog(
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Text(
@@ -419,7 +418,7 @@ fun ReportFilterDialog(
             ) {
                 Text(
                     text = "Clear",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -445,7 +444,7 @@ fun ReportDialogDropdown(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = PrimaryBlue
+                contentColor = ColorPrimary
             )
         ) {
             Text(
@@ -458,7 +457,7 @@ fun ReportDialogDropdown(
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = label,
-                tint = PrimaryBlue,
+                tint = ColorPrimary,
                 modifier = Modifier.size(18.dp)
             )
         }

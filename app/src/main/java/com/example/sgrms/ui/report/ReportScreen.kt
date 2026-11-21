@@ -52,9 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
@@ -64,6 +64,7 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.utils.ReportCalculator
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun ReportScreen(
@@ -290,7 +291,7 @@ fun ReportScreen(
                         selectedReportToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
+                        containerColor = SgrmsColors.Error
                     )
                 ) {
                     Text(
@@ -308,7 +309,7 @@ fun ReportScreen(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }
@@ -362,7 +363,7 @@ fun ReportScreen(
                     gradeViewModel.loadGrades()
                     subjectViewModel.loadSubjects()
                 },
-                containerColor = PrimaryBlue,
+                containerColor = ColorPrimary,
                 contentColor = Color.White,
                 icon = {
                     Icon(
@@ -384,7 +385,7 @@ fun ReportScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .padding(
                     start = 16.dp,
@@ -428,16 +429,16 @@ fun ReportScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = TextGrey
+                        tint = ColorOnSurfaceVariant
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
+                    focusedBorderColor = ColorPrimary,
+                    focusedLabelColor = ColorPrimary,
+                    cursorColor = ColorPrimary
                 )
             )
 
@@ -460,13 +461,13 @@ fun ReportScreen(
                     },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryBlue
+                        contentColor = ColorPrimary
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
                         contentDescription = "Filter Reports",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(18.dp)
                     )
 
@@ -485,7 +486,7 @@ fun ReportScreen(
             if (errorMessage.isNotBlank()) {
                 Text(
                     text = errorMessage,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -502,7 +503,7 @@ fun ReportScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }

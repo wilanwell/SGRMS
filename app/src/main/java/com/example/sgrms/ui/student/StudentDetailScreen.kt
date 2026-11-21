@@ -48,11 +48,11 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
@@ -142,7 +142,7 @@ fun StudentDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -172,7 +172,7 @@ fun StudentDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -193,7 +193,7 @@ fun StudentDetailScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(
@@ -219,7 +219,7 @@ fun StudentDetailScreen(
                             Text(
                                 text = "$studentCode • $className",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
 
                             Spacer(modifier = Modifier.height(12.dp))
@@ -228,9 +228,9 @@ fun StudentDetailScreen(
                                 text = status,
                                 fontSize = 14.sp,
                                 color = if (status == "Active") {
-                                    SuccessGreen
+                                    SgrmsColors.Success
                                 } else {
-                                    Color.Red
+                                    SgrmsColors.Error
                                 },
                                 fontWeight = FontWeight.Bold
                             )
@@ -242,7 +242,7 @@ fun StudentDetailScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(
@@ -264,7 +264,7 @@ fun StudentDetailScreen(
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
+                                color = ColorBackground
                             )
 
                             StudentDetailInfoRow(
@@ -275,7 +275,7 @@ fun StudentDetailScreen(
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
+                                color = ColorBackground
                             )
 
                             StudentDetailInfoRow(
@@ -286,7 +286,7 @@ fun StudentDetailScreen(
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
+                                color = ColorBackground
                             )
 
                             StudentDetailInfoRow(
@@ -301,7 +301,7 @@ fun StudentDetailScreen(
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
+                                color = ColorBackground
                             )
 
                             StudentDetailInfoRow(
@@ -312,7 +312,7 @@ fun StudentDetailScreen(
 
                             HorizontalDivider(
                                 modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
+                                color = ColorBackground
                             )
 
                             StudentDetailInfoRow(
@@ -328,7 +328,7 @@ fun StudentDetailScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+                        colors = CardDefaults.cardColors(containerColor = ColorPrimary),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Row(
@@ -377,7 +377,7 @@ fun StudentDetailScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(
@@ -389,7 +389,7 @@ fun StudentDetailScreen(
                                 Icon(
                                     imageVector = Icons.Default.School,
                                     contentDescription = "Academic Performance",
-                                    tint = PrimaryBlue
+                                    tint = ColorPrimary
                                 )
 
                                 Spacer(modifier = Modifier.size(8.dp))
@@ -407,7 +407,7 @@ fun StudentDetailScreen(
                                 Text(
                                     text = "No grade record found for this student.",
                                     fontSize = 14.sp,
-                                    color = TextGrey
+                                    color = ColorOnSurfaceVariant
                                 )
                             } else {
                                 subjectResults.forEach { subject ->
@@ -430,13 +430,13 @@ fun StudentDetailScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit Student",
-                                tint = PrimaryBlue
+                                tint = ColorPrimary
                             )
 
                             Spacer(modifier = Modifier.size(8.dp))
@@ -455,7 +455,7 @@ fun StudentDetailScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             Text(

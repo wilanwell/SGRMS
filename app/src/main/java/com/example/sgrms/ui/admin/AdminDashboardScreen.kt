@@ -51,13 +51,14 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.AdminDashboardViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun AdminDashboardScreen(
@@ -111,7 +112,7 @@ fun AdminDashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(
@@ -130,7 +131,7 @@ fun AdminDashboardScreen(
             Text(
                 text = "Manage user accounts and monitor school records",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             if (isLoading) {
@@ -141,7 +142,7 @@ fun AdminDashboardScreen(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = PrimaryBlue,
+                        color = ColorPrimary,
                         strokeWidth = 2.dp
                     )
 
@@ -150,7 +151,7 @@ fun AdminDashboardScreen(
                     Text(
                         text = "Loading dashboard data...",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -161,7 +162,7 @@ fun AdminDashboardScreen(
                 Text(
                     text = errorMessage,
                     fontSize = 14.sp,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -171,7 +172,7 @@ fun AdminDashboardScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+                colors = CardDefaults.cardColors(containerColor = ColorPrimary),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
@@ -330,7 +331,7 @@ fun AdminActionCard(
             },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -346,13 +347,13 @@ fun AdminActionCard(
                 modifier = Modifier
                     .size(50.dp)
                     .clip(CircleShape)
-                    .background(PrimaryBlue.copy(alpha = 0.12f)),
+                    .background(ColorPrimary.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -371,14 +372,14 @@ fun AdminActionCard(
                 Text(
                     text = description,
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
             Icon(
                 imageVector = Icons.Default.Assessment,
                 contentDescription = "Open",
-                tint = TextGrey,
+                tint = ColorOnSurfaceVariant,
                 modifier = Modifier.size(22.dp)
             )
         }

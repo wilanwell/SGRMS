@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
 
 @Composable
 fun SgrmsTextField(
@@ -70,9 +70,9 @@ fun SgrmsTextField(
             }
         },
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PrimaryBlue,
-            focusedLabelColor = PrimaryBlue,
-            cursorColor = PrimaryBlue
+            focusedBorderColor = ColorPrimary,
+            focusedLabelColor = ColorPrimary,
+            cursorColor = ColorPrimary
         )
     )
 }

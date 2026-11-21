@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
 import androidx.compose.ui.graphics.Color
 
 @Composable
@@ -48,7 +48,7 @@ fun SgrmsScreenLayout(
             if (floatingActionIcon != null && onFloatingActionClick != null) {
                 FloatingActionButton(
                     onClick = onFloatingActionClick,
-                    containerColor = PrimaryBlue,
+                    containerColor = ColorPrimary,
                     contentColor = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp)
                 ) {
@@ -63,7 +63,7 @@ fun SgrmsScreenLayout(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp),

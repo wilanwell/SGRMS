@@ -46,13 +46,14 @@ import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun ClassDetailScreen(
@@ -151,7 +152,7 @@ fun ClassDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -175,7 +176,7 @@ fun ClassDetailScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -188,13 +189,13 @@ fun ClassDetailScreen(
                             modifier = Modifier
                                 .size(58.dp)
                                 .clip(CircleShape)
-                                .background(PrimaryBlue.copy(alpha = 0.12f)),
+                                .background(ColorPrimary.copy(alpha = 0.12f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.School,
                                 contentDescription = "Class",
-                                tint = PrimaryBlue,
+                                tint = ColorPrimary,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
@@ -213,14 +214,14 @@ fun ClassDetailScreen(
                             Text(
                                 text = "Academic Year: ${schoolClass?.academicYear ?: "-"}",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    HorizontalDivider(color = BackgroundGrey)
+                    HorizontalDivider(color = ColorBackground)
 
                     Spacer(modifier = Modifier.height(14.dp))
 
@@ -263,7 +264,7 @@ fun ClassDetailScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Icon(
@@ -287,7 +288,7 @@ fun ClassDetailScreen(
 
                 Text(
                     text = classUiState.errorMessage,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -298,7 +299,7 @@ fun ClassDetailScreen(
 
                 Text(
                     text = studentUiState.errorMessage,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )

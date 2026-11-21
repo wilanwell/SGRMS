@@ -49,12 +49,11 @@ import com.example.sgrms.ui.components.SgrmsHeaderProfileCard
 import com.example.sgrms.ui.components.SgrmsPrimaryButton
 import com.example.sgrms.ui.components.SgrmsSmallSummaryBox
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
@@ -164,7 +163,7 @@ fun StudentGradeDetailScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues),
             contentPadding = PaddingValues(
@@ -185,7 +184,7 @@ fun StudentGradeDetailScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryBlue
+                                color = ColorPrimary
                             )
                         }
                     }
@@ -272,7 +271,7 @@ fun StudentGradeDetailScreen(
                         item {
                             Text(
                                 text = errorMessage,
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -286,7 +285,7 @@ fun StudentGradeDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.BarChart,
                                 contentDescription = "Subject Performance",
-                                tint = PrimaryBlue
+                                tint = ColorPrimary
                             )
 
                             Spacer(modifier = Modifier.size(8.dp))
@@ -337,7 +336,7 @@ fun StudentGradeSubjectCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -354,13 +353,13 @@ fun StudentGradeSubjectCard(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -382,7 +381,7 @@ fun StudentGradeSubjectCard(
                     Text(
                         text = item.subjectCode.ifBlank { "-" },
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -401,7 +400,7 @@ fun StudentGradeSubjectCard(
                     Text(
                         text = "%.1f%%".format(item.grade.marks),
                         fontSize = 15.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -415,8 +414,8 @@ fun StudentGradeSubjectCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
-                color = PrimaryBlue,
-                trackColor = BackgroundGrey
+                color = ColorPrimary,
+                trackColor = ColorBackground
             )
 
             if (item.grade.remarks.isNotBlank()) {
@@ -425,7 +424,7 @@ fun StudentGradeSubjectCard(
                 Text(
                     text = "Remarks: ${item.grade.remarks}",
                     fontSize = 15.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -436,9 +435,9 @@ fun StudentGradeSubjectCard(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (statusText.equals("Complete", ignoreCase = true)) {
-                    SuccessGreen
+                    SgrmsColors.Success
                 } else {
-                    WarningOrange
+                    SgrmsColors.WarningBar
                 }
             )
         }

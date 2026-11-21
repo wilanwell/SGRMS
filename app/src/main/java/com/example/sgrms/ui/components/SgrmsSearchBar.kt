@@ -11,8 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SgrmsSearchBar(
@@ -35,16 +35,16 @@ fun SgrmsSearchBar(
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
-                tint = TextGrey
+                tint = ColorOnSurfaceVariant
             )
         },
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         singleLine = true,
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PrimaryBlue,
-            focusedLabelColor = PrimaryBlue,
-            cursorColor = PrimaryBlue
+            focusedBorderColor = ColorPrimary,
+            focusedLabelColor = ColorPrimary,
+            cursorColor = ColorPrimary
         )
     )
 }

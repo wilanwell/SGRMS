@@ -28,12 +28,13 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.ui.theme.ColorBackground
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun EditGradeScreen(
@@ -169,7 +170,7 @@ fun EditGradeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -336,7 +337,7 @@ fun EditGradeScreen(
 
                     androidx.compose.material3.Text(
                         text = errorMessage,
-                        color = androidx.compose.ui.graphics.Color.Red
+                        color = SgrmsColors.Error
                     )
                 }
 

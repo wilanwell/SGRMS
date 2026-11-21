@@ -48,13 +48,14 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.ui.components.LoadMoreButton
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun StudentManagementScreen(
@@ -202,7 +203,7 @@ fun StudentManagementScreen(
                         selectedStudentToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
+                        containerColor = SgrmsColors.Error
                     )
                 ) {
                     Text(
@@ -220,7 +221,7 @@ fun StudentManagementScreen(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }
@@ -274,7 +275,7 @@ fun StudentManagementScreen(
             // Only an Admin can create login accounts (see firestore.rules).
             if (canAddStudent) FloatingActionButton(
                 onClick = onAddStudentClick,
-                containerColor = PrimaryBlue,
+                containerColor = ColorPrimary,
                 contentColor = Color.White,
                 modifier = Modifier
             ) {
@@ -289,7 +290,7 @@ fun StudentManagementScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         ) {
@@ -321,7 +322,7 @@ fun StudentManagementScreen(
                     Text(
                         text = "Students loaded: ${students.size}${if (uiState.hasMore) "+" else ""}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -336,13 +337,13 @@ fun StudentManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = "Filter Students",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -365,13 +366,13 @@ fun StudentManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.FileDownload,
                             contentDescription = "Export",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -391,7 +392,7 @@ fun StudentManagementScreen(
             Text(
                 text = "${filteredStudents.size} shown",
                 fontSize = 13.sp,
-                color = PrimaryBlue,
+                color = ColorPrimary,
                 fontWeight = FontWeight.Bold
             )
 
@@ -406,7 +407,7 @@ fun StudentManagementScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -414,7 +415,7 @@ fun StudentManagementScreen(
                 uiState.errorMessage.isNotBlank() -> {
                     Text(
                         text = uiState.errorMessage,
-                        color = Color.Red,
+                        color = SgrmsColors.Error,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )

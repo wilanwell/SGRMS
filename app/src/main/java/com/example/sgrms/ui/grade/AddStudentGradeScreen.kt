@@ -47,12 +47,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.theme.markColor
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.viewmodel.AddStudentGradeSubjectItem
@@ -93,7 +92,7 @@ fun AddStudentGradeScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues),
             contentPadding = PaddingValues(
@@ -114,7 +113,7 @@ fun AddStudentGradeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryBlue
+                                color = ColorPrimary
                             )
                         }
                     }
@@ -146,7 +145,7 @@ fun AddStudentGradeScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(14.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             ),
                             elevation = CardDefaults.cardElevation(
                                 defaultElevation = 3.dp
@@ -181,7 +180,7 @@ fun AddStudentGradeScreen(
                         Text(
                             text = "Enter marks for the subjects below.",
                             fontSize = 14.sp,
-                            color = TextGrey
+                            color = ColorOnSurfaceVariant
                         )
                     }
 
@@ -215,7 +214,7 @@ fun AddStudentGradeScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             Text(
@@ -246,13 +245,13 @@ private fun AddStudentGradeSubjectCard(
         "-"
     }
 
-    val gradeColor = if (marks == null) TextGrey else markColor(marks)
+    val gradeColor = if (marks == null) ColorOnSurfaceVariant else markColor(marks)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -269,7 +268,7 @@ private fun AddStudentGradeSubjectCard(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            color = PrimaryBlue.copy(alpha = 0.12f),
+                            color = ColorPrimary.copy(alpha = 0.12f),
                             shape = RoundedCornerShape(12.dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -277,7 +276,7 @@ private fun AddStudentGradeSubjectCard(
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(27.dp)
                     )
                 }
@@ -296,7 +295,7 @@ private fun AddStudentGradeSubjectCard(
                     Text(
                         text = item.subjectCode.ifBlank { "-" },
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -339,9 +338,9 @@ private fun AddStudentGradeSubjectCard(
                 ),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
+                    focusedBorderColor = ColorPrimary,
+                    focusedLabelColor = ColorPrimary,
+                    cursorColor = ColorPrimary
                 )
             )
 
@@ -361,9 +360,9 @@ private fun AddStudentGradeSubjectCard(
                 enabled = !item.isSaving,
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
+                    focusedBorderColor = ColorPrimary,
+                    focusedLabelColor = ColorPrimary,
+                    cursorColor = ColorPrimary
                 )
             )
 
@@ -373,9 +372,9 @@ private fun AddStudentGradeSubjectCard(
                 Text(
                     text = item.message,
                     color = if (item.message.contains("success", ignoreCase = true)) {
-                        SuccessGreen
+                        SgrmsColors.Success
                     } else {
-                        Color.Red
+                        SgrmsColors.Error
                     },
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold
@@ -392,7 +391,7 @@ private fun AddStudentGradeSubjectCard(
                     .height(48.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 if (item.isSaving) {

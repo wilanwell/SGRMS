@@ -26,3 +26,6 @@ ui-debug.log
 
 # Stray archives inside source
 app/src/main/java/**/*.zip
+
+# Local agent scratch (plan ledgers, review packages)
+.superpowers/

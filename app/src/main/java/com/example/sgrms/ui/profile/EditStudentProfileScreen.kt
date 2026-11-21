@@ -44,16 +44,17 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.ProfileImagePicker
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import java.util.Calendar
 import java.util.Date
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.StudentProfileViewModel
 import com.example.sgrms.data.repository.StudentProfileUpdate
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun EditStudentProfileScreen(
@@ -230,7 +231,7 @@ fun EditStudentProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -259,7 +260,7 @@ fun EditStudentProfileScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = CardWhite
+                    containerColor = ColorSurface
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 3.dp
@@ -278,14 +279,14 @@ fun EditStudentProfileScreen(
                     Text(
                         text = "Update contact, guardian, and profile picture",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(18.dp))
 
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -293,7 +294,7 @@ fun EditStudentProfileScreen(
                         Text(
                             text = "Loading student profile...",
                             fontSize = 14.sp,
-                            color = TextGrey
+                            color = ColorOnSurfaceVariant
                         )
                     } else {
                         ProfileImagePicker(
@@ -318,7 +319,7 @@ fun EditStudentProfileScreen(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Text(
@@ -333,7 +334,7 @@ fun EditStudentProfileScreen(
                         if (generalError.isNotBlank()) {
                             Text(
                                 text = generalError,
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -403,7 +404,7 @@ fun EditStudentProfileScreen(
                                 .height(48.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Text(
@@ -539,7 +540,7 @@ fun EditStudentProfileScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             if (isSaving) {
@@ -567,7 +568,7 @@ fun EditStudentProfileScreen(
                                 .height(52.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Text(

@@ -42,11 +42,11 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SubjectDetailItem(
@@ -62,7 +62,7 @@ fun SubjectDetailItem(
             modifier = Modifier.size(42.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(
-                containerColor = PrimaryBlue.copy(alpha = 0.10f)
+                containerColor = ColorPrimary.copy(alpha = 0.10f)
             )
         ) {
             Box(
@@ -72,7 +72,7 @@ fun SubjectDetailItem(
                 Icon(
                     imageVector = icon,
                     contentDescription = label,
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(22.dp)
                 )
             }
@@ -84,7 +84,7 @@ fun SubjectDetailItem(
             Text(
                 text = label,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(
@@ -105,7 +105,7 @@ fun SubjectStudentCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
@@ -121,7 +121,7 @@ fun SubjectStudentCard(
                         color = if (student.gender == "Female") {
                             Color(0xFFFF4081)
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         },
                         shape = CircleShape
                     ),
@@ -148,13 +148,13 @@ fun SubjectStudentCard(
                 Text(
                     text = "Code: ${student.studentCode.ifBlank { "-" }}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Text(
                     text = "Class: ${student.className.ifBlank { "Not assigned" }}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -162,9 +162,9 @@ fun SubjectStudentCard(
                 text = studentStatus,
                 fontSize = 12.sp,
                 color = if (studentStatus == "Active") {
-                    SuccessGreen
+                    SgrmsColors.Success
                 } else {
-                    Color.Red
+                    SgrmsColors.Error
                 },
                 fontWeight = FontWeight.Bold
             )
@@ -201,7 +201,7 @@ fun AddStudentToSubjectDialog(
                 Text(
                     text = "Choose a student to add into $subjectName",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         },
@@ -256,7 +256,7 @@ fun AddStudentToSubjectDialog(
             ) {
                 Text(
                     text = "Close",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -271,7 +271,7 @@ fun AddSubjectStudentSelectionCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = BackgroundGrey),
+        colors = CardDefaults.cardColors(containerColor = ColorBackground),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
@@ -287,7 +287,7 @@ fun AddSubjectStudentSelectionCard(
                         color = if (student.gender == "Female") {
                             Color(0xFFFF4081)
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         },
                         shape = CircleShape
                     ),
@@ -314,20 +314,20 @@ fun AddSubjectStudentSelectionCard(
                 Text(
                     text = "Code: ${student.studentCode.ifBlank { "-" }}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Text(
                     text = "Class: ${student.className.ifBlank { "Not assigned" }}",
                     fontSize = 12.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
             Button(
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {

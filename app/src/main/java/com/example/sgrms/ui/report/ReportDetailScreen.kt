@@ -45,12 +45,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
@@ -158,9 +157,9 @@ fun ReportDetailScreen(
     }
 
     val reportStatusColor = if (isReportOutdated) {
-        WarningOrange
+        SgrmsColors.WarningBar
     } else {
-        SuccessGreen
+        SgrmsColors.Success
     }
 
     val reportStatusIcon = if (isReportOutdated) {
@@ -216,7 +215,7 @@ fun ReportDetailScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues)
                 .padding(
@@ -234,7 +233,7 @@ fun ReportDetailScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -243,7 +242,7 @@ fun ReportDetailScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(
@@ -255,7 +254,7 @@ fun ReportDetailScreen(
                             Icon(
                                 imageVector = Icons.Default.Assessment,
                                 contentDescription = "Report Not Found",
-                                tint = TextGrey,
+                                tint = ColorOnSurfaceVariant,
                                 modifier = Modifier.size(44.dp)
                             )
 
@@ -274,7 +273,7 @@ fun ReportDetailScreen(
                                     "The selected report may have been deleted."
                                 },
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     }
@@ -326,13 +325,13 @@ fun ReportDetailScreen(
                                         .height(52.dp),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = PrimaryBlue
+                                        contentColor = ColorPrimary
                                     )
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Edit,
                                         contentDescription = "Update Report",
-                                        tint = PrimaryBlue
+                                        tint = ColorPrimary
                                     )
 
                                     Spacer(modifier = Modifier.size(8.dp))
@@ -361,8 +360,8 @@ fun ReportDetailScreen(
                                         .height(52.dp),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryBlue,
-                                        disabledContainerColor = PrimaryBlue.copy(alpha = 0.45f)
+                                        containerColor = ColorPrimary,
+                                        disabledContainerColor = ColorPrimary.copy(alpha = 0.45f)
                                     )
                                 ) {
                                     Icon(
@@ -387,7 +386,7 @@ fun ReportDetailScreen(
                             item {
                                 Text(
                                     text = errorMessage,
-                                    color = Color.Red,
+                                    color = SgrmsColors.Error,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -407,7 +406,7 @@ fun ReportDetailScreen(
                                 Card(
                                     modifier = Modifier.fillMaxWidth(),
                                     shape = RoundedCornerShape(14.dp),
-                                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                                    colors = CardDefaults.cardColors(containerColor = ColorSurface),
                                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                                 ) {
                                     Column(
@@ -419,7 +418,7 @@ fun ReportDetailScreen(
                                         Icon(
                                             imageVector = Icons.Default.MenuBook,
                                             contentDescription = "No Grade",
-                                            tint = TextGrey,
+                                            tint = ColorOnSurfaceVariant,
                                             modifier = Modifier.size(44.dp)
                                         )
 
@@ -434,7 +433,7 @@ fun ReportDetailScreen(
                                         Text(
                                             text = "Grade records will appear here after subject marks are added.",
                                             fontSize = 14.sp,
-                                            color = TextGrey
+                                            color = ColorOnSurfaceVariant
                                         )
                                     }
                                 }

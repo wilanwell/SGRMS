@@ -43,14 +43,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.components.DarkStatusBarIcons
 import com.example.sgrms.utils.isValidEmail
 import com.example.sgrms.viewmodel.AuthViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun LoginScreen() {
@@ -79,7 +80,7 @@ fun LoginScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey),
+            .background(ColorBackground),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -92,7 +93,7 @@ fun LoginScreen() {
             Icon(
                 imageVector = Icons.Default.School,
                 contentDescription = "SGRMS Logo",
-                tint = PrimaryBlue,
+                tint = ColorPrimary,
                 modifier = Modifier
                     .height(80.dp)
                     .fillMaxWidth()
@@ -104,13 +105,13 @@ fun LoginScreen() {
                 text = "SGRMS",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryBlue
+                color = ColorPrimary
             )
 
             Text(
                 text = "School Grade Record Management System",
                 fontSize = 15.sp,
-                color = TextGrey,
+                color = ColorOnSurfaceVariant,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
             )
@@ -120,7 +121,7 @@ fun LoginScreen() {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
@@ -132,13 +133,13 @@ fun LoginScreen() {
                         text = "Login",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
 
                     Text(
                         text = "Please enter your registered email and password",
                         fontSize = 14.sp,
-                        color = TextGrey,
+                        color = ColorOnSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
                     )
 
@@ -173,9 +174,9 @@ fun LoginScreen() {
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -232,9 +233,9 @@ fun LoginScreen() {
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -244,7 +245,7 @@ fun LoginScreen() {
                         Text(
                             text = authUiState.errorMessage,
                             fontSize = 14.sp,
-                            color = Color.Red,
+                            color = SgrmsColors.Error,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -269,8 +270,8 @@ fun LoginScreen() {
                             .height(52.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PrimaryBlue,
-                            disabledContainerColor = PrimaryBlue.copy(alpha = 0.6f)
+                            containerColor = ColorPrimary,
+                            disabledContainerColor = ColorPrimary.copy(alpha = 0.6f)
                         )
                     ) {
                         if (authUiState.isLoading) {
@@ -300,7 +301,7 @@ fun LoginScreen() {
                         Text(
                             text = "Forgot Password?",
                             fontSize = 14.sp,
-                            color = PrimaryBlue,
+                            color = ColorPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -312,7 +313,7 @@ fun LoginScreen() {
             Text(
                 text = "© 2026 SGRMS",
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
         }
     }

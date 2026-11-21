@@ -34,8 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
 import com.example.sgrms.utils.ReportPdfData
@@ -187,7 +187,7 @@ fun StudentReportSummaryScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues),
             contentPadding = PaddingValues(
                 start = 16.dp,
@@ -269,7 +269,7 @@ fun StudentReportSummaryScreen(
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject Performance",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
 
                     Spacer(modifier = Modifier.size(8.dp))

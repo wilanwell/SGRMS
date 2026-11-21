@@ -43,11 +43,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
@@ -176,7 +176,7 @@ fun ChangePasswordScreen(
                     },
                     enabled = !isLoading,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryBlue
+                        containerColor = ColorPrimary
                     )
                 ) {
                     if (isLoading) {
@@ -202,7 +202,7 @@ fun ChangePasswordScreen(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }
@@ -212,7 +212,7 @@ fun ChangePasswordScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -230,7 +230,7 @@ fun ChangePasswordScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -242,7 +242,7 @@ fun ChangePasswordScreen(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Password Icon",
-                            tint = PrimaryBlue
+                            tint = ColorPrimary
                         )
 
                         Spacer(modifier = Modifier.padding(5.dp))
@@ -257,7 +257,7 @@ fun ChangePasswordScreen(
                             Text(
                                 text = "Enter your current and new password",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     }
@@ -324,7 +324,7 @@ fun ChangePasswordScreen(
 
                         Text(
                             text = generalErrorMessage,
-                            color = Color.Red,
+                            color = SgrmsColors.Error,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -335,7 +335,7 @@ fun ChangePasswordScreen(
 
                         Text(
                             text = successMessage,
-                            color = SuccessGreen,
+                            color = SgrmsColors.Success,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -356,7 +356,7 @@ fun ChangePasswordScreen(
                         ) {
                             Text(
                                 text = "Cancel",
-                                color = PrimaryBlue,
+                                color = ColorPrimary,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -374,7 +374,7 @@ fun ChangePasswordScreen(
                                 .height(50.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             if (isLoading) {
@@ -455,12 +455,12 @@ fun PasswordInputField(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PrimaryBlue,
-            focusedLabelColor = PrimaryBlue,
-            cursorColor = PrimaryBlue,
-            errorBorderColor = Color.Red,
-            errorLabelColor = Color.Red,
-            errorCursorColor = Color.Red
+            focusedBorderColor = ColorPrimary,
+            focusedLabelColor = ColorPrimary,
+            cursorColor = ColorPrimary,
+            errorBorderColor = SgrmsColors.Error,
+            errorLabelColor = SgrmsColors.Error,
+            errorCursorColor = SgrmsColors.Error
         )
     )
 }

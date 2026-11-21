@@ -25,9 +25,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.navigation.Screen
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 data class BottomNavItem(
     val label: String,
@@ -147,7 +147,7 @@ fun BottomNavigationBar(
     }
 
     NavigationBar(
-        containerColor = CardWhite,
+        containerColor = ColorSurface,
         tonalElevation = 8.dp
     ) {
         items.forEach { item ->
@@ -187,11 +187,11 @@ fun BottomNavigationBar(
                 },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryBlue,
-                    selectedTextColor = PrimaryBlue,
-                    unselectedIconColor = TextGrey,
-                    unselectedTextColor = TextGrey,
-                    indicatorColor = PrimaryBlue.copy(alpha = 0.12f)
+                    selectedIconColor = ColorPrimary,
+                    selectedTextColor = ColorPrimary,
+                    unselectedIconColor = ColorOnSurfaceVariant,
+                    unselectedTextColor = ColorOnSurfaceVariant,
+                    indicatorColor = ColorPrimary.copy(alpha = 0.12f)
                 )
             )
         }

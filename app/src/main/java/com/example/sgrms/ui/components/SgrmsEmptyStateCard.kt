@@ -15,7 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SgrmsEmptyStateCard(
@@ -36,7 +36,7 @@ fun SgrmsEmptyStateCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = TextGrey,
+                tint = ColorOnSurfaceVariant,
                 modifier = Modifier.size(44.dp)
             )
 
@@ -51,7 +51,7 @@ fun SgrmsEmptyStateCard(
             Text(
                 text = message,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
         }
     }

@@ -61,12 +61,11 @@ import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun UserManagementScreen(
@@ -176,7 +175,7 @@ fun UserManagementScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues),
             contentPadding = PaddingValues(
                 start = 16.dp,
@@ -266,7 +265,7 @@ fun UserManagementScreen(
                 item {
                     Text(
                         text = errorMessage,
-                        color = Color.Red,
+                        color = SgrmsColors.Error,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -290,7 +289,7 @@ fun UserManagementScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -356,10 +355,10 @@ fun UserAccountCard(
     }
 
     val roleColor = when (user.role) {
-        "Admin" -> WarningOrange
-        "Teacher" -> PrimaryBlue
-        "Student" -> SuccessGreen
-        else -> TextGrey
+        "Admin" -> SgrmsColors.WarningBar
+        "Teacher" -> ColorPrimary
+        "Student" -> SgrmsColors.Success
+        else -> ColorOnSurfaceVariant
     }
 
     Card(
@@ -369,7 +368,7 @@ fun UserAccountCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -409,7 +408,7 @@ fun UserAccountCard(
                     Text(
                         text = "${user.email.ifBlank { "-" }} • ${user.role.ifBlank { "-" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -425,7 +424,7 @@ fun UserAccountCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -526,7 +525,7 @@ fun UserDetailDialog(
             ) {
                 Text(
                     text = "Close",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }

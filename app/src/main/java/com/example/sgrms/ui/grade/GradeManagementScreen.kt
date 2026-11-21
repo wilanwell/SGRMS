@@ -59,10 +59,11 @@ import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.components.LoadMoreButton
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun GradeManagementScreen(
@@ -207,7 +208,7 @@ fun GradeManagementScreen(
                         selectedGradeToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
+                        containerColor = SgrmsColors.Error
                     )
                 ) {
                     Text(
@@ -225,7 +226,7 @@ fun GradeManagementScreen(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }
@@ -245,7 +246,7 @@ fun GradeManagementScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddGradeClick,
-                containerColor = PrimaryBlue,
+                containerColor = ColorPrimary,
                 contentColor = Color.White,
                 modifier = Modifier.padding(end = 4.dp),
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -267,7 +268,7 @@ fun GradeManagementScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .padding(
                     start = 16.dp,
@@ -290,16 +291,16 @@ fun GradeManagementScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = TextGrey
+                        tint = ColorOnSurfaceVariant
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
+                    focusedBorderColor = ColorPrimary,
+                    focusedLabelColor = ColorPrimary,
+                    cursorColor = ColorPrimary
                 )
             )
 
@@ -319,13 +320,13 @@ fun GradeManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = "Class Filter",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -342,7 +343,7 @@ fun GradeManagementScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Select Class",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -375,7 +376,7 @@ fun GradeManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Text(
@@ -389,7 +390,7 @@ fun GradeManagementScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Select Subject",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -422,7 +423,7 @@ fun GradeManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Text(
@@ -436,7 +437,7 @@ fun GradeManagementScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Select Status",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -467,7 +468,7 @@ fun GradeManagementScreen(
 
                 Text(
                     text = errorMessage,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -492,7 +493,7 @@ fun GradeManagementScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }

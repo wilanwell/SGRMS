@@ -49,16 +49,17 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeBulkEntry
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun QuickAddGradeScreen(
@@ -168,7 +169,7 @@ fun QuickAddGradeScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues),
             contentPadding = PaddingValues(
@@ -183,7 +184,7 @@ fun QuickAddGradeScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    colors = CardDefaults.cardColors(containerColor = ColorSurface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
                     Column(
@@ -195,7 +196,7 @@ fun QuickAddGradeScreen(
                             Icon(
                                 imageVector = Icons.Default.Assessment,
                                 contentDescription = "Quick Grade",
-                                tint = PrimaryBlue,
+                                tint = ColorPrimary,
                                 modifier = Modifier.size(30.dp)
                             )
 
@@ -211,7 +212,7 @@ fun QuickAddGradeScreen(
                                 Text(
                                     text = "Select class and subject, then enter marks for students",
                                     fontSize = 14.sp,
-                                    color = TextGrey
+                                    color = ColorOnSurfaceVariant
                                 )
                             }
                         }
@@ -242,7 +243,7 @@ fun QuickAddGradeScreen(
                         if (classError) {
                             Text(
                                 text = "Class is required",
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
@@ -278,7 +279,7 @@ fun QuickAddGradeScreen(
                         if (subjectError) {
                             Text(
                                 text = "Subject is required",
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
@@ -301,7 +302,7 @@ fun QuickAddGradeScreen(
 
                             Text(
                                 text = errorMessage,
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )
@@ -328,7 +329,7 @@ fun QuickAddGradeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryBlue
+                                color = ColorPrimary
                             )
                         }
                     }
@@ -430,8 +431,8 @@ fun QuickAddGradeScreen(
                                 .height(54.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue,
-                                disabledContainerColor = PrimaryBlue.copy(alpha = 0.6f)
+                                containerColor = ColorPrimary,
+                                disabledContainerColor = ColorPrimary.copy(alpha = 0.6f)
                             )
                         ) {
                             if (gradeUiState.isLoading) {
@@ -466,7 +467,7 @@ fun QuickAddGradeScreen(
                         ) {
                             Text(
                                 text = "Cancel",
-                                color = PrimaryBlue,
+                                color = ColorPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         }

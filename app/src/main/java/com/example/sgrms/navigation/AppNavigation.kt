@@ -73,7 +73,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.ui.theme.ColorBackground
 
 private val AdminOnly = setOf(UserRole.ADMIN)
 private val TeacherOnly = setOf(UserRole.TEACHER)
@@ -191,7 +191,7 @@ fun AppNavigation() {
         // Keep content clear of the navigation bar / camera cutout at the
         // sides in landscape; top and bottom insets are handled per screen.
         modifier = Modifier
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {

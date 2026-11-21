@@ -43,11 +43,11 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun ClassStudentCard(
@@ -57,7 +57,7 @@ fun ClassStudentCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
@@ -74,7 +74,7 @@ fun ClassStudentCard(
                         if (student.gender == "Female") {
                             Color(0xFFFF4081)
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -100,16 +100,16 @@ fun ClassStudentCard(
                 Text(
                     text = "Code: ${student.studentCode}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Text(
                     text = "Status: ${student.status}",
                     fontSize = 13.sp,
                     color = if (student.status == "Active") {
-                        SuccessGreen
+                        SgrmsColors.Success
                     } else {
-                        Color.Red
+                        SgrmsColors.Error
                     },
                     fontWeight = FontWeight.Bold
                 )
@@ -121,7 +121,7 @@ fun ClassStudentCard(
                 Icon(
                     imageVector = Icons.Default.PersonRemove,
                     contentDescription = "Remove from class",
-                    tint = Color.Red
+                    tint = SgrmsColors.Error
                 )
             }
         }
@@ -156,7 +156,7 @@ fun AddStudentToClassDialog(
                 Text(
                     text = "Choose an unassigned student to add into $className",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         },
@@ -207,7 +207,7 @@ fun AddStudentToClassDialog(
             ) {
                 Text(
                     text = "Close",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -222,7 +222,7 @@ fun AddStudentSelectionCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = BackgroundGrey),
+        colors = CardDefaults.cardColors(containerColor = ColorBackground),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
@@ -239,7 +239,7 @@ fun AddStudentSelectionCard(
                         if (student.gender == "Female") {
                             Color(0xFFFF4081)
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -265,20 +265,20 @@ fun AddStudentSelectionCard(
                 Text(
                     text = "Code: ${student.studentCode}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Text(
                     text = "Current Class: ${student.className.ifBlank { "Not assigned" }}",
                     fontSize = 12.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
             Button(
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -316,7 +316,7 @@ fun RemoveStudentFromClassDialog(
             Button(
                 onClick = onConfirmRemove,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
+                    containerColor = SgrmsColors.Error
                 )
             ) {
                 Text(
@@ -331,7 +331,7 @@ fun RemoveStudentFromClassDialog(
             ) {
                 Text(
                     text = "Cancel",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }

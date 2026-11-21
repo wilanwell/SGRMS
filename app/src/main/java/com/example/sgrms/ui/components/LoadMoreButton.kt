@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
 
 /** Last item of a paged list: loads the next page from Firestore. */
 @Composable
@@ -28,7 +28,7 @@ fun LoadMoreButton(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = PrimaryBlue,
+                color = ColorPrimary,
                 modifier = Modifier.size(28.dp)
             )
         } else {

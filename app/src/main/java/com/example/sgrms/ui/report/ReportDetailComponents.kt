@@ -35,12 +35,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.theme.markColor
 
 data class ReportGradeDisplayItem(
@@ -60,7 +59,7 @@ fun ReportStudentInfoCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -73,7 +72,7 @@ fun ReportStudentInfoCard(
                     modifier = Modifier.size(58.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = PrimaryBlue.copy(alpha = 0.12f)
+                        containerColor = ColorPrimary.copy(alpha = 0.12f)
                     )
                 ) {
                     Box(
@@ -83,7 +82,7 @@ fun ReportStudentInfoCard(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Student",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -103,7 +102,7 @@ fun ReportStudentInfoCard(
                     Text(
                         text = student.studentCode.ifBlank { "-" },
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -117,7 +116,7 @@ fun ReportStudentInfoCard(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(18.dp))
 
@@ -160,7 +159,7 @@ fun ReportPerformanceSummaryCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -172,7 +171,7 @@ fun ReportPerformanceSummaryCard(
                 Icon(
                     imageVector = Icons.Default.TrendingUp,
                     contentDescription = "Performance Summary",
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(28.dp)
                 )
 
@@ -203,7 +202,7 @@ fun ReportPerformanceSummaryCard(
                     Text(
                         text = "Average Marks",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -220,7 +219,7 @@ fun ReportPerformanceSummaryCard(
                     Text(
                         text = "Overall Grade",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -234,8 +233,8 @@ fun ReportPerformanceSummaryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(9.dp),
-                color = PrimaryBlue,
-                trackColor = BackgroundGrey
+                color = ColorPrimary,
+                trackColor = ColorBackground
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -273,7 +272,7 @@ fun ReportStatusCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -304,7 +303,7 @@ fun ReportStatusCard(
             Text(
                 text = remarks.ifBlank { "No remarks available." },
                 fontSize = 14.sp,
-                color = TextGrey,
+                color = ColorOnSurfaceVariant,
                 lineHeight = 20.sp
             )
         }
@@ -325,7 +324,7 @@ fun ReportInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(22.dp)
         )
 
@@ -335,7 +334,7 @@ fun ReportInfoRow(
             Text(
                 text = label,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(
@@ -360,7 +359,7 @@ fun ReportGradeCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -377,13 +376,13 @@ fun ReportGradeCard(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -405,7 +404,7 @@ fun ReportGradeCard(
                     Text(
                         text = item.subjectCode.ifBlank { "-" },
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -424,7 +423,7 @@ fun ReportGradeCard(
                     Text(
                         text = "%.1f%%".format(item.grade.marks),
                         fontSize = 15.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -438,8 +437,8 @@ fun ReportGradeCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp),
-                color = PrimaryBlue,
-                trackColor = BackgroundGrey
+                color = ColorPrimary,
+                trackColor = ColorBackground
             )
 
             if (item.grade.remarks.isNotBlank()) {
@@ -448,7 +447,7 @@ fun ReportGradeCard(
                 Text(
                     text = "Remarks: ${item.grade.remarks}",
                     fontSize = 15.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -459,9 +458,9 @@ fun ReportGradeCard(
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (statusText.equals("Complete", ignoreCase = true)) {
-                    SuccessGreen
+                    SgrmsColors.Success
                 } else {
-                    WarningOrange
+                    SgrmsColors.WarningBar
                 }
             )
         }
@@ -478,13 +477,13 @@ fun ReportSmallInfo(
             text = value,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = PrimaryBlue
+            color = ColorPrimary
         )
 
         Text(
             text = label,
             fontSize = 11.sp,
-            color = TextGrey
+            color = ColorOnSurfaceVariant
         )
     }
 }

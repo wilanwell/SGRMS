@@ -32,11 +32,12 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun AddSubjectScreen(
@@ -117,7 +118,7 @@ fun AddSubjectScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -212,7 +213,7 @@ fun AddSubjectScreen(
                     Text(
                         text = "Teacher ID will be saved automatically.",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -242,7 +243,7 @@ fun AddSubjectScreen(
 
                     Text(
                         text = errorMessage,
-                        color = Color.Red,
+                        color = SgrmsColors.Error,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )

@@ -15,7 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
 
 @Composable
 fun SgrmsDropdownField(
@@ -56,9 +56,9 @@ fun SgrmsDropdownField(
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = PrimaryBlue,
-                focusedLabelColor = PrimaryBlue,
-                cursorColor = PrimaryBlue
+                focusedBorderColor = ColorPrimary,
+                focusedLabelColor = ColorPrimary,
+                cursorColor = ColorPrimary
             )
         )
 

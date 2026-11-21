@@ -42,13 +42,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.TeacherDashboardViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 data class ClassAverageItem(
     val subjectName: String,
@@ -89,7 +90,7 @@ fun TeacherDashboardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
     ) {
         TopBar(
             title = "SGRMS",
@@ -126,7 +127,7 @@ fun TeacherDashboardScreen(
             Text(
                 text = "Overview of student grades and academic records",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             if (isLoading) {
@@ -137,7 +138,7 @@ fun TeacherDashboardScreen(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        color = PrimaryBlue,
+                        color = ColorPrimary,
                         strokeWidth = 2.dp
                     )
 
@@ -146,7 +147,7 @@ fun TeacherDashboardScreen(
                     Text(
                         text = "Loading dashboard data...",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -157,7 +158,7 @@ fun TeacherDashboardScreen(
                 Text(
                     text = errorMessage,
                     fontSize = 14.sp,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -215,7 +216,7 @@ fun TeacherDashboardScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
@@ -229,7 +230,7 @@ fun TeacherDashboardScreen(
                         Icon(
                             imageVector = Icons.Default.BarChart,
                             contentDescription = "Class Averages",
-                            tint = PrimaryBlue
+                            tint = ColorPrimary
                         )
 
                         Spacer(modifier = Modifier.size(10.dp))
@@ -253,7 +254,7 @@ fun TeacherDashboardScreen(
                             Icon(
                                 imageVector = Icons.Default.BarChart,
                                 contentDescription = "No Average Data",
-                                tint = TextGrey,
+                                tint = ColorOnSurfaceVariant,
                                 modifier = Modifier.size(42.dp)
                             )
 
@@ -268,7 +269,7 @@ fun TeacherDashboardScreen(
                             Text(
                                 text = "Add subjects and grades to show average performance",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     } else {
@@ -309,7 +310,7 @@ fun DashboardSummaryCard(
                 onClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+        colors = CardDefaults.cardColors(containerColor = ColorPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -371,7 +372,7 @@ fun SubjectAverageItem(
                 text = percentage,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryBlue
+                color = ColorPrimary
             )
         }
 
@@ -384,8 +385,8 @@ fun SubjectAverageItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),
-            color = PrimaryBlue,
-            trackColor = BackgroundGrey
+            color = ColorPrimary,
+            trackColor = ColorBackground
         )
     }
 }

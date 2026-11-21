@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
 
 @Composable
 fun TopBar(
@@ -41,13 +41,13 @@ fun TopBar(
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = PrimaryBlue,
+        color = ColorPrimary,
         shadowElevation = 4.dp
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(PrimaryBlue)
+                .background(ColorPrimary)
                 .windowInsetsPadding(WindowInsets.statusBars)
                 .heightIn(min = 64.dp)
                 .padding(

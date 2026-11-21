@@ -43,10 +43,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
@@ -96,7 +96,7 @@ fun StudentProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
     ) {
         TopBar(
             title = "Student Profile",
@@ -132,7 +132,7 @@ fun StudentProfileScreen(
             Text(
                 text = "View student account information",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -140,7 +140,7 @@ fun StudentProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -162,7 +162,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -173,7 +173,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -184,7 +184,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -195,7 +195,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -206,7 +206,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -222,7 +222,7 @@ fun StudentProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -244,7 +244,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -255,7 +255,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -266,7 +266,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -282,7 +282,7 @@ fun StudentProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -304,7 +304,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -315,7 +315,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -326,7 +326,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -342,7 +342,7 @@ fun StudentProfileScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -364,7 +364,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -375,7 +375,7 @@ fun StudentProfileScreen(
 
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
+                        color = ColorBackground
                     )
 
                     StudentProfileInfoRow(
@@ -395,13 +395,13 @@ fun StudentProfileScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBlue
+                    contentColor = ColorPrimary
                 )
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Edit Profile",
-                    tint = PrimaryBlue
+                    tint = ColorPrimary
                 )
 
                 Spacer(modifier = Modifier.size(8.dp))
@@ -422,13 +422,13 @@ fun StudentProfileScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBlue
+                    contentColor = ColorPrimary
                 )
             ) {
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Change Password",
-                    tint = PrimaryBlue
+                    tint = ColorPrimary
                 )
 
                 Spacer(modifier = Modifier.size(8.dp))
@@ -449,7 +449,7 @@ fun StudentProfileScreen(
                     .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Icon(
@@ -484,7 +484,7 @@ fun StudentProfileInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(24.dp)
         )
 
@@ -494,7 +494,7 @@ fun StudentProfileInfoRow(
             Text(
                 text = title,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(

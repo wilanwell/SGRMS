@@ -36,10 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import java.util.Date
 import kotlin.math.roundToInt
 import com.example.sgrms.ui.theme.markColor
@@ -58,7 +58,7 @@ fun StudentReportHeaderCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+        colors = CardDefaults.cardColors(containerColor = ColorPrimary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -141,7 +141,7 @@ fun StudentMainPerformanceCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -153,7 +153,7 @@ fun StudentMainPerformanceCard(
                 Icon(
                     imageVector = Icons.Default.TrendingUp,
                     contentDescription = "Performance",
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(28.dp)
                 )
 
@@ -169,7 +169,7 @@ fun StudentMainPerformanceCard(
                     Text(
                         text = "Summary based on completed subjects",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -192,7 +192,7 @@ fun StudentMainPerformanceCard(
                     Text(
                         text = "Average Marks",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -209,7 +209,7 @@ fun StudentMainPerformanceCard(
                     Text(
                         text = "Overall Grade",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -224,7 +224,7 @@ fun StudentMainPerformanceCard(
                     .fillMaxWidth()
                     .height(9.dp),
                 color = gradeColor,
-                trackColor = BackgroundGrey
+                trackColor = ColorBackground
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -262,7 +262,7 @@ fun StudentReportSummaryCard(
     Card(
         modifier = modifier.height(108.dp),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -274,7 +274,7 @@ fun StudentReportSummaryCard(
             Icon(
                 imageVector = icon,
                 contentDescription = title,
-                tint = PrimaryBlue,
+                tint = ColorPrimary,
                 modifier = Modifier.size(26.dp)
             )
 
@@ -288,7 +288,7 @@ fun StudentReportSummaryCard(
                 Text(
                     text = title,
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         }
@@ -302,7 +302,7 @@ fun StudentReportRemarksCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -314,7 +314,7 @@ fun StudentReportRemarksCard(
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "Remarks",
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(24.dp)
                 )
 
@@ -332,7 +332,7 @@ fun StudentReportRemarksCard(
             Text(
                 text = remarks.ifBlank { "No remarks available." },
                 fontSize = 14.sp,
-                color = TextGrey,
+                color = ColorOnSurfaceVariant,
                 lineHeight = 20.sp
             )
         }
@@ -349,7 +349,7 @@ fun StudentReportSubjectCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -363,13 +363,13 @@ fun StudentReportSubjectCard(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(26.dp)
                     )
                 }
@@ -388,7 +388,7 @@ fun StudentReportSubjectCard(
                     Text(
                         text = item.subjectCode.ifBlank { "-" },
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -405,7 +405,7 @@ fun StudentReportSubjectCard(
                     Text(
                         text = "${item.grade.marks.roundToInt()}%",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -420,12 +420,12 @@ fun StudentReportSubjectCard(
                     .fillMaxWidth()
                     .height(8.dp),
                 color = markColor,
-                trackColor = BackgroundGrey
+                trackColor = ColorBackground
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -455,7 +455,7 @@ fun StudentReportSubjectCard(
                 Text(
                     text = "Remarks: ${item.grade.remarks}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         }
@@ -472,13 +472,13 @@ fun StudentReportMiniInfo(
             text = value,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
-            color = PrimaryBlue
+            color = ColorPrimary
         )
 
         Text(
             text = label,
             fontSize = 11.sp,
-            color = TextGrey
+            color = ColorOnSurfaceVariant
         )
     }
 }

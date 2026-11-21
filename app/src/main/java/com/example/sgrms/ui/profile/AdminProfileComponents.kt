@@ -21,8 +21,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun AdminProfileSummaryBox(
@@ -35,7 +35,7 @@ fun AdminProfileSummaryBox(
         modifier = modifier.height(90.dp),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = PrimaryBlue.copy(alpha = 0.10f)
+            containerColor = ColorPrimary.copy(alpha = 0.10f)
         )
     ) {
         Row(
@@ -48,7 +48,7 @@ fun AdminProfileSummaryBox(
                 modifier = Modifier.size(44.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = PrimaryBlue.copy(alpha = 0.12f)
+                    containerColor = ColorPrimary.copy(alpha = 0.12f)
                 )
             ) {
                 Box(
@@ -58,7 +58,7 @@ fun AdminProfileSummaryBox(
                     Icon(
                         imageVector = icon,
                         contentDescription = title,
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -71,13 +71,13 @@ fun AdminProfileSummaryBox(
                     text = value,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
 
                 Text(
                     text = title,
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         }
@@ -97,7 +97,7 @@ fun AdminProfileInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(26.dp)
         )
 
@@ -107,7 +107,7 @@ fun AdminProfileInfoRow(
             Text(
                 text = title,
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(

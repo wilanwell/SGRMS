@@ -47,13 +47,14 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.ProfileImageView
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.TeacherProfileViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun TeacherProfileScreen(
@@ -81,7 +82,7 @@ fun TeacherProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
     ) {
         TopBar(
             title = "Teacher Profile",
@@ -104,7 +105,7 @@ fun TeacherProfileScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 CircularProgressIndicator(
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -112,7 +113,7 @@ fun TeacherProfileScreen(
                 Text(
                     text = "Loading teacher profile...",
                     fontSize = 14.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             } else if (teacher == null) {
                 SgrmsEmptyStateCard(
@@ -132,7 +133,7 @@ fun TeacherProfileScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryBlue
+                        containerColor = ColorPrimary
                     )
                 ) {
                     Icon(
@@ -168,7 +169,7 @@ fun TeacherProfileScreen(
                 Text(
                     text = teacher?.position?.ifBlank { "Teacher" } ?: "Teacher",
                     fontSize = 14.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 if (errorMessage.isNotBlank()) {
@@ -177,7 +178,7 @@ fun TeacherProfileScreen(
                     Text(
                         text = errorMessage,
                         fontSize = 14.sp,
-                        color = Color.Red,
+                        color = SgrmsColors.Error,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -187,7 +188,7 @@ fun TeacherProfileScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    colors = CardDefaults.cardColors(containerColor = ColorSurface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
                     Column(
@@ -209,7 +210,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -220,7 +221,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -231,7 +232,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -243,7 +244,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -259,7 +260,7 @@ fun TeacherProfileScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    colors = CardDefaults.cardColors(containerColor = ColorSurface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
                     Column(
@@ -281,7 +282,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -292,7 +293,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -303,7 +304,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -314,7 +315,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -325,7 +326,7 @@ fun TeacherProfileScreen(
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 12.dp),
-                            color = BackgroundGrey
+                            color = ColorBackground
                         )
 
                         TeacherProfileInfoRow(
@@ -341,7 +342,7 @@ fun TeacherProfileScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = CardWhite),
+                    colors = CardDefaults.cardColors(containerColor = ColorSurface),
                     elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                 ) {
                     Column(
@@ -426,13 +427,13 @@ fun TeacherProfileScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryBlue
+                        contentColor = ColorPrimary
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Edit Profile",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
 
                     Spacer(modifier = Modifier.size(8.dp))
@@ -453,13 +454,13 @@ fun TeacherProfileScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryBlue
+                        contentColor = ColorPrimary
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Lock,
                         contentDescription = "Change Password",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
 
                     Spacer(modifier = Modifier.size(8.dp))
@@ -480,7 +481,7 @@ fun TeacherProfileScreen(
                         .height(52.dp),
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryBlue
+                        containerColor = ColorPrimary
                     )
                 ) {
                     Icon(

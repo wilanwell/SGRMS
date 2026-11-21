@@ -44,10 +44,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsActionButtonRow
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import java.io.File
 
 @Composable
@@ -63,13 +63,13 @@ fun StudentCard(
     val profileColor = if (gender == "Female") {
         Color(0xFFFF4081)
     } else {
-        PrimaryBlue
+        ColorPrimary
     }
 
     val statusColor = if (status == "Active") {
-        SuccessGreen
+        SgrmsColors.Success
     } else {
-        Color.Red
+        SgrmsColors.Error
     }
 
     Card(
@@ -79,7 +79,7 @@ fun StudentCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -118,31 +118,31 @@ fun StudentCard(
                     Text(
                         text = "Code: ${student.studentCode.ifBlank { "-" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Text(
                         text = "Class: ${student.className.ifBlank { "Not assigned" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Text(
                         text = "Gender: $gender",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Text(
                         text = "Email: ${student.email.ifBlank { "Not specified" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Text(
                         text = "Phone: ${student.phoneNumber.ifBlank { "Not specified" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -177,7 +177,7 @@ fun EmptyStudentCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -189,7 +189,7 @@ fun EmptyStudentCard() {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "No Students",
-                tint = TextGrey,
+                tint = ColorOnSurfaceVariant,
                 modifier = Modifier.size(42.dp)
             )
 
@@ -207,7 +207,7 @@ fun EmptyStudentCard() {
             Text(
                 text = "Add a new student to display records here.",
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
         }
     }
@@ -312,7 +312,7 @@ fun StudentFilterDialog(
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Text(
@@ -327,7 +327,7 @@ fun StudentFilterDialog(
             ) {
                 Text(
                     text = "Clear",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -353,7 +353,7 @@ fun StudentDialogDropdown(
                 .height(50.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = PrimaryBlue
+                contentColor = ColorPrimary
             )
         ) {
             Text(
@@ -366,7 +366,7 @@ fun StudentDialogDropdown(
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = label,
-                tint = PrimaryBlue,
+                tint = ColorPrimary,
                 modifier = Modifier.size(18.dp)
             )
         }

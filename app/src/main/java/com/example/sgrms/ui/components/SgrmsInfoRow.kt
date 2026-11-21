@@ -12,8 +12,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SgrmsInfoRow(
@@ -29,7 +29,7 @@ fun SgrmsInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(19.dp)
         )
 
@@ -38,7 +38,7 @@ fun SgrmsInfoRow(
         Text(
             text = "$label: ",
             fontSize = 13.sp,
-            color = TextGrey
+            color = ColorOnSurfaceVariant
         )
 
         Text(

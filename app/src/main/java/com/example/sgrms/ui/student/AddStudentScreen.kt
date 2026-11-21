@@ -30,10 +30,11 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.ui.theme.ColorBackground
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun AddStudentScreen(
@@ -129,7 +130,7 @@ fun AddStudentScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -303,7 +304,7 @@ fun AddStudentScreen(
                         text = uiState.errorMessage.ifBlank {
                             classLoadError
                         },
-                        color = androidx.compose.ui.graphics.Color.Red
+                        color = SgrmsColors.Error
                     )
                 }
 

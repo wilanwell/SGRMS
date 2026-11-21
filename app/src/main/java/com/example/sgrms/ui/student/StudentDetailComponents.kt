@@ -18,9 +18,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.theme.markColor
 
 data class StudentDetailSubjectItem(
@@ -43,7 +43,7 @@ fun StudentDetailInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(26.dp)
         )
 
@@ -53,7 +53,7 @@ fun StudentDetailInfoRow(
             Text(
                 text = title,
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(
@@ -109,7 +109,7 @@ fun StudentDetailSubjectRow(
                 .fillMaxWidth()
                 .height(8.dp),
             color = markColor(subject.marks),
-            trackColor = BackgroundGrey
+            trackColor = ColorBackground
         )
     }
 }

@@ -21,10 +21,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SgrmsHeaderProfileCard(
@@ -38,7 +38,7 @@ fun SgrmsHeaderProfileCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 3.dp
@@ -54,7 +54,7 @@ fun SgrmsHeaderProfileCard(
                     modifier = Modifier.size(58.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = PrimaryBlue.copy(alpha = 0.12f)
+                        containerColor = ColorPrimary.copy(alpha = 0.12f)
                     )
                 ) {
                     Box(
@@ -64,7 +64,7 @@ fun SgrmsHeaderProfileCard(
                         Icon(
                             imageVector = icon,
                             contentDescription = title,
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -84,7 +84,7 @@ fun SgrmsHeaderProfileCard(
                     Text(
                         text = subtitle,
                         fontSize = 15.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
@@ -92,7 +92,7 @@ fun SgrmsHeaderProfileCard(
             if (content != null) {
                 Spacer(modifier = Modifier.size(18.dp))
 
-                HorizontalDivider(color = BackgroundGrey)
+                HorizontalDivider(color = ColorBackground)
 
                 Spacer(modifier = Modifier.size(18.dp))
 

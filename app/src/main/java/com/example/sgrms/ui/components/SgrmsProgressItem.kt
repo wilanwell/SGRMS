@@ -14,10 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 @Composable
 fun SgrmsProgressItem(
@@ -46,7 +46,7 @@ fun SgrmsProgressItem(
                     Text(
                         text = subtitle,
                         fontSize = 13.sp,
-                        color = if (subtitleAsGrade) SuccessGreen else TextGrey,
+                        color = if (subtitleAsGrade) SgrmsColors.Success else ColorOnSurfaceVariant,
                         fontWeight = if (subtitleAsGrade) FontWeight.Bold else FontWeight.Normal
                     )
                 }
@@ -56,7 +56,7 @@ fun SgrmsProgressItem(
                 text = percentageText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryBlue
+                color = ColorPrimary
             )
         }
 
@@ -69,8 +69,8 @@ fun SgrmsProgressItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp),
-            color = PrimaryBlue,
-            trackColor = BackgroundGrey
+            color = ColorPrimary,
+            trackColor = ColorBackground
         )
     }
 }

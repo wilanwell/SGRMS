@@ -55,12 +55,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.SubjectModel
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun SubjectManagementScreen(
@@ -165,7 +166,7 @@ fun SubjectManagementScreen(
                         selectedSubjectToDelete = null
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
+                        containerColor = SgrmsColors.Error
                     )
                 ) {
                     Text(
@@ -183,7 +184,7 @@ fun SubjectManagementScreen(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }
@@ -202,7 +203,7 @@ fun SubjectManagementScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddSubjectClick,
-                containerColor = PrimaryBlue,
+                containerColor = ColorPrimary,
                 contentColor = Color.White,
                 modifier = Modifier.padding(end = 4.dp),
                 elevation = FloatingActionButtonDefaults.elevation(
@@ -224,7 +225,7 @@ fun SubjectManagementScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .padding(
                     start = 16.dp,
@@ -247,16 +248,16 @@ fun SubjectManagementScreen(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "Search",
-                        tint = TextGrey
+                        tint = ColorOnSurfaceVariant
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
+                    focusedBorderColor = ColorPrimary,
+                    focusedLabelColor = ColorPrimary,
+                    cursorColor = ColorPrimary
                 )
             )
 
@@ -276,13 +277,13 @@ fun SubjectManagementScreen(
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
                             contentDescription = "Category Filter",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -299,7 +300,7 @@ fun SubjectManagementScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Select Category",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -334,7 +335,7 @@ fun SubjectManagementScreen(
                             .height(50.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Text(
@@ -348,7 +349,7 @@ fun SubjectManagementScreen(
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = "Sort Subject",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -379,7 +380,7 @@ fun SubjectManagementScreen(
 
                 Text(
                     text = uiState.errorMessage,
-                    color = Color.Red,
+                    color = SgrmsColors.Error,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -404,7 +405,7 @@ fun SubjectManagementScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -413,7 +414,7 @@ fun SubjectManagementScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                     ) {
                         Column(
@@ -425,7 +426,7 @@ fun SubjectManagementScreen(
                             Icon(
                                 imageVector = Icons.Default.MenuBook,
                                 contentDescription = "No Subjects",
-                                tint = TextGrey,
+                                tint = ColorOnSurfaceVariant,
                                 modifier = Modifier.size(42.dp)
                             )
 
@@ -440,7 +441,7 @@ fun SubjectManagementScreen(
                             Text(
                                 text = "Tap the add button to create a subject",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     }

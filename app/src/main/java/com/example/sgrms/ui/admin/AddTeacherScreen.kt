@@ -42,13 +42,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun AddTeacherScreen(
@@ -87,7 +88,7 @@ fun AddTeacherScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
@@ -96,7 +97,7 @@ fun AddTeacherScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(
@@ -111,7 +112,7 @@ fun AddTeacherScreen(
                     Text(
                         text = "Create a teacher profile and Firebase login account",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(22.dp))
@@ -141,9 +142,9 @@ fun AddTeacherScreen(
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -174,9 +175,9 @@ fun AddTeacherScreen(
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -207,9 +208,9 @@ fun AddTeacherScreen(
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -233,9 +234,9 @@ fun AddTeacherScreen(
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -259,9 +260,9 @@ fun AddTeacherScreen(
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -283,9 +284,9 @@ fun AddTeacherScreen(
                         singleLine = true,
                         readOnly = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -317,9 +318,9 @@ fun AddTeacherScreen(
                             }
                         },
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryBlue,
-                            focusedLabelColor = PrimaryBlue,
-                            cursorColor = PrimaryBlue
+                            focusedBorderColor = ColorPrimary,
+                            focusedLabelColor = ColorPrimary,
+                            cursorColor = ColorPrimary
                         )
                     )
 
@@ -328,7 +329,7 @@ fun AddTeacherScreen(
 
                         Text(
                             text = uiState.errorMessage,
-                            color = Color.Red,
+                            color = SgrmsColors.Error,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )

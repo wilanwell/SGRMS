@@ -39,12 +39,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.GradeModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.GradeCalculator
 
 data class GradeDisplayItem(
@@ -60,7 +59,7 @@ fun GradeEmptyStateCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -72,7 +71,7 @@ fun GradeEmptyStateCard() {
             Icon(
                 imageVector = Icons.Default.Assessment,
                 contentDescription = "No Grades",
-                tint = TextGrey,
+                tint = ColorOnSurfaceVariant,
                 modifier = Modifier.size(42.dp)
             )
 
@@ -87,7 +86,7 @@ fun GradeEmptyStateCard() {
             Text(
                 text = "Tap the add button to create a grade record",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
         }
     }
@@ -109,9 +108,9 @@ fun GradeCard(
 
     val statusColor: Color =
         if (item.grade.status == "Complete") {
-            SuccessGreen
+            SgrmsColors.Success
         } else {
-            WarningOrange
+            SgrmsColors.WarningBar
         }
 
     Card(
@@ -121,7 +120,7 @@ fun GradeCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -135,13 +134,13 @@ fun GradeCard(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
                         contentDescription = "Student",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -160,7 +159,7 @@ fun GradeCard(
                     Text(
                         text = item.className,
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -173,20 +172,20 @@ fun GradeCard(
                         },
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
 
                     Text(
                         text = "%.2f%%".format(item.grade.marks),
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -202,7 +201,7 @@ fun GradeCard(
                         Icon(
                             imageVector = Icons.Default.BarChart,
                             contentDescription = "Subject",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -218,7 +217,7 @@ fun GradeCard(
                     Text(
                         text = item.subjectCode,
                         fontSize = 13.sp,
-                        color = TextGrey,
+                        color = ColorOnSurfaceVariant,
                         modifier = Modifier.padding(start = 24.dp)
                     )
                 }
@@ -250,7 +249,7 @@ fun GradeCard(
                 Text(
                     text = "Remarks: ${item.grade.remarks}",
                     fontSize = 14.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -268,7 +267,7 @@ fun GradeCard(
                     Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "View Grade",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -280,7 +279,7 @@ fun GradeCard(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Grade",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -292,7 +291,7 @@ fun GradeCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Grade",
-                        tint = Color.Red
+                        tint = SgrmsColors.Error
                     )
                 }
             }

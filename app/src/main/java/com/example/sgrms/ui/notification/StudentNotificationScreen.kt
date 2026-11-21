@@ -46,11 +46,11 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.NotificationModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextDark
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurface
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.NotificationFirebaseViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -89,7 +89,7 @@ fun StudentNotificationScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues)
                 .padding(
@@ -110,7 +110,7 @@ fun StudentNotificationScreen(
                         text = "Notifications",
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark
+                        color = ColorOnSurface
                     )
 
                     Text(
@@ -120,7 +120,7 @@ fun StudentNotificationScreen(
                             "You are all caught up"
                         },
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -132,7 +132,7 @@ fun StudentNotificationScreen(
                     ) {
                         Text(
                             text = "Read all",
-                            color = PrimaryBlue,
+                            color = ColorPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -159,7 +159,7 @@ fun StudentNotificationScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -228,7 +228,7 @@ private fun SimpleNotificationCard(
             },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = if (notification.isRead) {
@@ -257,7 +257,7 @@ private fun SimpleNotificationCard(
                         if (notification.isRead) {
                             Color(0xFFECEFF1)
                         } else {
-                            PrimaryBlue.copy(alpha = 0.12f)
+                            ColorPrimary.copy(alpha = 0.12f)
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -266,9 +266,9 @@ private fun SimpleNotificationCard(
                     imageVector = Icons.Default.Notifications,
                     contentDescription = "Notification",
                     tint = if (notification.isRead) {
-                        TextGrey
+                        ColorOnSurfaceVariant
                     } else {
-                        PrimaryBlue
+                        ColorPrimary
                     },
                     modifier = Modifier.size(23.dp)
                 )
@@ -289,7 +289,7 @@ private fun SimpleNotificationCard(
                         },
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextDark,
+                        color = ColorOnSurface,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -298,7 +298,7 @@ private fun SimpleNotificationCard(
                             modifier = Modifier
                                 .size(9.dp)
                                 .clip(CircleShape)
-                                .background(PrimaryBlue)
+                                .background(ColorPrimary)
                         )
                     }
                 }
@@ -311,7 +311,7 @@ private fun SimpleNotificationCard(
                     },
                     fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -319,7 +319,7 @@ private fun SimpleNotificationCard(
                 Text(
                     text = dateText,
                     fontSize = 12.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 if (!notification.isRead) {
@@ -329,7 +329,7 @@ private fun SimpleNotificationCard(
                         text = "Tap to mark as read",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
-                        color = PrimaryBlue
+                        color = ColorPrimary
                     )
                 }
             }

@@ -31,10 +31,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun SubjectCard(
@@ -50,7 +51,7 @@ fun SubjectCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -64,7 +65,7 @@ fun SubjectCard(
                     modifier = Modifier.size(52.dp),
                     shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = PrimaryBlue.copy(alpha = 0.12f)
+                        containerColor = ColorPrimary.copy(alpha = 0.12f)
                     )
                 ) {
                     Box(
@@ -74,7 +75,7 @@ fun SubjectCard(
                         Icon(
                             imageVector = Icons.Default.MenuBook,
                             contentDescription = "Subject",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -94,7 +95,7 @@ fun SubjectCard(
                     Text(
                         text = subject.subjectCode.ifBlank { "-" },
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -102,20 +103,20 @@ fun SubjectCard(
                     text = subject.category.ifBlank { "-" },
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = "Teacher: ${subject.teacherName.ifBlank { "Not assigned" }}",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -132,7 +133,7 @@ fun SubjectCard(
                     Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "View Subject",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -144,7 +145,7 @@ fun SubjectCard(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = "Edit Subject",
-                        tint = PrimaryBlue
+                        tint = ColorPrimary
                     )
                 }
 
@@ -156,7 +157,7 @@ fun SubjectCard(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Subject",
-                        tint = Color.Red
+                        tint = SgrmsColors.Error
                     )
                 }
             }

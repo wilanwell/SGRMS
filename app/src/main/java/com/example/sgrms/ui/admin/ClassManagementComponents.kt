@@ -51,11 +51,11 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.SgrmsTextField
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 
 data class ClassTeacherItem(
     val teacherId: String = "",
@@ -187,7 +187,7 @@ fun AddClassDialog(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Text(
@@ -202,7 +202,7 @@ fun AddClassDialog(
             ) {
                 Text(
                     text = "Cancel",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -339,7 +339,7 @@ fun EditClassDialog(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 Text(
@@ -354,7 +354,7 @@ fun EditClassDialog(
             ) {
                 Text(
                     text = "Cancel",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -372,7 +372,7 @@ fun ClassCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -385,13 +385,13 @@ fun ClassCard(
                     modifier = Modifier
                         .size(52.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.School,
                         contentDescription = "Class",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -410,14 +410,14 @@ fun ClassCard(
                     Text(
                         text = "Academic Year: ${schoolClass.academicYear}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -468,7 +468,7 @@ fun ClassStudentsDialog(
                 Text(
                     text = "Students in this class (${students.size})",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         },
@@ -478,7 +478,7 @@ fun ClassStudentsDialog(
                     onClick = onAddStudentClick,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryBlue
+                        containerColor = ColorPrimary
                     )
                 ) {
                     Icon(
@@ -527,7 +527,7 @@ fun ClassStudentsDialog(
             ) {
                 Text(
                     text = "Close",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -542,7 +542,7 @@ fun StudentInClassCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = BackgroundGrey
+            containerColor = ColorBackground
         )
     ) {
         Row(
@@ -559,7 +559,7 @@ fun StudentInClassCard(
                         if (student.gender == "Female") {
                             Color(0xFFFF4081)
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -585,7 +585,7 @@ fun StudentInClassCard(
                 Text(
                     text = student.studentCode,
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -593,9 +593,9 @@ fun StudentInClassCard(
                 text = student.status,
                 fontSize = 12.sp,
                 color = if (student.status == "Active") {
-                    SuccessGreen
+                    SgrmsColors.Success
                 } else {
-                    Color.Red
+                    SgrmsColors.Error
                 },
                 fontWeight = FontWeight.Bold
             )

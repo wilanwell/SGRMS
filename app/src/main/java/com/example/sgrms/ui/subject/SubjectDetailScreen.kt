@@ -49,14 +49,15 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun SubjectDetailScreen(
@@ -146,7 +147,7 @@ fun SubjectDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -176,7 +177,7 @@ fun SubjectDetailScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryBlue
+                                color = ColorPrimary
                             )
                         }
                     }
@@ -209,7 +210,7 @@ fun SubjectDetailScreen(
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(14.dp),
-                            colors = CardDefaults.cardColors(containerColor = CardWhite),
+                            colors = CardDefaults.cardColors(containerColor = ColorSurface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
                         ) {
                             Column(
@@ -222,7 +223,7 @@ fun SubjectDetailScreen(
                                         modifier = Modifier.size(58.dp),
                                         shape = RoundedCornerShape(16.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = PrimaryBlue.copy(alpha = 0.12f)
+                                            containerColor = ColorPrimary.copy(alpha = 0.12f)
                                         )
                                     ) {
                                         Box(
@@ -232,7 +233,7 @@ fun SubjectDetailScreen(
                                             Icon(
                                                 imageVector = Icons.Default.MenuBook,
                                                 contentDescription = "Subject Icon",
-                                                tint = PrimaryBlue,
+                                                tint = ColorPrimary,
                                                 modifier = Modifier.size(32.dp)
                                             )
                                         }
@@ -252,14 +253,14 @@ fun SubjectDetailScreen(
                                         Text(
                                             text = subject.subjectCode.ifBlank { "-" },
                                             fontSize = 15.sp,
-                                            color = TextGrey
+                                            color = ColorOnSurfaceVariant
                                         )
                                     }
                                 }
 
                                 Spacer(modifier = Modifier.height(18.dp))
 
-                                HorizontalDivider(color = BackgroundGrey)
+                                HorizontalDivider(color = ColorBackground)
 
                                 Spacer(modifier = Modifier.height(18.dp))
 
@@ -312,7 +313,7 @@ fun SubjectDetailScreen(
                                         .height(52.dp),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryBlue
+                                        containerColor = ColorPrimary
                                     )
                                 ) {
                                     Icon(
@@ -344,13 +345,13 @@ fun SubjectDetailScreen(
                                             .height(52.dp),
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = PrimaryBlue
+                                            contentColor = ColorPrimary
                                         )
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Edit,
                                             contentDescription = "Edit Subject",
-                                            tint = PrimaryBlue,
+                                            tint = ColorPrimary,
                                             modifier = Modifier.size(20.dp)
                                         )
 
@@ -370,13 +371,13 @@ fun SubjectDetailScreen(
                                             .height(52.dp),
                                         shape = RoundedCornerShape(12.dp),
                                         colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = PrimaryBlue
+                                            contentColor = ColorPrimary
                                         )
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Visibility,
                                             contentDescription = "View Students",
-                                            tint = PrimaryBlue,
+                                            tint = ColorPrimary,
                                             modifier = Modifier.size(20.dp)
                                         )
 
@@ -402,7 +403,7 @@ fun SubjectDetailScreen(
                                 text = subjectUiState.errorMessage.ifBlank {
                                     studentGradeErrorMessage
                                 },
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium
                             )

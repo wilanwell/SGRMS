@@ -7,10 +7,10 @@ import com.example.sgrms.utils.PerformanceLevel
 /** Colour for a mark or an average, shared by every screen. */
 fun markColor(marks: Double): Color {
     return when (GradeCalculator.performanceLevel(marks)) {
-        PerformanceLevel.EXCELLENT -> SuccessGreen
+        PerformanceLevel.EXCELLENT -> SgrmsColors.Success
         PerformanceLevel.GOOD,
-        PerformanceLevel.SATISFACTORY -> PrimaryBlue
-        PerformanceLevel.NEEDS_IMPROVEMENT -> WarningOrange
-        PerformanceLevel.AT_RISK -> ErrorRed
+        PerformanceLevel.SATISFACTORY -> ColorPrimary
+        PerformanceLevel.NEEDS_IMPROVEMENT -> SgrmsColors.WarningBar
+        PerformanceLevel.AT_RISK -> SgrmsColors.Error
     }
 }

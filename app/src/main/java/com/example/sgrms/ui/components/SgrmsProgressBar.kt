@@ -6,8 +6,8 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
 
 @Composable
 fun SgrmsProgressBar(
@@ -21,7 +21,7 @@ fun SgrmsProgressBar(
         modifier = modifier
             .fillMaxWidth()
             .height(8.dp),
-        color = PrimaryBlue,
-        trackColor = BackgroundGrey
+        color = ColorPrimary,
+        trackColor = ColorBackground
     )
 }

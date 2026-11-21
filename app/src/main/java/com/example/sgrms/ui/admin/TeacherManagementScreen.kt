@@ -62,13 +62,14 @@ import com.example.sgrms.ui.components.SgrmsFilterButton
 import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import java.io.File
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun TeacherManagementScreen(
@@ -152,7 +153,7 @@ fun TeacherManagementScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddTeacherClick,
-                containerColor = PrimaryBlue,
+                containerColor = ColorPrimary,
                 contentColor = Color.White,
                 modifier = Modifier
             ) {
@@ -167,7 +168,7 @@ fun TeacherManagementScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues),
             contentPadding = PaddingValues(
                 start = 16.dp,
@@ -187,7 +188,7 @@ fun TeacherManagementScreen(
                 Text(
                     text = "View and manage teacher profiles and Firebase login accounts",
                     fontSize = 14.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
@@ -231,13 +232,13 @@ fun TeacherManagementScreen(
                         modifier = Modifier.height(48.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+                            contentColor = ColorPrimary
                         )
                     ) {
                         Icon(
                             imageVector = Icons.Default.FileDownload,
                             contentDescription = "Export",
-                            tint = PrimaryBlue,
+                            tint = ColorPrimary,
                             modifier = Modifier.size(18.dp)
                         )
 
@@ -256,7 +257,7 @@ fun TeacherManagementScreen(
                 item {
                     Text(
                         text = uiState.errorMessage,
-                        color = Color.Red,
+                        color = SgrmsColors.Error,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -280,7 +281,7 @@ fun TeacherManagementScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -332,7 +333,7 @@ fun TeacherAccountCard(
                 onViewClick()
             },
         shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Column(
@@ -345,13 +346,13 @@ fun TeacherAccountCard(
                     modifier = Modifier
                         .size(52.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
+                        .background(ColorPrimary.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.SupervisorAccount,
                         contentDescription = "Teacher",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -370,7 +371,7 @@ fun TeacherAccountCard(
                     Text(
                         text = "${teacher.staffId.ifBlank { "No Staff ID" }} • Teacher",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -378,13 +379,13 @@ fun TeacherAccountCard(
                     text = teacher.position.ifBlank { "Teacher" },
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 

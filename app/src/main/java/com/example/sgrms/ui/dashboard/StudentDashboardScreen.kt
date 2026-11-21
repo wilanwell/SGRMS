@@ -42,10 +42,10 @@ import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsProgressItem
 import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
@@ -152,7 +152,7 @@ fun StudentDashboardScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .padding(
                     start = 18.dp,
@@ -170,7 +170,7 @@ fun StudentDashboardScreen(
             Text(
                 text = "View your grades and academic performance",
                 fontSize = 14.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -178,7 +178,7 @@ fun StudentDashboardScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
+                colors = CardDefaults.cardColors(containerColor = ColorPrimary),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Row(
@@ -255,7 +255,7 @@ fun StudentDashboardScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
@@ -269,7 +269,7 @@ fun StudentDashboardScreen(
                         Icon(
                             imageVector = Icons.Default.BarChart,
                             contentDescription = "Subject Performance",
-                            tint = PrimaryBlue
+                            tint = ColorPrimary
                         )
 
                         Spacer(modifier = Modifier.size(8.dp))
@@ -293,7 +293,7 @@ fun StudentDashboardScreen(
                             Icon(
                                 imageVector = Icons.Default.Assessment,
                                 contentDescription = "No Grades",
-                                tint = TextGrey,
+                                tint = ColorOnSurfaceVariant,
                                 modifier = Modifier.size(44.dp)
                             )
 
@@ -308,7 +308,7 @@ fun StudentDashboardScreen(
                             Text(
                                 text = "Your grades will appear here after the teacher adds marks.",
                                 fontSize = 13.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
                         }
                     } else {
