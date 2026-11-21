@@ -2,337 +2,215 @@ package com.example.sgrms.ui.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Assessment
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
-import com.example.sgrms.ui.components.SgrmsProgressItem
-import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
-import com.example.sgrms.ui.theme.ColorPrimary
-import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import com.example.sgrms.ui.components.SgrmsGroupedCard
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsPageHeader
+import com.example.sgrms.ui.components.SgrmsProgressBar
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsSectionTitle
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.toneForGrade
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.SgrmsSpacing
+import com.example.sgrms.ui.theme.markColor
+import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
+import com.example.sgrms.viewmodel.NotificationFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
-import com.example.sgrms.utils.GradeCalculator
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-
-data class StudentDashboardGradeItem(
-    val gradeId: String,
-    val subjectId: String,
-    val subjectName: String,
-    val marks: Double,
-    val gradeLetter: String
-)
 
 @Composable
 fun StudentDashboardScreen(
     studentId: String,
     onProfileClick: () -> Unit = {},
-    onReportClick: () -> Unit = {}
+    onReportClick: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {}
 ) {
-    val currentStudentId = studentId
-
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
-
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
-
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
+    val notificationViewModel: NotificationFirebaseViewModel = hiltViewModel()
 
     val studentUiState by studentViewModel.uiState.collectAsState()
     val gradeUiState by gradeViewModel.uiState.collectAsState()
     val subjectUiState by subjectViewModel.uiState.collectAsState()
+    val notificationUiState by notificationViewModel.uiState.collectAsState()
 
-    LaunchedEffect(currentStudentId) {
-        if (currentStudentId.isNotBlank()) {
-            studentViewModel.loadStudentById(currentStudentId)
-            gradeViewModel.loadGradesByStudentId(currentStudentId)
+    LaunchedEffect(studentId) {
+        if (studentId.isNotBlank()) {
+            studentViewModel.loadStudentById(studentId)
+            gradeViewModel.loadGradesByStudentId(studentId)
             subjectViewModel.loadSubjects()
+            notificationViewModel.loadNotificationsByStudentId(studentId)
         }
     }
 
     val student = studentUiState.selectedStudent
-    val grades = gradeUiState.grades
-    val subjects = subjectUiState.subjects
+    val firstName = student?.studentName?.trim()?.substringBefore(' ')?.ifBlank { null } ?: "Student"
+    val summary = studentGradeSummary(gradeUiState.grades, subjectUiState.subjects)
+    val unread = notificationUiState.notifications.filter { !it.isRead }
+    val latestUnread = unread.maxByOrNull { it.createdAt }
+    val isLoading = studentUiState.isLoading || gradeUiState.isLoading
 
-    val studentName = student?.studentName?.ifBlank { "Student" } ?: "Student"
-
-    val completedGrades = grades.filter { grade ->
-        grade.status.equals("Complete", ignoreCase = true)
-    }
-
-    val subjectResults = completedGrades.map { grade ->
-        val subject = subjects.find { subject ->
-            subject.subjectId == grade.subjectId
-        }
-
-        StudentDashboardGradeItem(
-            gradeId = grade.gradeId,
-            subjectId = grade.subjectId,
-            subjectName = subject?.subjectName ?: "Unknown Subject",
-            marks = grade.marks,
-            gradeLetter = grade.gradeLetter
-        )
-    }.sortedWith(
-        compareBy<StudentDashboardGradeItem> { item ->
-            item.subjectName
-        }.thenBy { item ->
-            item.gradeId
-        }
-    )
-
-    val totalMarks = subjectResults.sumOf { item ->
-        item.marks
-    }
-
-    val averageMarks = if (subjectResults.isNotEmpty()) {
-        totalMarks / subjectResults.size
-    } else {
-        0.0
-    }
-
-    val overallGrade = GradeCalculator.overallGrade(averageMarks)
-
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "SGRMS",
-                showBack = false,
-                showIcon = true,
-                actions = {
-                    IconButton(onClick = onProfileClick) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        SgrmsPageHeader(
+            title = "Hi, $firstName",
+            subtitle = listOfNotNull(
+                student?.className?.ifBlank { null },
+                student?.studentCode?.ifBlank { null }
+            ).joinToString(" · ").ifBlank { "Student" },
+            trailing = {
+                Box {
+                    IconButton(onClick = onNotificationsClick) {
                         Icon(
-                            imageVector = Icons.Default.AccountCircle,
-                            contentDescription = "Profile",
-                            tint = Color.White,
-                            modifier = Modifier.size(30.dp)
+                            Icons.Default.Notifications,
+                            contentDescription = if (unread.isEmpty()) "Notifications" else "Notifications, ${unread.size} unread",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    if (unread.isNotEmpty()) {
+                        Box(
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(top = 10.dp, end = 10.dp)
+                                .size(9.dp)
+                                .clip(CircleShape)
+                                .background(SgrmsColors.WarningBar)
                         )
                     }
                 }
-            )
-        }
-    ) { paddingValues ->
+                IconButton(onClick = onProfileClick) {
+                    com.example.sgrms.ui.components.SgrmsAvatar(name = student?.studentName ?: "Student", size = 40.dp)
+                }
+            }
+        )
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ColorBackground)
-                .padding(paddingValues)
-                .padding(
-                    start = 18.dp,
-                    end = 18.dp,
-                    top = 18.dp,
-                    bottom = 8.dp
-                )
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = SgrmsSpacing.ScreenPadding)
+                .padding(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Text(
-                text = "Welcome, $studentName",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+            OverallCard(
+                averageMarks = summary.averageMarks,
+                overallGrade = summary.overallGrade,
+                gradedCount = summary.gradedCount,
+                totalCount = summary.totalCount
             )
 
-            Text(
-                text = "View your grades and academic performance",
-                fontSize = 14.sp,
-                color = ColorOnSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = ColorPrimary),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(18.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            if (latestUnread != null) {
+                Surface(
+                    onClick = onNotificationsClick,
+                    shape = RoundedCornerShape(18.dp),
+                    color = SgrmsColors.OrangeContainer,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column {
-                        Text(
-                            text = "Average Mark",
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
-
-                        Text(
-                            text = "%.2f%%".format(averageMarks),
-                            color = Color.White,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Column(
-                        horizontalAlignment = Alignment.End
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text(
-                            text = "Overall Grade",
-                            color = Color.White,
-                            fontSize = 15.sp
-                        )
-
-                        Text(
-                            text = overallGrade,
-                            color = Color.White,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        SgrmsIconTile(icon = Icons.Default.Notifications, tint = SgrmsColors.Orange, container = androidx.compose.ui.graphics.Color(0xFFFFEDD5))
+                        Column(Modifier.weight(1f)) {
+                            Text(latestUnread.title.ifBlank { "New notification" }, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(
+                                latestUnread.message,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = androidx.compose.ui.graphics.Color(0xFF9A3412),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-                SgrmsDashboardSummaryCard(
-                    title = "Subjects",
-                    value = subjectResults.size.toString(),
-                    icon = Icons.Default.MenuBook,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp
-                )
-
-                SgrmsDashboardSummaryCard(
-                    title = "Report",
-                    value = "View",
-                    icon = Icons.Default.Summarize,
-                    modifier = Modifier.weight(1f),
-                    style = SgrmsSummaryCardStyle.White,
-                    height = 120.dp,
-                    onClick = onReportClick
-                )
+            SgrmsSectionTitle("My subjects") {
+                TextButton(onClick = onReportClick) { Text("Full report", fontWeight = FontWeight.SemiBold) }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            when {
+                isLoading && summary.items.isEmpty() -> Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(20.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.BarChart,
-                            contentDescription = "Subject Performance",
-                            tint = ColorPrimary
-                        )
+                summary.items.isEmpty() -> SgrmsEmptyState(
+                    title = "No grades yet",
+                    message = "Your grades will appear here after your teacher adds marks.",
+                    icon = Icons.Default.Assessment
+                )
 
-                        Spacer(modifier = Modifier.size(8.dp))
-
-                        Text(
-                            text = "Subject Performance",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    if (subjectResults.isEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 30.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                else -> SgrmsGroupedCard {
+                    summary.items.forEachIndexed { index, item ->
+                        if (index > 0) SgrmsRowDivider()
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Assessment,
-                                contentDescription = "No Grades",
-                                tint = ColorOnSurfaceVariant,
-                                modifier = Modifier.size(44.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "No grade record found",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "Your grades will appear here after the teacher adds marks.",
-                                fontSize = 13.sp,
-                                color = ColorOnSurfaceVariant
-                            )
-                        }
-                    } else {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            contentPadding = PaddingValues(bottom = 8.dp)
-                        ) {
-                            itemsIndexed(
-                                items = subjectResults,
-                                key = { index, item ->
-                                    item.gradeId.ifBlank {
-                                        "${item.subjectId}-${item.subjectName}-${item.marks}-$index"
-                                    }
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Row {
+                                    Text(
+                                        item.subjectName,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Text("%.0f".format(item.marks), style = MaterialTheme.typography.titleSmall)
                                 }
-                            ) { _, item ->
-                                SgrmsProgressItem(
-                                    title = item.subjectName,
-                                    progress = (item.marks / 100.0).toFloat()
-                                        .coerceIn(0f, 1f),
-                                    percentageText = "%.1f%%".format(item.marks),
-                                    subtitle = "Grade ${item.gradeLetter.ifBlank { "-" }}",
-                                    subtitleAsGrade = true
+                                androidx.compose.material3.LinearProgressIndicator(
+                                    progress = { (item.marks / 100.0).toFloat().coerceIn(0f, 1f) },
+                                    color = markColor(item.marks),
+                                    trackColor = MaterialTheme.colorScheme.outlineVariant,
+                                    strokeCap = StrokeCap.Round,
+                                    gapSize = 0.dp,
+                                    drawStopIndicator = {},
+                                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(3.dp))
                                 )
                             }
+                            SgrmsStatusChip(text = item.gradeLetter.ifBlank { "-" }, tone = toneForGrade(item.gradeLetter))
                         }
                     }
                 }
@@ -341,3 +219,52 @@ fun StudentDashboardScreen(
     }
 }
 
+/** White card with a ring showing the average and the overall grade in the middle. */
+@Composable
+private fun OverallCard(
+    averageMarks: Double,
+    overallGrade: String,
+    gradedCount: Int,
+    totalCount: Int
+) {
+    Surface(
+        shape = RoundedCornerShape(SgrmsRadius.Hero),
+        color = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center, modifier = Modifier.size(96.dp)) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    progress = { (averageMarks / 100.0).toFloat().coerceIn(0f, 1f) },
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.outlineVariant,
+                    strokeWidth = 10.dp,
+                    strokeCap = StrokeCap.Round,
+                    gapSize = 0.dp,
+                    modifier = Modifier.size(96.dp)
+                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(overallGrade, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
+                    Text("%.1f%%".format(averageMarks), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Overall average", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    GradeCalculator.performanceStatus(averageMarks, hasGrades = gradedCount > 0),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                if (totalCount > 0) {
+                    SgrmsStatusChip(
+                        text = "$gradedCount of $totalCount subjects graded",
+                        tone = if (gradedCount == totalCount) com.example.sgrms.ui.components.ChipTone.Success else com.example.sgrms.ui.components.ChipTone.Warning
+                    )
+                }
+            }
+        }
+    }
+}

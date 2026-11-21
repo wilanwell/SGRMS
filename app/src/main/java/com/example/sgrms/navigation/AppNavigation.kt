@@ -472,6 +472,11 @@ fun AppNavigation() {
                         navController.navigate(
                             Screen.StudentReportSummary.createRoute(currentStudentId)
                         )
+                    },
+                    onNotificationsClick = {
+                        navController.navigate(
+                            Screen.StudentNotifications.createRoute(currentStudentId)
+                        )
                     }
                 )
             }
