@@ -75,7 +75,7 @@ fun TeacherDashboardScreen(
             subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
             trailing = {
                 IconButton(onClick = onProfileClick) {
-                    SgrmsAvatar(name = uiState.teacherName, size = 44.dp)
+                    SgrmsAvatar(name = uiState.teacherName, size = 44.dp, imageUrl = uiState.teacherImageUrl, legacyImageBase64 = uiState.teacherImageBase64)
                 }
             }
         )

@@ -194,7 +194,7 @@ fun SubjectDetailScreen(
                     SgrmsListRow(
                         title = student.studentName,
                         subtitle = listOf(student.studentCode, student.className).filter { it.isNotBlank() }.joinToString(" · "),
-                        leading = { SgrmsAvatar(name = student.studentName, size = 40.dp) },
+                        leading = { SgrmsAvatar(name = student.studentName, size = 40.dp, imageUrl = student.profileImageUrl, legacyImageBase64 = student.profileImageBase64) },
                         trailing = {
                             if (grade != null && complete) {
                                 val letter = grade.gradeLetter.ifBlank { com.example.sgrms.utils.GradeCalculator.gradeLetter(grade.marks) }

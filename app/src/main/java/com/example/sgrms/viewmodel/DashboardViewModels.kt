@@ -84,6 +84,8 @@ class AdminDashboardViewModel @Inject constructor(
 
 data class TeacherDashboardUiState(
     val teacherName: String = "Teacher",
+    val teacherImageUrl: String = "",
+    val teacherImageBase64: String = "",
     val summary: TeacherDashboardSummary = TeacherDashboardSummary(),
     val isLoading: Boolean = true,
     val errorMessage: String = ""
@@ -112,9 +114,10 @@ class TeacherDashboardViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = "") }
 
             try {
-                val teacherName = sessionManager.currentTeacherId
+                val teacher = sessionManager.currentTeacherId
                     .takeIf { it.isNotBlank() }
-                    ?.let { teacherRepository.getTeacherById(it)?.teacherName }
+                    ?.let { teacherRepository.getTeacherById(it) }
+                val teacherName = teacher?.teacherName
                     ?.takeIf { it.isNotBlank() }
                     ?: _uiState.value.teacherName
 
@@ -122,6 +125,8 @@ class TeacherDashboardViewModel @Inject constructor(
 
                 _uiState.value = TeacherDashboardUiState(
                     teacherName = teacherName,
+                    teacherImageUrl = teacher?.profileImageUrl.orEmpty(),
+                    teacherImageBase64 = teacher?.profileImageBase64.orEmpty(),
                     summary = summary,
                     isLoading = false
                 )

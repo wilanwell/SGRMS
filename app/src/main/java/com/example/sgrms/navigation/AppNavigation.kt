@@ -249,6 +249,8 @@ fun AppNavigation() {
             guardedComposable(allowedRoles = AdminOnly, route = Screen.AdminDashboard.route) {
                 AdminDashboardScreen(
                     adminName = loggedInUser?.fullName.orEmpty(),
+                    adminImageUrl = loggedInUser?.profileImageUrl.orEmpty(),
+                    adminImageBase64 = loggedInUser?.profileImageBase64.orEmpty(),
                     onUserManagementClick = {
                         navController.navigate(Screen.UserManagement.route)
                     },

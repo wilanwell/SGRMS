@@ -69,6 +69,8 @@ fun greetingFor(hourOfDay: Int): String = when (hourOfDay) {
 @Composable
 fun AdminDashboardScreen(
     adminName: String = "Admin",
+    adminImageUrl: String = "",
+    adminImageBase64: String = "",
     onUserManagementClick: () -> Unit = {},
     onAddTeacherClick: () -> Unit = {},
     onAddStudentAccountClick: () -> Unit = {},
@@ -94,7 +96,7 @@ fun AdminDashboardScreen(
             subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
             trailing = {
                 IconButton(onClick = onProfileClick) {
-                    SgrmsAvatar(name = name, size = 44.dp)
+                    SgrmsAvatar(name = name, size = 44.dp, imageUrl = adminImageUrl, legacyImageBase64 = adminImageBase64)
                 }
             }
         )

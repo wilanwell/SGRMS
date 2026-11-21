@@ -317,7 +317,7 @@ fun ReportScreen(
                 SgrmsListItemCard(
                     title = item.studentName,
                     subtitle = "${item.studentCode} · ${item.className} · avg ${"%.1f".format(item.report.averageMarks)}%",
-                    leading = { SgrmsAvatar(name = item.studentName, size = 44.dp) },
+                    leading = { SgrmsAvatar(name = item.studentName, size = 44.dp, imageUrl = item.student.profileImageUrl, legacyImageBase64 = item.student.profileImageBase64) },
                     onClick = { onViewReportDetailClick(item.report.reportId) }
                 ) {
                     if (item.status == "Generated") {

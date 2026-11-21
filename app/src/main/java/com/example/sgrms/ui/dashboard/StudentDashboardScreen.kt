@@ -119,7 +119,12 @@ fun StudentDashboardScreen(
                     }
                 }
                 IconButton(onClick = onProfileClick) {
-                    com.example.sgrms.ui.components.SgrmsAvatar(name = student?.studentName ?: "Student", size = 40.dp)
+                    com.example.sgrms.ui.components.SgrmsAvatar(
+                        name = student?.studentName ?: "Student",
+                        size = 40.dp,
+                        imageUrl = student?.profileImageUrl.orEmpty(),
+                        legacyImageBase64 = student?.profileImageBase64.orEmpty()
+                    )
                 }
             }
         )
