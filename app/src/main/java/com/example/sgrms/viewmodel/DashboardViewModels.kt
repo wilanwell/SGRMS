@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 data class AdminDashboardUiState(
     val summary: AdminSummary = AdminSummary(),
@@ -28,8 +29,10 @@ data class AdminDashboardUiState(
     val errorMessage: String = ""
 )
 
+private const val RECENT_ACCOUNTS = 3
+
 /** The [limit] newest teacher / student accounts, newest first. */
-fun recentAccounts(users: List<UserModel>, limit: Int = 3): List<UserModel> =
+fun recentAccounts(users: List<UserModel>, limit: Int = RECENT_ACCOUNTS): List<UserModel> =
     users
         .filter { it.userRole != UserRole.ADMIN }
         .sortedByDescending { it.createdAt }
@@ -54,7 +57,16 @@ class AdminDashboardViewModel @Inject constructor(
 
             try {
                 // The recent list is a nice-to-have: its failure never fails the dashboard.
-                val recent = async { runCatching { recentAccounts(userRepository.getAllUsers()) }.getOrDefault(emptyList()) }
+                val recent = async {
+                    try {
+                        // +1 leaves room for the admin account, which recentAccounts() drops.
+                        recentAccounts(userRepository.getNewestUsers(limit = RECENT_ACCOUNTS + 1L))
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
+                }
                 val summary = dashboardRepository.getAdminSummary()
                 _uiState.value = AdminDashboardUiState(
                     summary = summary,

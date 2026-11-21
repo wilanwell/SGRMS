@@ -43,6 +43,8 @@ import com.example.sgrms.ui.components.SgrmsMarkRow
 import com.example.sgrms.ui.components.SgrmsStatCard
 import com.example.sgrms.ui.components.SgrmsPrimaryButton
 import com.example.sgrms.ui.components.SgrmsSecondaryButton
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import androidx.compose.material.icons.filled.Person
 
 @Composable
 fun ReportDetailScreen(
@@ -188,7 +190,8 @@ fun ReportDetailScreen(
         onBack = onBackClick,
         isLoading = isLoading && student == null,
         errorMessage = errorMessage.ifBlank { localErrorMessage },
-        bottomBar = {
+        bottomBar = if (student == null) null else {
+            {
             SgrmsSecondaryButton(text = "Remarks", icon = Icons.Default.EditNote, onClick = onUpdateReportClick, modifier = Modifier.weight(1f))
             SgrmsPrimaryButton(
                 text = "Save PDF",
@@ -205,8 +208,14 @@ fun ReportDetailScreen(
                 },
                 modifier = Modifier.weight(1f)
             )
+            }
         }
     ) {
+        if (student == null) {
+            SgrmsEmptyState(title = "Report not found", message = "This student or report could not be loaded. It may have been deleted.", icon = Icons.Default.Person)
+            return@SgrmsDetailScreen
+        }
+
         SgrmsDetailHero(
             title = student?.studentName ?: "Unknown student",
             subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),

@@ -93,7 +93,8 @@ fun StudentNotificationScreen(
             Box(ListItemPadding) {
                 SgrmsListItemCard(
                     title = notification.title.ifBlank { "Notification" },
-                    subtitle = "${notification.message} · ${formatNotificationDate(notification.createdAt)}",
+                    subtitle = "${notification.message}\n${formatNotificationDate(notification.createdAt)}",
+                    subtitleMaxLines = 5,
                     leading = {
                         SgrmsIconTile(
                             icon = Icons.Default.Notifications,

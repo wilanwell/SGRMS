@@ -30,6 +30,8 @@ import com.example.sgrms.ui.components.SgrmsInfoSection
 import com.example.sgrms.ui.components.SgrmsRowDivider
 import com.example.sgrms.ui.components.SgrmsMarkRow
 import com.example.sgrms.ui.components.SgrmsSecondaryButton
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import androidx.compose.material.icons.filled.Person
 
 data class StudentGradeSubjectDisplayItem(
     val grade: GradeModel,
@@ -123,11 +125,18 @@ fun StudentGradeDetailScreen(
         onBack = onBackClick,
         isLoading = isLoading && student == null,
         errorMessage = errorMessage,
-        bottomBar = {
+        bottomBar = if (student == null) null else {
+            {
             SgrmsSecondaryButton(text = "Report", icon = Icons.Default.Summarize, onClick = onGenerateReportClick, modifier = Modifier.weight(1f))
             SgrmsPrimaryButton(text = "Enter marks", icon = Icons.Default.EditNote, onClick = onAddGradeClick, modifier = Modifier.weight(1f))
+            }
         }
     ) {
+        if (student == null) {
+            SgrmsEmptyState(title = "Student not found", message = "This student could not be loaded. It may have been deleted.", icon = Icons.Default.Person)
+            return@SgrmsDetailScreen
+        }
+
         SgrmsDetailHero(
             title = studentName,
             subtitle = className,

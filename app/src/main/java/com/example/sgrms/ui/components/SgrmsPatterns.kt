@@ -316,7 +316,8 @@ fun SgrmsListRow(
     subtitle: String?,
     leading: @Composable () -> Unit,
     trailing: @Composable RowScope.() -> Unit = {},
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
+    subtitleMaxLines: Int = 1
 ) {
     Row(
         modifier = Modifier
@@ -341,7 +342,7 @@ fun SgrmsListRow(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
+                    maxLines = subtitleMaxLines,
                     overflow = TextOverflow.Ellipsis
                 )
             }

@@ -113,6 +113,7 @@ fun SgrmsListItemCard(
     subtitle: String?,
     leading: @Composable () -> Unit,
     onClick: (() -> Unit)? = null,
+    subtitleMaxLines: Int = 1,
     trailing: @Composable RowScope.() -> Unit = {}
 ) {
     Surface(
@@ -121,7 +122,7 @@ fun SgrmsListItemCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Box(Modifier.padding(start = 14.dp, end = 4.dp)) {
-            SgrmsListRow(title = title, subtitle = subtitle, leading = leading, trailing = trailing, onClick = onClick)
+            SgrmsListRow(title = title, subtitle = subtitle, leading = leading, trailing = trailing, onClick = onClick, subtitleMaxLines = subtitleMaxLines)
         }
     }
 }
@@ -196,7 +197,11 @@ fun SgrmsListScreen(
                     }
                 }
 
-                errorMessage.isNotBlank() -> item(key = "error") {
+                else -> {}
+            }
+
+            if (!isLoading && errorMessage.isNotBlank()) {
+                item(key = "error") {
                     Surface(
                         shape = RoundedCornerShape(SgrmsRadius.Field),
                         color = SgrmsColors.ErrorContainer,
@@ -205,6 +210,10 @@ fun SgrmsListScreen(
                         Text(errorMessage, color = SgrmsColors.Error, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(14.dp))
                     }
                 }
+            }
+
+            when {
+                isLoading -> {}
 
                 isEmpty -> item(key = "empty") {
                     SgrmsEmptyState(
