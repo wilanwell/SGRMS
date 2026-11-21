@@ -1,37 +1,15 @@
 package com.example.sgrms.ui.subject
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,22 +20,30 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.GradeModel
-import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
-import com.example.sgrms.ui.theme.ColorPrimary
-import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.toneForGrade
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Category
+import com.example.sgrms.ui.components.SgrmsDetailScreen
+import com.example.sgrms.ui.components.SgrmsDetailHero
+import com.example.sgrms.ui.components.SgrmsInfoSection
+import com.example.sgrms.ui.components.SgrmsInfoRow
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import com.example.sgrms.ui.components.SgrmsListRow
+import com.example.sgrms.ui.components.SgrmsPrimaryButton
+import com.example.sgrms.ui.components.SgrmsSecondaryButton
 
 @Composable
 fun SubjectDetailScreen(
@@ -144,298 +130,80 @@ fun SubjectDetailScreen(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ColorBackground)
-            .navigationBarsPadding()
-    ) {
-        TopBar(
-            title = "Subject Detail",
-            showBack = true,
-            onBackClick = onBackClick,
-            showIcon = false
-        )
+    val gradeByStudent = subjectGrades.associateBy { it.studentId }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = 32.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+    SgrmsDetailScreen(
+        title = "Subject",
+        onBack = onBackClick,
+        isLoading = subjectUiState.isLoading && subject == null,
+        errorMessage = subjectUiState.errorMessage.ifBlank { studentGradeErrorMessage },
+        bottomBar = if (subject != null) {
+            {
+                SgrmsSecondaryButton(text = "Edit", icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
+                SgrmsPrimaryButton(text = "Add student", icon = Icons.Default.PersonAdd, onClick = { showAddStudentDialog = true }, modifier = Modifier.weight(1f))
+            }
+        } else {
+            null
+        }
+    ) {
+        if (subject == null) {
+            SgrmsEmptyState(title = "Subject not found", message = "The selected subject could not be loaded.", icon = Icons.AutoMirrored.Filled.MenuBook)
+            return@SgrmsDetailScreen
+        }
+
+        SgrmsDetailHero(
+            title = subject.subjectName.ifBlank { "Unnamed subject" },
+            subtitle = subject.subjectCode,
+            leading = {
+                SgrmsIconTile(
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
+                    tint = MaterialTheme.colorScheme.primary,
+                    container = MaterialTheme.colorScheme.primaryContainer,
+                    size = 72.dp
+                )
+            }
+        ) {
+            if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
+            SgrmsStatusChip("${studentsTakingSubject.size} students", ChipTone.Primary)
+        }
+
+        SgrmsInfoSection("Details") {
+            SgrmsInfoRow(icon = Icons.Default.Person, label = "Teacher", value = subject.teacherName.ifBlank { "Not assigned" })
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Category, label = "Category", value = subject.category.ifBlank { "-" })
+        }
+
+        SgrmsInfoSection(
+            title = "Students taking this subject",
+            trailing = {
+                androidx.compose.material3.TextButton(onClick = onViewStudentsClick) { Text("All students") }
+            }
         ) {
             when {
-                subjectUiState.isLoading || isStudentGradeLoading -> {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 40.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = ColorPrimary
-                            )
-                        }
-                    }
-                }
-
-                subject == null -> {
-                    item {
-                        SgrmsEmptyStateCard(
-                            icon = Icons.Default.MenuBook,
-                            title = "Subject not found",
-                            message = when {
-                                subjectUiState.errorMessage.isNotBlank() -> {
-                                    subjectUiState.errorMessage
-                                }
-
-                                studentGradeErrorMessage.isNotBlank() -> {
-                                    studentGradeErrorMessage
-                                }
-
-                                else -> {
-                                    "The selected subject may have been deleted."
-                                }
-                            }
-                        )
-                    }
-                }
-
-                else -> {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(18.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Card(
-                                        modifier = Modifier.size(58.dp),
-                                        shape = RoundedCornerShape(16.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = ColorPrimary.copy(alpha = 0.12f)
-                                        )
-                                    ) {
-                                        Box(
-                                            modifier = Modifier.fillMaxSize(),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.MenuBook,
-                                                contentDescription = "Subject Icon",
-                                                tint = ColorPrimary,
-                                                modifier = Modifier.size(32.dp)
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.size(14.dp))
-
-                                    Column(
-                                        modifier = Modifier.weight(1f)
-                                    ) {
-                                        Text(
-                                            text = subject.subjectName.ifBlank { "Unknown Subject" },
-                                            fontSize = 22.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-
-                                        Text(
-                                            text = subject.subjectCode.ifBlank { "-" },
-                                            fontSize = 15.sp,
-                                            color = ColorOnSurfaceVariant
-                                        )
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(18.dp))
-
-                                HorizontalDivider(color = ColorBackground)
-
-                                Spacer(modifier = Modifier.height(18.dp))
-
-                                SubjectDetailItem(
-                                    icon = Icons.Default.Tag,
-                                    label = "Subject Code",
-                                    value = subject.subjectCode.ifBlank { "-" }
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                SubjectDetailItem(
-                                    icon = Icons.Default.MenuBook,
-                                    label = "Subject Name",
-                                    value = subject.subjectName.ifBlank { "Unknown Subject" }
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                SubjectDetailItem(
-                                    icon = Icons.Default.Person,
-                                    label = "Teacher Name",
-                                    value = subject.teacherName.ifBlank { "Not assigned" }
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                SubjectDetailItem(
-                                    icon = Icons.Default.Group,
-                                    label = "Category",
-                                    value = subject.category.ifBlank { "-" }
-                                )
-
-                                Spacer(modifier = Modifier.height(16.dp))
-
-                                SubjectDetailItem(
-                                    icon = Icons.Default.Group,
-                                    label = "Total Students",
-                                    value = studentsTakingSubject.size.toString()
-                                )
-
-                                Spacer(modifier = Modifier.height(26.dp))
-
-                                Button(
-                                    onClick = {
-                                        showAddStudentDialog = true
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(52.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = ColorPrimary
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.PersonAdd,
-                                        contentDescription = "Add Student",
-                                        tint = Color.White
-                                    )
-
-                                    Spacer(modifier = Modifier.size(8.dp))
-
-                                    Text(
-                                        text = "Add Student to This Subject",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-
-                                Spacer(modifier = Modifier.height(12.dp))
-
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    OutlinedButton(
-                                        onClick = onEditClick,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(52.dp),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = ColorPrimary
-                                        )
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Edit Subject",
-                                            tint = ColorPrimary,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-
-                                        Spacer(modifier = Modifier.size(8.dp))
-
-                                        Text(
-                                            text = "Edit",
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-
-                                    OutlinedButton(
-                                        onClick = onViewStudentsClick,
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(52.dp),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = ButtonDefaults.outlinedButtonColors(
-                                            contentColor = ColorPrimary
-                                        )
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Visibility,
-                                            contentDescription = "View Students",
-                                            tint = ColorPrimary,
-                                            modifier = Modifier.size(20.dp)
-                                        )
-
-                                        Spacer(modifier = Modifier.size(8.dp))
-
-                                        Text(
-                                            text = "Students",
-                                            fontSize = 15.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                }
+                isStudentGradeLoading -> Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                studentsTakingSubject.isEmpty() -> Text(
+                    "No students yet. Use Add student to enrol one.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+                else -> studentsTakingSubject.forEachIndexed { index, student ->
+                    if (index > 0) SgrmsRowDivider()
+                    val grade = gradeByStudent[student.studentId]
+                    val complete = grade?.status.equals("Complete", ignoreCase = true)
+                    SgrmsListRow(
+                        title = student.studentName,
+                        subtitle = listOf(student.studentCode, student.className).filter { it.isNotBlank() }.joinToString(" · "),
+                        leading = { SgrmsAvatar(name = student.studentName, size = 40.dp) },
+                        trailing = {
+                            if (grade != null && complete) {
+                                val letter = grade.gradeLetter.ifBlank { com.example.sgrms.utils.GradeCalculator.gradeLetter(grade.marks) }
+                                SgrmsStatusChip("$letter · ${"%.0f".format(grade.marks)}", toneForGrade(letter))
+                            } else {
+                                SgrmsStatusChip("Pending", ChipTone.Warning)
                             }
                         }
-                    }
-
-                    if (
-                        subjectUiState.errorMessage.isNotBlank() ||
-                        studentGradeErrorMessage.isNotBlank()
-                    ) {
-                        item {
-                            Text(
-                                text = subjectUiState.errorMessage.ifBlank {
-                                    studentGradeErrorMessage
-                                },
-                                color = SgrmsColors.Error,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-
-                    item {
-                        Text(
-                            text = "Students Taking This Subject (${studentsTakingSubject.size})",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    if (studentsTakingSubject.isEmpty()) {
-                        item {
-                            SgrmsEmptyStateCard(
-                                icon = Icons.Default.Group,
-                                title = "No student found",
-                                message = "No student has been added to this subject yet."
-                            )
-                        }
-                    } else {
-                        items(
-                            items = studentsTakingSubject,
-                            key = { student ->
-                                student.studentId
-                            }
-                        ) { student ->
-                            SubjectStudentCard(student = student)
-                        }
-                    }
+                    )
                 }
             }
         }

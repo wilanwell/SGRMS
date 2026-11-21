@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,134 +41,9 @@ import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
 import com.example.sgrms.ui.theme.ColorPrimary
-import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
-
-@Composable
-fun SubjectDetailItem(
-    icon: ImageVector,
-    label: String,
-    value: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Card(
-            modifier = Modifier.size(42.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = ColorPrimary.copy(alpha = 0.10f)
-            )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = ColorPrimary,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.size(12.dp))
-
-        Column {
-            Text(
-                text = label,
-                fontSize = 13.sp,
-                color = ColorOnSurfaceVariant
-            )
-
-            Text(
-                text = value.ifBlank { "-" },
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
-
-@Composable
-fun SubjectStudentCard(
-    student: StudentModel
-) {
-    val studentStatus = student.status.ifBlank { "Active" }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ColorSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        color = if (student.gender == "Female") {
-                            Color(0xFFFF4081)
-                        } else {
-                            ColorPrimary
-                        },
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
-                    tint = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.size(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = student.studentName.ifBlank { "Unknown Student" },
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "Code: ${student.studentCode.ifBlank { "-" }}",
-                    fontSize = 13.sp,
-                    color = ColorOnSurfaceVariant
-                )
-
-                Text(
-                    text = "Class: ${student.className.ifBlank { "Not assigned" }}",
-                    fontSize = 13.sp,
-                    color = ColorOnSurfaceVariant
-                )
-            }
-
-            Text(
-                text = studentStatus,
-                fontSize = 12.sp,
-                color = if (studentStatus == "Active") {
-                    SgrmsColors.Success
-                } else {
-                    SgrmsColors.Error
-                },
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
+import androidx.compose.material.icons.filled.Add
 
 @Composable
 fun AddStudentToSubjectDialog(

@@ -18,14 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -44,89 +42,10 @@ import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
 import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
-
-@Composable
-fun ClassStudentCard(
-    student: StudentModel,
-    onRemoveClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ColorSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (student.gender == "Female") {
-                            Color(0xFFFF4081)
-                        } else {
-                            ColorPrimary
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
-                    tint = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.size(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = student.studentName,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "Code: ${student.studentCode}",
-                    fontSize = 13.sp,
-                    color = ColorOnSurfaceVariant
-                )
-
-                Text(
-                    text = "Status: ${student.status}",
-                    fontSize = 13.sp,
-                    color = if (student.status == "Active") {
-                        SgrmsColors.Success
-                    } else {
-                        SgrmsColors.Error
-                    },
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            OutlinedIconButton(
-                onClick = onRemoveClick
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PersonRemove,
-                    contentDescription = "Remove from class",
-                    tint = SgrmsColors.Error
-                )
-            }
-        }
-    }
-}
+import androidx.compose.material.icons.filled.Add
 
 @Composable
 fun AddStudentToClassDialog(
