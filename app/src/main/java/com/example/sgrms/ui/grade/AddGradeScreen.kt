@@ -35,6 +35,12 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun AddGradeScreen(
@@ -116,7 +122,7 @@ fun AddGradeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorBackground)
-            .navigationBarsPadding()
+            .imePadding()
     ) {
         TopBar(
             title = "Add New Grade",
@@ -127,7 +133,7 @@ fun AddGradeScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -265,53 +271,59 @@ fun AddGradeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
 
-                SgrmsButtonRow(
-                    cancelText = "Cancel",
-                    confirmText = if (isLoading) {
-                        "Saving..."
-                    } else {
-                        "Save Grade"
-                    },
-                    onCancelClick = onBackClick,
-                    onConfirmClick = {
-                        val marksValue = marks.toDoubleOrNull()
-
-                        studentError = selectedStudentId.isBlank() ||
-                                selectedStudentDisplay == "No student available"
-
-                        subjectError = selectedSubjectId.isBlank() ||
-                                selectedSubjectDisplay == "No subject available"
-
-                        marksError = marksValue == null ||
-                                marksValue < 0.0 ||
-                                marksValue > 100.0
-
-                        val isValid = !studentError &&
-                                !subjectError &&
-                                !marksError
-
-                        if (isValid && marksValue != null) {
-                            val grade = GradeModel(
-                                studentId = selectedStudentId,
-                                subjectId = selectedSubjectId,
-                                marks = marksValue,
-                                gradeLetter = GradeCalculator.gradeLetter(marks),
-                                remarks = remarks.trim(),
-                                status = "Complete",
-                                createdByTeacherId = "",
-                                createdAt = System.currentTimeMillis()
-                            )
-
-                            gradeViewModel.addGrade(
-                                grade = grade,
-                                onSuccess = onSaveClick
-                            )
-                        }
-                    }
-                )
             }
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                cancelText = "Cancel",
+                                confirmText = if (isLoading) {
+                                    "Saving..."
+                                } else {
+                                    "Save Grade"
+                                },
+                                onCancelClick = onBackClick,
+                                onConfirmClick = {
+                                    val marksValue = marks.toDoubleOrNull()
+            
+                                    studentError = selectedStudentId.isBlank() ||
+                                            selectedStudentDisplay == "No student available"
+            
+                                    subjectError = selectedSubjectId.isBlank() ||
+                                            selectedSubjectDisplay == "No subject available"
+            
+                                    marksError = marksValue == null ||
+                                            marksValue < 0.0 ||
+                                            marksValue > 100.0
+            
+                                    val isValid = !studentError &&
+                                            !subjectError &&
+                                            !marksError
+            
+                                    if (isValid && marksValue != null) {
+                                        val grade = GradeModel(
+                                            studentId = selectedStudentId,
+                                            subjectId = selectedSubjectId,
+                                            marks = marksValue,
+                                            gradeLetter = GradeCalculator.gradeLetter(marks),
+                                            remarks = remarks.trim(),
+                                            status = "Complete",
+                                            createdByTeacherId = "",
+                                            createdAt = System.currentTimeMillis()
+                                        )
+            
+                                        gradeViewModel.addGrade(
+                                            grade = grade,
+                                            onSuccess = onSaveClick
+                                        )
+                                    }
+                                }
+                            )
         }
     }
 }

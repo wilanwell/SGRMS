@@ -53,6 +53,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import com.example.sgrms.viewmodel.ChangePasswordResult
 import com.example.sgrms.viewmodel.ChangePasswordViewModel
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun ChangePasswordScreen(
@@ -229,9 +230,9 @@ fun ChangePasswordScreen(
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Card),
                 colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(18.dp)
@@ -372,7 +373,7 @@ fun ChangePasswordScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorPrimary
                             )
@@ -453,7 +454,7 @@ fun PasswordInputField(
             }
         },
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Field),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = ColorPrimary,
             focusedLabelColor = ColorPrimary,

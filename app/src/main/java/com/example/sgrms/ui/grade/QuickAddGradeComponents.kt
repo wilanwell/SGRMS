@@ -38,6 +38,8 @@ import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
 
 @Composable
 fun QuickGradeStudentCard(
@@ -64,9 +66,9 @@ fun QuickGradeStudentCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(containerColor = ColorSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(14.dp)
@@ -146,12 +148,8 @@ fun QuickGradeStudentCard(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal
                 ),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ColorPrimary,
-                    focusedLabelColor = ColorPrimary,
-                    cursorColor = ColorPrimary
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
         }
     }

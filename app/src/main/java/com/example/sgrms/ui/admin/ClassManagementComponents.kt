@@ -54,6 +54,7 @@ import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Edit
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 data class ClassTeacherItem(
     val teacherId: String = "",
@@ -450,7 +451,7 @@ fun StudentInClassCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Field),
         colors = CardDefaults.cardColors(
             containerColor = ColorBackground
         )

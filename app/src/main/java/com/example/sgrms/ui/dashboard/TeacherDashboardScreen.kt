@@ -192,7 +192,7 @@ private fun QuickAction(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         color = MaterialTheme.colorScheme.surface,
         modifier = modifier.height(56.dp)
     ) {

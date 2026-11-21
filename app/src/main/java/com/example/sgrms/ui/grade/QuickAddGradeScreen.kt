@@ -60,6 +60,7 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun QuickAddGradeScreen(
@@ -183,9 +184,9 @@ fun QuickAddGradeScreen(
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Card),
                     colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(18.dp)
@@ -429,7 +430,7 @@ fun QuickAddGradeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(54.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorPrimary,
                                 disabledContainerColor = ColorPrimary.copy(alpha = 0.6f)

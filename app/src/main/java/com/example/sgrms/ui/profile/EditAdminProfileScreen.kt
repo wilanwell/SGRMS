@@ -53,6 +53,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.AdminProfileViewModel
 import com.example.sgrms.data.repository.UserProfileUpdate
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun EditAdminProfileScreen(
@@ -186,9 +187,9 @@ fun EditAdminProfileScreen(
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Card),
                 colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(18.dp),
@@ -239,7 +240,7 @@ fun EditAdminProfileScreen(
                                     !isSaving &&
                                     !isUploadingImage,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = ColorPrimary
                             )
@@ -399,7 +400,7 @@ fun EditAdminProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorPrimary
                             )
@@ -427,7 +428,7 @@ fun EditAdminProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = ColorPrimary
                             )

@@ -142,7 +142,7 @@ fun StudentDashboardScreen(
             if (latestUnread != null) {
                 Surface(
                     onClick = onNotificationsClick,
-                    shape = RoundedCornerShape(18.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Card),
                     color = SgrmsColors.OrangeContainer,
                     modifier = Modifier.fillMaxWidth()
                 ) {

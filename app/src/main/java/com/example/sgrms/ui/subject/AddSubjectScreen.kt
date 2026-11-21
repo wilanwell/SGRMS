@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,6 +36,13 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun AddSubjectScreen(
@@ -119,7 +124,7 @@ fun AddSubjectScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorBackground)
-            .navigationBarsPadding()
+            .imePadding()
     ) {
         TopBar(
             title = "Add New Subject",
@@ -130,7 +135,7 @@ fun AddSubjectScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -249,32 +254,38 @@ fun AddSubjectScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
 
-                SgrmsButtonRow(
-                    cancelText = "Cancel",
-                    confirmText = if (isLoading) {
-                        "Saving..."
-                    } else {
-                        "Save"
-                    },
-                    onCancelClick = onBackClick,
-                    onConfirmClick = {
-                        if (validateInput()) {
-                            subjectViewModel.addSubject(
-                                subjectCode = subjectCode.trim(),
-                                subjectName = subjectName.trim(),
-                                teacherId = selectedTeacherId,
-                                teacherName = selectedTeacherName,
-                                category = selectedCategory,
-                                onSuccess = onSaveClick
-                            )
-                        }
-                    }
-                )
             }
 
             Spacer(modifier = Modifier.height(36.dp))
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                cancelText = "Cancel",
+                                confirmText = if (isLoading) {
+                                    "Saving..."
+                                } else {
+                                    "Save"
+                                },
+                                onCancelClick = onBackClick,
+                                onConfirmClick = {
+                                    if (validateInput()) {
+                                        subjectViewModel.addSubject(
+                                            subjectCode = subjectCode.trim(),
+                                            subjectName = subjectName.trim(),
+                                            teacherId = selectedTeacherId,
+                                            teacherName = selectedTeacherName,
+                                            category = selectedCategory,
+                                            onSuccess = onSaveClick
+                                        )
+                                    }
+                                }
+                            )
         }
     }
 }

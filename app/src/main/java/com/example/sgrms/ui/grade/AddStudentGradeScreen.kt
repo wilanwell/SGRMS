@@ -58,6 +58,8 @@ import com.example.sgrms.viewmodel.AddStudentGradeSubjectItem
 import com.example.sgrms.viewmodel.AddStudentGradeViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
 
 @Composable
 fun AddStudentGradeScreen(
@@ -143,13 +145,11 @@ fun AddStudentGradeScreen(
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Card),
                             colors = CardDefaults.cardColors(
                                 containerColor = ColorPrimary
                             ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = 3.dp
-                            )
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Column(
                                 modifier = Modifier.padding(18.dp)
@@ -212,7 +212,7 @@ fun AddStudentGradeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ColorPrimary
                             )
@@ -249,13 +249,11 @@ private fun AddStudentGradeSubjectCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
             containerColor = ColorSurface
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp)
@@ -269,7 +267,7 @@ private fun AddStudentGradeSubjectCard(
                         .size(48.dp)
                         .background(
                             color = ColorPrimary.copy(alpha = 0.12f),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(SgrmsRadius.Field)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -336,12 +334,8 @@ private fun AddStudentGradeSubjectCard(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ColorPrimary,
-                    focusedLabelColor = ColorPrimary,
-                    cursorColor = ColorPrimary
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -358,12 +352,8 @@ private fun AddStudentGradeSubjectCard(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 enabled = !item.isSaving,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = ColorPrimary,
-                    focusedLabelColor = ColorPrimary,
-                    cursorColor = ColorPrimary
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
 
             if (item.message.isNotBlank()) {
@@ -389,7 +379,7 @@ private fun AddStudentGradeSubjectCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Field),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ColorPrimary
                 )

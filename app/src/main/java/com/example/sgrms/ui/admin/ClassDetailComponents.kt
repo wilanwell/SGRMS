@@ -46,6 +46,7 @@ import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.compose.material.icons.filled.Add
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun AddStudentToClassDialog(
@@ -140,9 +141,9 @@ fun AddStudentSelectionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Field),
         colors = CardDefaults.cardColors(containerColor = ColorBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier

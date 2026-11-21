@@ -58,6 +58,7 @@ import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.AdminProfileViewModel
 import com.example.sgrms.data.model.UserRole
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun AdminProfileScreen(
@@ -143,7 +144,7 @@ fun AdminProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Field),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ColorPrimary
                     )
@@ -199,9 +200,9 @@ fun AdminProfileScreen(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Card),
                     colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(18.dp)
@@ -270,9 +271,9 @@ fun AdminProfileScreen(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Card),
                     colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(18.dp)
@@ -319,9 +320,9 @@ fun AdminProfileScreen(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Card),
                     colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(18.dp)
@@ -400,7 +401,7 @@ fun AdminProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Field),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = ColorPrimary
                     )
@@ -427,7 +428,7 @@ fun AdminProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Field),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = ColorPrimary
                     )
@@ -454,7 +455,7 @@ fun AdminProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(SgrmsRadius.Field),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ColorPrimary
                     )

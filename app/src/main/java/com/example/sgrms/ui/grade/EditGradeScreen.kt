@@ -35,6 +35,12 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import com.example.sgrms.ui.components.SgrmsSegmentedField
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun EditGradeScreen(
@@ -171,7 +177,7 @@ fun EditGradeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorBackground)
-            .navigationBarsPadding()
+            .imePadding()
     ) {
         TopBar(
             title = "Edit Grade",
@@ -182,7 +188,7 @@ fun EditGradeScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -299,20 +305,14 @@ fun EditGradeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SgrmsDropdownField(
-                    value = selectedStatus.ifBlank { "Select status" },
+                SgrmsSegmentedField(
                     label = "Status",
-                    placeholder = "Select status",
-                    expanded = statusExpanded,
-                    onExpandedChange = {
-                        statusExpanded = it
-                    },
-                    items = statusList,
-                    onItemSelected = {
+                    options = statusList,
+                    selected = selectedStatus.ifBlank { "Select status" },
+                    onSelect = { it ->
                         selectedStatus = it
                         statusError = false
-                        statusExpanded = false
-                        clearMessages()
+clearMessages()
                     },
                     isError = statusError,
                     errorMessage = "Status is required"
@@ -341,60 +341,66 @@ fun EditGradeScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
 
-                SgrmsButtonRow(
-                    cancelText = "Cancel",
-                    confirmText = if (isLoading) {
-                        "Saving..."
-                    } else {
-                        "Save Changes"
-                    },
-                    onCancelClick = onBackClick,
-                    onConfirmClick = {
-                        val marksValue = marks.toDoubleOrNull()
-
-                        studentError = selectedStudentId.isBlank() ||
-                                selectedStudentDisplay == "No student available"
-
-                        subjectError = selectedSubjectId.isBlank() ||
-                                selectedSubjectDisplay == "No subject available"
-
-                        marksError = marksValue == null ||
-                                marksValue < 0.0 ||
-                                marksValue > 100.0
-
-                        statusError = selectedStatus.isBlank()
-
-                        val isValid = !studentError &&
-                                !subjectError &&
-                                !marksError &&
-                                !statusError
-
-                        if (isValid && marksValue != null && gradeId.isNotBlank()) {
-                            val updatedGrade = GradeModel(
-                                gradeId = gradeId,
-                                studentId = selectedStudentId,
-                                subjectId = selectedSubjectId,
-                                marks = marksValue,
-                                gradeLetter = GradeCalculator.gradeLetter(marks),
-                                status = selectedStatus,
-                                remarks = remarks.trim(),
-                                createdByTeacherId = selectedGrade?.createdByTeacherId ?: "",
-                                createdAt = selectedGrade?.createdAt ?: System.currentTimeMillis()
-                            )
-
-                            gradeViewModel.updateGrade(
-                                grade = updatedGrade,
-                                subjectName = selectedSubjectDisplay,
-                                onSuccess = onSaveClick
-                            )
-                        } else if (gradeId.isBlank()) {
-                            localErrorMessage = "Invalid grade ID"
-                        }
-                    }
-                )
             }
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                cancelText = "Cancel",
+                                confirmText = if (isLoading) {
+                                    "Saving..."
+                                } else {
+                                    "Save Changes"
+                                },
+                                onCancelClick = onBackClick,
+                                onConfirmClick = {
+                                    val marksValue = marks.toDoubleOrNull()
+            
+                                    studentError = selectedStudentId.isBlank() ||
+                                            selectedStudentDisplay == "No student available"
+            
+                                    subjectError = selectedSubjectId.isBlank() ||
+                                            selectedSubjectDisplay == "No subject available"
+            
+                                    marksError = marksValue == null ||
+                                            marksValue < 0.0 ||
+                                            marksValue > 100.0
+            
+                                    statusError = selectedStatus.isBlank()
+            
+                                    val isValid = !studentError &&
+                                            !subjectError &&
+                                            !marksError &&
+                                            !statusError
+            
+                                    if (isValid && marksValue != null && gradeId.isNotBlank()) {
+                                        val updatedGrade = GradeModel(
+                                            gradeId = gradeId,
+                                            studentId = selectedStudentId,
+                                            subjectId = selectedSubjectId,
+                                            marks = marksValue,
+                                            gradeLetter = GradeCalculator.gradeLetter(marks),
+                                            status = selectedStatus,
+                                            remarks = remarks.trim(),
+                                            createdByTeacherId = selectedGrade?.createdByTeacherId ?: "",
+                                            createdAt = selectedGrade?.createdAt ?: System.currentTimeMillis()
+                                        )
+            
+                                        gradeViewModel.updateGrade(
+                                            grade = updatedGrade,
+                                            subjectName = selectedSubjectDisplay,
+                                            onSuccess = onSaveClick
+                                        )
+                                    } else if (gradeId.isBlank()) {
+                                        localErrorMessage = "Invalid grade ID"
+                                    }
+                                }
+                            )
         }
     }
 }

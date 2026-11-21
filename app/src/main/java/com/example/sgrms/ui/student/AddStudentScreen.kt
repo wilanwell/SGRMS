@@ -18,7 +18,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -35,6 +34,13 @@ import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Add
+import com.example.sgrms.ui.components.SgrmsSegmentedField
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun AddStudentScreen(
@@ -131,7 +137,7 @@ fun AddStudentScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorBackground)
-            .navigationBarsPadding()
+            .imePadding()
     ) {
         TopBar(
             title = "Add Student",
@@ -142,7 +148,7 @@ fun AddStudentScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -243,20 +249,14 @@ fun AddStudentScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SgrmsDropdownField(
-                    value = selectedGender,
+                SgrmsSegmentedField(
                     label = "Gender",
-                    placeholder = "Select gender",
-                    expanded = genderExpanded,
-                    onExpandedChange = {
-                        genderExpanded = it
-                    },
-                    items = genderList,
-                    onItemSelected = {
+                    options = genderList,
+                    selected = selectedGender,
+                    onSelect = { it ->
                         selectedGender = it
                         genderError = false
                         clearMessages()
-                        genderExpanded = false
                     },
                     isError = genderError,
                     errorMessage = "Gender is required"
@@ -264,19 +264,13 @@ fun AddStudentScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SgrmsDropdownField(
-                    value = selectedStatus,
+                SgrmsSegmentedField(
                     label = "Status",
-                    placeholder = "Select status",
-                    expanded = statusExpanded,
-                    onExpandedChange = {
-                        statusExpanded = it
-                    },
-                    items = statusList,
-                    onItemSelected = {
+                    options = statusList,
+                    selected = selectedStatus,
+                    onSelect = { it ->
                         selectedStatus = it
                         clearMessages()
-                        statusExpanded = false
                     }
                 )
 
@@ -308,36 +302,42 @@ fun AddStudentScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
 
-                SgrmsButtonRow(
-                    cancelText = "Cancel",
-                    confirmText = if (uiState.isLoading) {
-                        "Saving..."
-                    } else {
-                        "Save"
-                    },
-                    onCancelClick = onBackClick,
-                    onConfirmClick = {
-                        if (validateInput()) {
-                            studentViewModel.addStudentWithAccount(
-                                studentCode = studentCode.trim(),
-                                studentName = studentName.trim(),
-                                email = email.trim(),
-                                phoneNumber = phoneNumber.trim(),
-                                classId = selectedClassId,
-                                className = selectedClass,
-                                gender = selectedGender,
-                                status = selectedStatus,
-                                password = password.trim(),
-                                onSuccess = onSaveClick
-                            )
-                        }
-                    }
-                )
             }
 
             Spacer(modifier = Modifier.height(36.dp))
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                cancelText = "Cancel",
+                                confirmText = if (uiState.isLoading) {
+                                    "Saving..."
+                                } else {
+                                    "Save"
+                                },
+                                onCancelClick = onBackClick,
+                                onConfirmClick = {
+                                    if (validateInput()) {
+                                        studentViewModel.addStudentWithAccount(
+                                            studentCode = studentCode.trim(),
+                                            studentName = studentName.trim(),
+                                            email = email.trim(),
+                                            phoneNumber = phoneNumber.trim(),
+                                            classId = selectedClassId,
+                                            className = selectedClass,
+                                            gender = selectedGender,
+                                            status = selectedStatus,
+                                            password = password.trim(),
+                                            onSuccess = onSaveClick
+                                        )
+                                    }
+                                }
+                            )
         }
     }
 }

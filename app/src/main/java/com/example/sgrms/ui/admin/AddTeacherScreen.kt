@@ -1,9 +1,7 @@
 package com.example.sgrms.ui.admin
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -36,7 +33,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -50,6 +46,12 @@ import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
 
 @Composable
 fun AddTeacherScreen(
@@ -75,6 +77,48 @@ fun AddTeacherScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+                SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                        cancelText = "Cancel",
+                        confirmText = if (uiState.isLoading) {
+                            "Saving..."
+                        } else {
+                            "Save"
+                        },
+                        onCancelClick = onBackClick,
+                        onConfirmClick = {
+                            staffIdError = staffId.isBlank()
+                            teacherNameError = teacherName.isBlank()
+                            emailError = email.isBlank()
+                            passwordError = password.isBlank()
+
+                            val isValid = !staffIdError &&
+                                    !teacherNameError &&
+                                    !emailError &&
+                                    !passwordError
+
+                            if (isValid) {
+                                teacherViewModel.addTeacherWithAccount(
+                                    staffId = staffId.trim(),
+                                    teacherName = teacherName.trim(),
+                                    email = email.trim(),
+                                    phoneNumber = phoneNumber.trim(),
+                                    department = department.trim(),
+                                    position = position.trim().ifBlank { "Teacher" },
+                                    password = password.trim(),
+                                    onSuccess = onSaveClick
+                                )
+                            }
+                        },
+                        confirmEnabled = !uiState.isLoading
+                    )
+            }
+        },
         topBar = {
             TopBar(
                 title = "Add Teacher",
@@ -89,16 +133,16 @@ fun AddTeacherScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(ColorBackground)
-                .navigationBarsPadding()
+                .imePadding()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 32.dp)
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Card),
                 colors = CardDefaults.cardColors(containerColor = ColorSurface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(18.dp)
@@ -133,7 +177,7 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
                         isError = staffIdError,
                         supportingText = {
@@ -141,11 +185,7 @@ fun AddTeacherScreen(
                                 Text("Staff ID is required")
                             }
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -166,7 +206,7 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
                         isError = teacherNameError,
                         supportingText = {
@@ -174,11 +214,7 @@ fun AddTeacherScreen(
                                 Text("Teacher name is required")
                             }
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -199,7 +235,7 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
                         isError = emailError,
                         supportingText = {
@@ -207,11 +243,7 @@ fun AddTeacherScreen(
                                 Text("Email is required")
                             }
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -231,13 +263,9 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -257,13 +285,9 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -280,14 +304,10 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
                         readOnly = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -308,7 +328,7 @@ fun AddTeacherScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
                         isError = passwordError,
@@ -317,11 +337,7 @@ fun AddTeacherScreen(
                                 Text("Password is required")
                             }
                         },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = ColorPrimary,
-                            focusedLabelColor = ColorPrimary,
-                            cursorColor = ColorPrimary
-                        )
+                        colors = sgrmsFieldColors()
                     )
 
                     if (uiState.errorMessage.isNotBlank()) {
@@ -335,42 +351,7 @@ fun AddTeacherScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
 
-                    SgrmsButtonRow(
-                        cancelText = "Cancel",
-                        confirmText = if (uiState.isLoading) {
-                            "Saving..."
-                        } else {
-                            "Save"
-                        },
-                        onCancelClick = onBackClick,
-                        onConfirmClick = {
-                            staffIdError = staffId.isBlank()
-                            teacherNameError = teacherName.isBlank()
-                            emailError = email.isBlank()
-                            passwordError = password.isBlank()
-
-                            val isValid = !staffIdError &&
-                                    !teacherNameError &&
-                                    !emailError &&
-                                    !passwordError
-
-                            if (isValid) {
-                                teacherViewModel.addTeacherWithAccount(
-                                    staffId = staffId.trim(),
-                                    teacherName = teacherName.trim(),
-                                    email = email.trim(),
-                                    phoneNumber = phoneNumber.trim(),
-                                    department = department.trim(),
-                                    position = position.trim().ifBlank { "Teacher" },
-                                    password = password.trim(),
-                                    onSuccess = onSaveClick
-                                )
-                            }
-                        },
-                        confirmEnabled = !uiState.isLoading
-                    )
                 }
             }
         }

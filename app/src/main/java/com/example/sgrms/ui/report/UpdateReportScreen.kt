@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.sgrms.ui.components.SgrmsButtonRow
@@ -41,6 +40,9 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
 
 @Composable
 fun UpdateReportScreen(
@@ -135,7 +137,7 @@ fun UpdateReportScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(ColorBackground)
-            .navigationBarsPadding()
+            .imePadding()
     ) {
         TopBar(
             title = "Update Report",
@@ -146,7 +148,7 @@ fun UpdateReportScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -281,30 +283,36 @@ fun UpdateReportScreen(
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
 
-                        SgrmsButtonRow(
-                            cancelText = "Cancel",
-                            confirmText = if (isSaving) {
-                                "Saving..."
-                            } else {
-                                "Save"
-                            },
-                            onCancelClick = onBackClick,
-                            onConfirmClick = {
-                                remarksError = remarks.isBlank()
-
-                                if (!remarksError) {
-                                    remarksViewModel.saveRemarks(
-                                        studentId = reportId,
-                                        remarks = remarks
-                                    )
-                                }
-                            }
-                        )
                     }
                 }
             }
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                        cancelText = "Cancel",
+                                        confirmText = if (isSaving) {
+                                            "Saving..."
+                                        } else {
+                                            "Save"
+                                        },
+                                        onCancelClick = onBackClick,
+                                        onConfirmClick = {
+                                            remarksError = remarks.isBlank()
+            
+                                            if (!remarksError) {
+                                                remarksViewModel.saveRemarks(
+                                                    studentId = reportId,
+                                                    remarks = remarks
+                                                )
+                                            }
+                                        }
+                                    )
         }
     }
 }

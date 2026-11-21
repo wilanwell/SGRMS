@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun AdminProfileSummaryBox(
@@ -33,7 +34,7 @@ fun AdminProfileSummaryBox(
 ) {
     Card(
         modifier = modifier.height(90.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
             containerColor = ColorPrimary.copy(alpha = 0.10f)
         )
@@ -46,7 +47,7 @@ fun AdminProfileSummaryBox(
         ) {
             Card(
                 modifier = Modifier.size(44.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Field),
                 colors = CardDefaults.cardColors(
                     containerColor = ColorPrimary.copy(alpha = 0.12f)
                 )
