@@ -26,6 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import com.example.sgrms.ui.theme.ColorPrimaryContainer
 
 @Composable
 fun SgrmsPrimaryButton(
@@ -39,7 +43,7 @@ fun SgrmsPrimaryButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.height(52.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Field),
         colors = ButtonDefaults.buttonColors(
             containerColor = ColorPrimary,
             contentColor = Color.White,
@@ -60,7 +64,7 @@ fun SgrmsPrimaryButton(
         Text(
             text = text,
             color = Color.White,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -74,13 +78,15 @@ fun SgrmsSecondaryButton(
     icon: ImageVector? = null,
     enabled: Boolean = true
 ) {
-    OutlinedButton(
+    FilledTonalButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier.height(52.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
+        shape = RoundedCornerShape(SgrmsRadius.Field),
+        colors = ButtonDefaults.filledTonalButtonColors(
+            containerColor = ColorPrimaryContainer,
             contentColor = ColorPrimary,
+            disabledContainerColor = ColorPrimaryContainer.copy(alpha = 0.5f),
             disabledContentColor = ColorPrimary.copy(alpha = 0.45f)
         )
     ) {
@@ -97,7 +103,7 @@ fun SgrmsSecondaryButton(
         Text(
             text = text,
             color = ColorPrimary,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -118,7 +124,7 @@ fun SgrmsTextButton(
         Text(
             text = text,
             color = ColorPrimary,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
     }
@@ -164,7 +170,7 @@ fun SgrmsViewButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Field)
     ) {
         Icon(
             imageVector = Icons.Default.Visibility,
@@ -184,7 +190,7 @@ fun SgrmsEditButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Field)
     ) {
         Icon(
             imageVector = Icons.Default.Edit,
@@ -204,7 +210,7 @@ fun SgrmsDeleteButton(
         onClick = onClick,
         enabled = enabled,
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Field)
     ) {
         Icon(
             imageVector = Icons.Default.Delete,

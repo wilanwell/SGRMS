@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.ColorPrimaryContainer
 
 @Composable
 fun SgrmsSmallSummaryBox(
@@ -27,9 +29,9 @@ fun SgrmsSmallSummaryBox(
 ) {
     Card(
         modifier = modifier.height(height),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
-            containerColor = ColorPrimary.copy(alpha = 0.10f)
+            containerColor = ColorPrimaryContainer
         )
     ) {
         Column(

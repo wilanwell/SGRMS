@@ -25,6 +25,8 @@ import com.example.sgrms.ui.theme.ColorBackground
 import com.example.sgrms.ui.theme.ColorSurface
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.ColorPrimaryContainer
 
 @Composable
 fun SgrmsHeaderProfileCard(
@@ -36,13 +38,11 @@ fun SgrmsHeaderProfileCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
             containerColor = ColorSurface
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp)
@@ -54,7 +54,7 @@ fun SgrmsHeaderProfileCard(
                     modifier = Modifier.size(58.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = ColorPrimary.copy(alpha = 0.12f)
+                        containerColor = ColorPrimaryContainer
                     )
                 ) {
                     Box(

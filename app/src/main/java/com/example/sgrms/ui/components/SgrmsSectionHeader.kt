@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun SgrmsSectionHeader(
@@ -17,8 +18,7 @@ fun SgrmsSectionHeader(
     Column(modifier = modifier) {
         Text(
             text = title,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge
         )
 
         if (subtitle != null) {

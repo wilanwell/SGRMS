@@ -14,6 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.text.style.TextOverflow
 
 @Composable
 fun SgrmsInfoRow(
@@ -23,28 +29,32 @@ fun SgrmsInfoRow(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = ColorPrimary,
-            modifier = Modifier.size(19.dp)
+        SgrmsIconTile(
+            icon = icon,
+            tint = MaterialTheme.colorScheme.primary,
+            container = MaterialTheme.colorScheme.primaryContainer,
+            size = 36.dp
         )
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        Text(
-            text = "$label: ",
-            fontSize = 13.sp,
-            color = ColorOnSurfaceVariant
-        )
-
-        Text(
-            text = value,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
+            )
+            Text(
+                text = value.ifBlank { "-" },
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }

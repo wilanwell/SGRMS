@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun SgrmsFilterButton(
@@ -36,7 +37,7 @@ fun SgrmsFilterButton(
                 onExpandedChange(true)
             },
             modifier = Modifier.height(48.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(SgrmsRadius.Field),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = ColorPrimary
             )

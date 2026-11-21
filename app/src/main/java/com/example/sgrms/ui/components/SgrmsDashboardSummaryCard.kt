@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorSurface
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 enum class SgrmsSummaryCardStyle {
     Primary,
@@ -72,13 +73,11 @@ fun SgrmsDashboardSummaryCard(
                     Modifier
                 }
             ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(if (style == SgrmsSummaryCardStyle.Primary) SgrmsRadius.Hero else SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier

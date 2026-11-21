@@ -24,35 +24,5 @@ fun SgrmsEmptyStateCard(
     message: String,
     modifier: Modifier = Modifier
 ) {
-    SgrmsCard(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = ColorOnSurfaceVariant,
-                modifier = Modifier.size(44.dp)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = title,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = message,
-                fontSize = 13.sp,
-                color = ColorOnSurfaceVariant
-            )
-        }
-    }
+    SgrmsEmptyState(title = title, message = message, icon = icon, modifier = modifier)
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun DashboardSummaryCard(
@@ -25,7 +26,7 @@ fun DashboardSummaryCard(
     Column(
         modifier = modifier
             .height(135.dp)
-            .background(ColorPrimary, RoundedCornerShape(12.dp))
+            .background(ColorPrimary, RoundedCornerShape(SgrmsRadius.Hero))
             .padding(18.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
