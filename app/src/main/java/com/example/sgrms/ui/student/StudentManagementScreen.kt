@@ -56,6 +56,23 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.ui.components.LoadMoreButton
 import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.components.toneForStatus
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.SgrmsOverflowMenu
+import com.example.sgrms.ui.components.SgrmsListScreen
+import com.example.sgrms.ui.components.SgrmsListItemCard
+import com.example.sgrms.ui.components.SgrmsDeleteDialog
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.RowAction
+import com.example.sgrms.ui.components.ListItemPadding
+import com.example.sgrms.ui.components.ListFab
+import com.example.sgrms.ui.components.EmptyContent
+import com.example.sgrms.ui.components.ChipGroup
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.automirrored.filled.Sort
 
 @Composable
 fun StudentManagementScreen(
@@ -78,7 +95,6 @@ fun StudentManagementScreen(
     var selectedStatus by remember { mutableStateOf("All Status") }
     var selectedSort by remember { mutableStateOf("Name") }
 
-    var showFilterDialog by remember { mutableStateOf(false) }
 
     var selectedStudentToDelete by remember { mutableStateOf<StudentModel?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -174,294 +190,96 @@ fun StudentManagementScreen(
     }
 
     if (showDeleteDialog && selectedStudentToDelete != null) {
-        AlertDialog(
-            onDismissRequest = {
+        SgrmsDeleteDialog(
+            title = "Delete student?",
+            message = "${selectedStudentToDelete?.studentName} and their grades, notifications and report will be removed. This cannot be undone.",
+            onConfirmClick = {
+                selectedStudentToDelete?.let { studentViewModel.deleteStudent(studentId = it.studentId) }
                 showDeleteDialog = false
                 selectedStudentToDelete = null
             },
-            title = {
-                Text(
-                    text = "Delete Student",
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to delete ${selectedStudentToDelete?.studentName}? This student profile will be removed from Firestore."
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        selectedStudentToDelete?.let { student ->
-                            studentViewModel.deleteStudent(
-                                studentId = student.studentId,
-                            )
-                        }
+            onDismissClick = {
+                showDeleteDialog = false
+                selectedStudentToDelete = null
+            }
+        )
+    }
 
-                        showDeleteDialog = false
-                        selectedStudentToDelete = null
+    SgrmsListScreen(
+        title = "Students",
+        subtitle = "${filteredStudents.size} shown · ${students.size}${if (uiState.hasMore) "+" else ""} loaded",
+        searchText = searchText,
+        onSearchChange = { searchText = it },
+        searchPlaceholder = "Search name, code, email or phone",
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
+        isEmpty = filteredStudents.isEmpty(),
+        empty = EmptyContent(
+            title = "No students found",
+            message = "Try another search or filter.",
+            icon = Icons.Default.Group
+        ),
+        chipGroups = listOf(
+            ChipGroup(classList, selectedClass) { selectedClass = it },
+            ChipGroup(statusList, selectedStatus) { selectedStatus = it },
+            ChipGroup(genderList, selectedGender) { selectedGender = it }
+        ),
+        fab = if (canAddStudent) ListFab("Add student", Icons.Default.PersonAdd, onAddStudentClick) else null,
+        headerActions = {
+            SgrmsOverflowMenu(
+                contentDescription = "Sort and export",
+                actions = sortList.map { option ->
+                    RowAction(
+                        label = if (option == selectedSort) "Sort by $option (current)" else "Sort by $option",
+                        icon = Icons.AutoMirrored.Filled.Sort
+                    ) { selectedSort = option }
+                } + RowAction("Export CSV", Icons.Default.FileDownload) {
+                    exportStudentListToCsv(context = context, students = filteredStudents)
+                }
+            )
+        }
+    ) {
+        items(items = filteredStudents, key = { it.studentId }) { student ->
+            Box(ListItemPadding) {
+                SgrmsListItemCard(
+                    title = student.studentName.ifBlank { "Unnamed student" },
+                    subtitle = listOf(
+                        student.studentCode,
+                        student.className.ifBlank { "No class" },
+                        student.gender
+                    ).filter { it.isNotBlank() }.joinToString(" · "),
+                    leading = {
+                        SgrmsAvatar(
+                            name = student.studentName,
+                            size = 44.dp,
+                            imageUrl = student.profileImageUrl,
+                            legacyImageBase64 = student.profileImageBase64
+                        )
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = SgrmsColors.Error
-                    )
+                    onClick = { onStudentDetailClick(student.studentId) }
                 ) {
-                    Text(
-                        text = "Delete",
-                        color = Color.White
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        selectedStudentToDelete = null
-                    }
-                ) {
-                    Text(
-                        text = "Cancel",
-                        color = ColorPrimary
-                    )
-                }
-            }
-        )
-    }
-
-    if (showFilterDialog) {
-        StudentFilterDialog(
-            selectedClass = selectedClass,
-            selectedGender = selectedGender,
-            selectedStatus = selectedStatus,
-            selectedSort = selectedSort,
-            classList = classList,
-            genderList = genderList,
-            statusList = statusList,
-            sortList = sortList,
-            onClassSelected = {
-                selectedClass = it
-            },
-            onGenderSelected = {
-                selectedGender = it
-            },
-            onStatusSelected = {
-                selectedStatus = it
-            },
-            onSortSelected = {
-                selectedSort = it
-            },
-            onDismiss = {
-                showFilterDialog = false
-            },
-            onClearFilter = {
-                selectedClass = "All Classes"
-                selectedGender = "All Gender"
-                selectedStatus = "All Status"
-                selectedSort = "Name"
-                showFilterDialog = false
-            }
-        )
-    }
-
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Students",
-                showBack = false
-            )
-        },
-        floatingActionButton = {
-            // Only an Admin can create login accounts (see firestore.rules).
-            if (canAddStudent) FloatingActionButton(
-                onClick = onAddStudentClick,
-                containerColor = ColorPrimary,
-                contentColor = Color.White,
-                modifier = Modifier
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Student"
-                )
-            }
-        }
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(ColorBackground)
-                .padding(paddingValues)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-        ) {
-            SgrmsSearchBar(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                },
-                label = "Search Student",
-                placeholder = "Search by name, code, email, phone, class, gender, or status"
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = "Student List",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "Students loaded: ${students.size}${if (uiState.hasMore) "+" else ""}",
-                        fontSize = 13.sp,
-                        color = ColorOnSurfaceVariant
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedButton(
-                        onClick = {
-                            showFilterDialog = true
-                        },
-                        modifier = Modifier.height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = ColorPrimary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = "Filter Students",
-                            tint = ColorPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(6.dp))
-
-                        Text(
-                            text = "Filter",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            exportStudentListToCsv(
-                                context = context,
-                                students = filteredStudents
-                            )
-                        },
-                        modifier = Modifier.height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = ColorPrimary
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FileDownload,
-                            contentDescription = "Export",
-                            tint = ColorPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(6.dp))
-
-                        Text(
-                            text = "Export",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = "${filteredStudents.size} shown",
-                fontSize = 13.sp,
-                color = ColorPrimary,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = ColorPrimary
-                        )
-                    }
-                }
-
-                uiState.errorMessage.isNotBlank() -> {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = SgrmsColors.Error,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
-                filteredStudents.isEmpty() -> {
-                    EmptyStudentCard()
-                }
-
-                else -> {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        contentPadding = PaddingValues(bottom = 8.dp)
-                    ) {
-                        items(
-                            items = filteredStudents,
-                            key = { student ->
-                                student.studentId
+                    val status = student.status.ifBlank { "Active" }
+                    SgrmsStatusChip(text = status, tone = toneForStatus(status))
+                    SgrmsOverflowMenu(
+                        contentDescription = "Actions for ${student.studentName}",
+                        actions = listOf(
+                            RowAction("View", Icons.Default.Visibility) { onStudentDetailClick(student.studentId) },
+                            RowAction("Edit", Icons.Default.Edit) { onEditStudentClick(student.studentId) },
+                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                                selectedStudentToDelete = student
+                                showDeleteDialog = true
                             }
-                        ) { student ->
-                            StudentCard(
-                                student = student,
-                                onViewClick = {
-                                    onStudentDetailClick(student.studentId)
-                                },
-                                onEditClick = {
-                                    onEditStudentClick(student.studentId)
-                                },
-                                onDeleteClick = {
-                                    selectedStudentToDelete = student
-                                    showDeleteDialog = true
-                                }
-                            )
-                        }
-
-                        if (uiState.hasMore) {
-                            item(key = "load_more") {
-                                LoadMoreButton(
-                                    isLoading = uiState.isLoadingMore,
-                                    onClick = { studentViewModel.loadMoreStudents() }
-                                )
-                            }
-                        }
-                    }
+                        )
+                    )
                 }
             }
         }
+
+        if (uiState.hasMore) {
+            item(key = "load_more") {
+                LoadMoreButton(isLoading = uiState.isLoadingMore, onClick = { studentViewModel.loadMoreStudents() })
+            }
+        }
     }
+
 }

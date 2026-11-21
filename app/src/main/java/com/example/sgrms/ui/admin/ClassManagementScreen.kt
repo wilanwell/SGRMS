@@ -1,25 +1,10 @@
 package com.example.sgrms.ui.admin
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -27,25 +12,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.ClassModel
-import com.example.sgrms.ui.components.SgrmsDashboardSummaryCard
 import com.example.sgrms.ui.components.SgrmsDeleteDialog
-import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.SgrmsSearchBar
-import com.example.sgrms.ui.components.SgrmsSummaryCardStyle
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.layout.Box
+import com.example.sgrms.ui.components.EmptyContent
+import com.example.sgrms.ui.components.ListFab
+import com.example.sgrms.ui.components.ListItemPadding
+import com.example.sgrms.ui.components.RowAction
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsListItemCard
+import com.example.sgrms.ui.components.SgrmsListScreen
+import com.example.sgrms.ui.components.SgrmsOverflowMenu
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Group
 
 @Composable
 fun ClassManagementScreen(
@@ -177,130 +166,58 @@ fun ClassManagementScreen(
         )
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Class Management",
-                showBack = false,
-                showIcon = true
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    showAddDialog = true
-                },
-                containerColor = ColorPrimary,
-                contentColor = Color.White
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Class"
-                )
-            }
+    val studentCountByClass = remember(students, classes) {
+        classes.associate { schoolClass ->
+            schoolClass.classId to students.count { it.classId == schoolClass.classId || it.className == schoolClass.className }
         }
-    ) { paddingValues ->
+    }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(ColorBackground)
-                .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp
-                ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 8.dp)
-        ) {
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    SgrmsDashboardSummaryCard(
-                        title = "Classes",
-                        value = classes.size.toString(),
-                        icon = Icons.Default.School,
-                        modifier = Modifier.weight(1f),
-                        style = SgrmsSummaryCardStyle.Primary,
-                        height = 108.dp
-                    )
-
-                    SgrmsDashboardSummaryCard(
-                        title = "Teachers",
-                        value = teachers.size.toString(),
-                        icon = Icons.Default.Person,
-                        modifier = Modifier.weight(1f),
-                        style = SgrmsSummaryCardStyle.Primary,
-                        height = 108.dp
-                    )
-                }
-            }
-
-            item {
-                SgrmsSearchBar(
-                    value = searchText,
-                    onValueChange = {
-                        searchText = it
+    SgrmsListScreen(
+        title = "Classes",
+        subtitle = "${classes.size} classes · ${students.size} students",
+        searchText = searchText,
+        onSearchChange = { searchText = it },
+        searchPlaceholder = "Search class, year or class teacher",
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
+        isEmpty = filteredClasses.isEmpty(),
+        empty = EmptyContent("No classes yet", "Create a class, then add students to it.", Icons.Default.School),
+        fab = ListFab("Add class", Icons.Default.Add) { showAddDialog = true }
+    ) {
+        items(items = filteredClasses, key = { it.classId }) { schoolClass ->
+            val count = studentCountByClass[schoolClass.classId] ?: 0
+            Box(ListItemPadding) {
+                SgrmsListItemCard(
+                    title = schoolClass.className.ifBlank { "Unnamed class" },
+                    subtitle = listOf(
+                        schoolClass.academicYear,
+                        "Teacher: " + schoolClass.classTeacherName.ifBlank { "Not assigned" }
+                    ).filter { it.isNotBlank() }.joinToString(" · "),
+                    leading = {
+                        SgrmsIconTile(
+                            icon = Icons.Default.School,
+                            tint = com.example.sgrms.ui.theme.SgrmsColors.Pink,
+                            container = com.example.sgrms.ui.theme.SgrmsColors.PinkContainer,
+                            size = 44.dp
+                        )
                     },
-                    label = "Search Class",
-                    placeholder = "Search by class name or academic year"
-                )
-            }
-
-            if (uiState.errorMessage.isNotBlank()) {
-                item {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = SgrmsColors.Error,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            item {
-                Text(
-                    text = "Class List (${filteredClasses.size})",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            if (filteredClasses.isEmpty()) {
-                item {
-                    SgrmsEmptyStateCard(
-                        icon = Icons.Default.School,
-                        title = "No class found",
-                        message = "Tap Add Class to create a class record"
-                    )
-                }
-            } else {
-                items(
-                    items = filteredClasses,
-                    key = { schoolClass ->
-                        schoolClass.classId
-                    }
-                ) { schoolClass ->
-                    ClassCard(
-                        schoolClass = schoolClass,
-                        classTeacherName = schoolClass.classTeacherName.ifBlank {
-                            "Not assigned"
-                        },
-                        onViewClick = {
-                            onViewClassClick(schoolClass.classId)
-                        },
-                        onEditClick = {
-                            selectedClassToEdit = schoolClass
-                            showEditDialog = true
-                        },
-                        onDeleteClick = {
-                            selectedClassToDelete = schoolClass
-                            showDeleteDialog = true
-                        }
+                    onClick = { onViewClassClick(schoolClass.classId) }
+                ) {
+                    SgrmsStatusChip(if (count == 1) "1 student" else "$count students", ChipTone.Primary)
+                    SgrmsOverflowMenu(
+                        contentDescription = "Actions for ${schoolClass.className}",
+                        actions = listOf(
+                            RowAction("View", Icons.Default.Visibility) { onViewClassClick(schoolClass.classId) },
+                            RowAction("Students", Icons.Default.Group) { selectedClassToView = schoolClass },
+                            RowAction("Edit", Icons.Default.Edit) {
+                                selectedClassToEdit = schoolClass
+                                showEditDialog = true
+                            },
+                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                                selectedClassToDelete = schoolClass
+                                showDeleteDialog = true
+                            }
+                        )
                     )
                 }
             }

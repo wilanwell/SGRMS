@@ -28,7 +28,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,16 +45,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.ClassModel
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.SgrmsInfoRow
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.theme.ColorBackground
-import com.example.sgrms.ui.theme.ColorSurface
 import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Edit
 
 data class ClassTeacherItem(
     val teacherId: String = "",
@@ -359,94 +357,6 @@ fun EditClassDialog(
             }
         }
     )
-}
-
-@Composable
-fun ClassCard(
-    schoolClass: ClassModel,
-    classTeacherName: String,
-    onViewClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = ColorSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(ColorPrimary.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.School,
-                        contentDescription = "Class",
-                        tint = ColorPrimary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.size(12.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = schoolClass.className,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "Academic Year: ${schoolClass.academicYear}",
-                        fontSize = 13.sp,
-                        color = ColorOnSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            HorizontalDivider(color = ColorBackground)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            SgrmsInfoRow(
-                icon = Icons.Default.Person,
-                label = "Class Teacher",
-                value = classTeacherName
-            )
-
-            if (schoolClass.description.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                SgrmsInfoRow(
-                    icon = Icons.Default.MenuBook,
-                    label = "Description",
-                    value = schoolClass.description
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            SgrmsActionButtonRow(
-                onViewClick = onViewClick,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
 }
 
 @Composable
