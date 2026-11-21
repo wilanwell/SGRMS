@@ -398,7 +398,9 @@ fun SgrmsSegmentedField(
     selected: String,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    isError: Boolean = false,
+    errorMessage: String? = null
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -417,6 +419,9 @@ fun SgrmsSegmentedField(
                     label = { Text(option, maxLines = 1) }
                 )
             }
+        }
+        if (isError && !errorMessage.isNullOrBlank()) {
+            Text(errorMessage, style = MaterialTheme.typography.bodySmall, color = SgrmsColors.Error)
         }
     }
 }
