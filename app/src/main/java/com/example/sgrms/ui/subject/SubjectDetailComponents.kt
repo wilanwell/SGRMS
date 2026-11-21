@@ -45,6 +45,7 @@ import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.compose.material.icons.filled.Add
 import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun AddStudentToSubjectDialog(
@@ -159,7 +160,7 @@ fun AddSubjectStudentSelectionCard(
                     .size(42.dp)
                     .background(
                         color = if (student.gender == "Female") {
-                            Color(0xFFFF4081)
+                            SgrmsColors.Pink
                         } else {
                             ColorPrimary
                         },

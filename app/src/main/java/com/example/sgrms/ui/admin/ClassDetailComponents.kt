@@ -157,7 +157,7 @@ fun AddStudentSelectionCard(
                     .clip(CircleShape)
                     .background(
                         if (student.gender == "Female") {
-                            Color(0xFFFF4081)
+                            SgrmsColors.Pink
                         } else {
                             ColorPrimary
                         }

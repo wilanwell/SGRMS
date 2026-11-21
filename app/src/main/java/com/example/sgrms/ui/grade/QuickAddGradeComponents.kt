@@ -58,8 +58,8 @@ fun QuickGradeStudentCard(
     val gradeColor = when (gradeLetter) {
         "A+", "A" -> SgrmsColors.Success
         "B" -> ColorPrimary
-        "C" -> Color(0xFFFF9800)
-        "D" -> Color(0xFFFF5722)
+        "C" -> SgrmsColors.WarningBar
+        "D" -> SgrmsColors.Warning
         "E" -> SgrmsColors.Error
         else -> ColorOnSurfaceVariant
     }
@@ -82,7 +82,7 @@ fun QuickGradeStudentCard(
                         .clip(CircleShape)
                         .background(
                             if (student.gender == "Female") {
-                                Color(0xFFFF4081)
+                                SgrmsColors.Pink
                             } else {
                                 ColorPrimary
                             }
