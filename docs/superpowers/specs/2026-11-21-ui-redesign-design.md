@@ -1,6 +1,6 @@
 # SGRMS UI Redesign — "Indigo Clean"
 
-Date: 2026-11-21 · Status: awaiting approval
+Date: 2026-11-21 · Status: approved by the owner (2026-11-21), with the change below
 
 ## Intent
 
@@ -22,8 +22,11 @@ are the visual reference.
   system: the same colours, type, radii, spacing and components.
 - The four "first impression" screens match the mockups closely:
   **Login, Admin dashboard, Teacher dashboard, Student dashboard**.
-- List, detail and form screens get the new components and colours, and
-  their layouts are tidied (spacing, card style, chips, empty states).
+- **Every screen's layout is redesigned too** (owner's change on approval):
+  list, detail, form and profile screens get new layouts, and old elements
+  may be replaced with more modern ones (for example a filter dialog with
+  filter chips, a dropdown with a bottom sheet or segmented control, a
+  plain list with avatar rows, an info table with a grouped card).
 - The design is built as a real **design system in code** (theme tokens plus
   shared components), so a recruiter reading the code sees good structure,
   not hard-coded hex values.
@@ -146,8 +149,25 @@ titles 700, body 400/500, labels 600.
 - **Teacher dashboard:** the same pattern as Admin, using its existing
   data (student / subject / grade / report counts and subject averages).
 
-All other screens keep their structure and get the new components, colours
-and spacing.
+All other screens are re-laid-out with the same patterns, by screen type:
+
+- **List screens** (students, teachers, subjects, classes, grades, users,
+  reports): header with a count; a search field; horizontally scrolling
+  **filter chips** instead of dropdown dialogs; avatar rows inside one
+  grouped card, with status pills and a trailing chevron; row actions in an
+  overflow menu instead of three outlined buttons per card; an
+  extended FAB for the main add action.
+- **Detail screens** (student, teacher, subject, class, grade, report):
+  a profile hero (avatar, name, key chips), then grouped info cards with
+  icon rows, then primary and secondary actions at the bottom.
+- **Form screens** (add/edit student, teacher, subject, grade, profile,
+  password): one field group per card with section titles; dropdowns
+  become exposed menus or **segmented buttons** where there are 2–3 options
+  (gender, status); a sticky full-width save button.
+- **Profile screens:** hero with photo, grouped settings-style rows,
+  logout as a quiet destructive row.
+- **Dialogs:** confirmation dialogs restyled; filter dialogs replaced by
+  chips or a modal bottom sheet.
 
 ## Decided by the owner
 
@@ -165,7 +185,7 @@ and spacing.
 
 - The exact order of the work, as long as the app builds after each step.
 - Icon choices from Material Icons (rounded style where it exists).
-- Small layout adjustments on secondary screens, within the rules above.
+- The exact layout of each secondary screen, within the patterns above.
 
 ## Done when
 
