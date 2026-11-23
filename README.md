@@ -97,7 +97,7 @@ The optional Cloud Functions in [`functions/`](functions/README.md) show how the
 ## Project structure
 
 ```
-app/src/main/java/com/example/sgrms/
+app/src/main/java/com/wilanwell/sgrms/
 ├── data/            # models, Firebase services, repositories, session
 ├── di/              # Hilt modules
 ├── navigation/      # routes and the NavHost with role guards
@@ -116,7 +116,7 @@ docs/                # screenshots, logo, design notes
 **Requirements:** Android Studio (recent stable), JDK 17+, Node.js 18+ and the Firebase CLI (only for rules and indexes).
 
 1. **Create a Firebase project** and enable **Email/Password** sign-in and **Cloud Firestore**.
-2. **Register an Android app** with the package name `com.example.sgrms`, download `google-services.json` and put it in `app/`.
+2. **Register an Android app** with the package name `com.wilanwell.sgrms`, download `google-services.json` and put it in `app/`.
 3. **Deploy the security rules and indexes:**
    ```bash
    firebase use --add            # pick your project

@@ -1,0 +1,185 @@
+package com.wilanwell.sgrms.data.firebase
+
+import com.wilanwell.sgrms.data.model.GradeModel
+import com.google.firebase.firestore.FirebaseFirestore
+import com.wilanwell.sgrms.data.repository.Page
+import com.wilanwell.sgrms.data.repository.PageCursor
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class GradeFirebaseService @Inject constructor(
+    private val firestore: FirebaseFirestore
+) {
+     private val gradesCollection = firestore.collection("grades")
+
+    suspend fun addGrade(
+        grade: GradeModel
+    ): GradeModel {
+        val existingGrade = getGradeByStudentAndSubject(
+            studentId = grade.studentId,
+            subjectId = grade.subjectId
+        )
+
+        if (existingGrade != null) {
+            val updatedGrade = grade.copy(
+                gradeId = existingGrade.gradeId,
+                createdAt = existingGrade.createdAt
+            )
+
+            gradesCollection
+                .document(existingGrade.gradeId)
+                .set(updatedGrade)
+                .await()
+
+            return updatedGrade
+        }
+
+        val gradeDocument = gradesCollection.document()
+
+        val newGrade = grade.copy(
+            gradeId = gradeDocument.id,
+            createdAt = if (grade.createdAt == 0L) {
+                System.currentTimeMillis()
+            } else {
+                grade.createdAt
+            }
+        )
+
+        gradeDocument
+            .set(newGrade)
+            .await()
+
+        return newGrade
+    }
+
+    suspend fun getAllGrades(): List<GradeModel> {
+        return gradesCollection
+            .get()
+            .await()
+            .documents
+            .mapNotNull { document ->
+                document.toObject(GradeModel::class.java)?.copy(
+                    gradeId = document.id
+                )
+            }
+    }
+
+    suspend fun getGradeById(
+        gradeId: String
+    ): GradeModel? {
+        return gradesCollection
+            .document(gradeId)
+            .get()
+            .await()
+            .toObject(GradeModel::class.java)
+            ?.copy(
+                gradeId = gradeId
+            )
+    }
+
+    suspend fun getGradesByStudentId(
+        studentId: String
+    ): List<GradeModel> {
+        return gradesCollection
+            .whereEqualTo("studentId", studentId)
+            .get()
+            .await()
+            .documents
+            .mapNotNull { document ->
+                document.toObject(GradeModel::class.java)?.copy(
+                    gradeId = document.id
+                )
+            }
+    }
+
+    suspend fun getGradesBySubjectId(
+        subjectId: String
+    ): List<GradeModel> {
+        return gradesCollection
+            .whereEqualTo("subjectId", subjectId)
+            .get()
+            .await()
+            .documents
+            .mapNotNull { document ->
+                document.toObject(GradeModel::class.java)?.copy(
+                    gradeId = document.id
+                )
+            }
+    }
+
+    suspend fun getGradeByStudentAndSubject(
+        studentId: String,
+        subjectId: String
+    ): GradeModel? {
+        return gradesCollection
+            .whereEqualTo("studentId", studentId)
+            .whereEqualTo("subjectId", subjectId)
+            .get()
+            .await()
+            .documents
+            .firstOrNull()
+            ?.let { document ->
+                document.toObject(GradeModel::class.java)?.copy(
+                    gradeId = document.id
+                )
+            }
+    }
+
+    suspend fun updateGrade(
+        grade: GradeModel
+    ) {
+        if (grade.gradeId.isBlank()) {
+            addGrade(grade)
+            return
+        }
+
+        gradesCollection
+            .document(grade.gradeId)
+            .set(grade)
+            .await()
+    }
+
+    suspend fun deleteGrade(
+        gradeId: String
+    ) {
+        gradesCollection
+            .document(gradeId)
+            .delete()
+            .await()
+    }
+
+    /**
+     * One page of grades, newest first, optionally only one subject.
+     * Needs the composite index grades(subjectId, createdAt desc) in
+     * firestore.indexes.json when [subjectId] is set.
+     */
+    suspend fun getGradesPage(
+        pageSize: Long,
+        subjectId: String?,
+        cursor: PageCursor?
+    ): Page<GradeModel> {
+        var query: Query = gradesCollection
+
+        if (!subjectId.isNullOrBlank()) {
+            query = query.whereEqualTo("subjectId", subjectId)
+        }
+
+        query = query.orderBy("createdAt", Query.Direction.DESCENDING).limit(pageSize)
+
+        if (cursor != null) {
+            query = query.startAfter(cursor.lastDocument)
+        }
+
+        val documents = query.get().await().documents
+
+        return Page(
+            items = documents.mapNotNull { it.toObject(GradeModel::class.java)?.copy(gradeId = it.id) },
+            nextCursor = documents.lastOrNull()
+                ?.takeIf { documents.size.toLong() == pageSize }
+                ?.let(::PageCursor)
+        )
+    }
+}

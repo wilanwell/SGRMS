@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.sgrms"
+    namespace = "com.wilanwell.sgrms"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.sgrms"
+        applicationId = "com.wilanwell.sgrms"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
