@@ -50,6 +50,9 @@ fun AddGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noStudentAvailableText = stringResource(R.string.no_student_available)
+    val noSubjectAvailableText = stringResource(R.string.no_subject_available)
+    val notAssignedText = stringResource(R.string.not_assigned)
     val saveGradeText = stringResource(R.string.save_grade)
     val text4Text = stringResource(R.string.format_name_detail_extra)
     val text5Text = stringResource(R.string.format_with_brackets)
@@ -92,7 +95,7 @@ fun AddGradeScreen(
     val subjects = subjectUiState.subjects.filter { access.canWriteSubject(it.teacherId) }
 
     val studentDropdownItems = if (students.isEmpty()) {
-        listOf("No student available")
+        listOf(noStudentAvailableText)
     } else {
         students.map { student ->
             val className = student.className.ifBlank { stringResource(R.string.not_assigned) }
@@ -101,7 +104,7 @@ fun AddGradeScreen(
     }
 
     val subjectDropdownItems = if (subjects.isEmpty()) {
-        listOf("No subject available")
+        listOf(noSubjectAvailableText)
     } else {
         subjects.map { subject ->
             text5Text.format(subject.subjectName, subject.subjectCode)
@@ -165,9 +168,9 @@ fun AddGradeScreen(
                     },
                     items = studentDropdownItems,
                     onItemSelected = { selectedText ->
-                        if (selectedText != "No student available") {
+                        if (selectedText != noStudentAvailableText) {
                             val selectedStudent = students.find { student ->
-                                val className = student.className.ifBlank { "Not assigned" }
+                                val className = student.className.ifBlank { notAssignedText }
                                 "${student.studentName} (${student.studentCode}) - $className" == selectedText
                             }
 
@@ -197,7 +200,7 @@ fun AddGradeScreen(
                     },
                     items = subjectDropdownItems,
                     onItemSelected = { selectedText ->
-                        if (selectedText != "No subject available") {
+                        if (selectedText != noSubjectAvailableText) {
                             val selectedSubject = subjects.find { subject ->
                                 "${subject.subjectName} (${subject.subjectCode})" == selectedText
                             }
@@ -300,10 +303,10 @@ fun AddGradeScreen(
                                     val marksValue = marks.toDoubleOrNull()
             
                                     studentError = selectedStudentId.isBlank() ||
-                                            selectedStudentDisplay == "No student available"
+                                            selectedStudentDisplay == noStudentAvailableText
             
                                     subjectError = selectedSubjectId.isBlank() ||
-                                            selectedSubjectDisplay == "No subject available"
+                                            selectedSubjectDisplay == noSubjectAvailableText
             
                                     marksError = marksValue == null ||
                                             marksValue < 0.0 ||

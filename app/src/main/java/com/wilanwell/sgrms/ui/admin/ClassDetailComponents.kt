@@ -191,7 +191,7 @@ fun AddStudentSelectionCard(
                 )
 
                 Text(
-                    text = "Current Class: ${student.className.ifBlank { "Not assigned" }}",
+                    text = stringResource(R.string.current_class_value, student.className.ifBlank { stringResource(R.string.not_assigned) }),
                     fontSize = 12.sp,
                     color = ColorOnSurfaceVariant
                 )

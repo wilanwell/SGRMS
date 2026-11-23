@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.data.model.assignedTeacherName
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -75,6 +76,7 @@ fun AddClassDialog(
         classTeacherName: String
     ) -> Unit
 ) {
+    val notAssignedText = stringResource(R.string.not_assigned)
     var className by remember { mutableStateOf("") }
     var academicYear by remember { mutableStateOf("2024/2025") }
     var description by remember { mutableStateOf("") }
@@ -86,7 +88,7 @@ fun AddClassDialog(
     var classNameError by remember { mutableStateOf(false) }
     var academicYearError by remember { mutableStateOf(false) }
 
-    val teacherItems = listOf("Not assigned") + teachers.map { teacher ->
+    val teacherItems = listOf(notAssignedText) + teachers.map { teacher ->
         teacher.teacherName
     }
 
@@ -142,7 +144,7 @@ fun AddClassDialog(
                     onItemSelected = { selectedName ->
                         selectedTeacherName = selectedName
 
-                        if (selectedName == "Not assigned") {
+                        if (selectedName == notAssignedText) {
                             selectedTeacherId = ""
                         } else {
                             selectedTeacherId = teachers.find { teacher ->
@@ -183,7 +185,7 @@ fun AddClassDialog(
                             academicYear,
                             description,
                             selectedTeacherId,
-                            selectedTeacherName.ifBlank { "Not assigned" }
+                            if (selectedTeacherId.isBlank()) "" else selectedTeacherName
                         )
                     }
                 },
@@ -217,12 +219,13 @@ fun EditClassDialog(
     onDismiss: () -> Unit,
     onSave: (ClassModel) -> Unit
 ) {
+    val notAssignedText = stringResource(R.string.not_assigned)
     var className by remember { mutableStateOf(schoolClass.className) }
     var academicYear by remember { mutableStateOf(schoolClass.academicYear) }
     var description by remember { mutableStateOf(schoolClass.description) }
 
     var selectedTeacherName by remember {
-        mutableStateOf(schoolClass.classTeacherName.ifBlank { "Not assigned" })
+        mutableStateOf(schoolClass.assignedTeacherName.ifBlank { notAssignedText })
     }
 
     var selectedTeacherId by remember {
@@ -234,7 +237,7 @@ fun EditClassDialog(
     var classNameError by remember { mutableStateOf(false) }
     var academicYearError by remember { mutableStateOf(false) }
 
-    val teacherItems = listOf("Not assigned") + teachers.map { teacher ->
+    val teacherItems = listOf(notAssignedText) + teachers.map { teacher ->
         teacher.teacherName
     }
 
@@ -290,7 +293,7 @@ fun EditClassDialog(
                     onItemSelected = { selectedName ->
                         selectedTeacherName = selectedName
 
-                        if (selectedName == "Not assigned") {
+                        if (selectedName == notAssignedText) {
                             selectedTeacherId = ""
                         } else {
                             selectedTeacherId = teachers.find { teacher ->
@@ -331,9 +334,7 @@ fun EditClassDialog(
                             academicYear = academicYear.trim(),
                             description = description.trim(),
                             classTeacherId = selectedTeacherId,
-                            classTeacherName = selectedTeacherName.ifBlank {
-                                "Not assigned"
-                            }
+                            classTeacherName = if (selectedTeacherId.isBlank()) "" else selectedTeacherName
                         )
 
                         onSave(updatedClass)

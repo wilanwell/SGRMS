@@ -140,6 +140,9 @@ class NotificationFirebaseService @Inject constructor(
             "type" to type,
             "relatedGradeId" to relatedGradeId,
             "relatedSubjectId" to relatedSubjectId,
+            "subjectName" to subjectName,
+            "marks" to marks,
+            "gradeLetter" to gradeLetter,
             "isRead" to isRead,
             "read" to isRead,
             "createdAt" to createdAt
@@ -155,6 +158,9 @@ class NotificationFirebaseService @Inject constructor(
             type = getString("type") ?: "",
             relatedGradeId = getString("relatedGradeId") ?: "",
             relatedSubjectId = getString("relatedSubjectId") ?: "",
+            subjectName = getString("subjectName") ?: "",
+            marks = getDouble("marks") ?: 0.0,
+            gradeLetter = getString("gradeLetter") ?: "",
             isRead = getBoolean("isRead") ?: getBoolean("read") ?: false,
             createdAt = getLong("createdAt") ?: 0L
         )

@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.data.repository
 
+import com.wilanwell.sgrms.data.model.LEGACY_NOT_ASSIGNED
 import com.wilanwell.sgrms.data.model.StudentModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -41,9 +42,9 @@ class ReportRepository @Inject constructor(
             .await()
     }
 
-    /** Class teacher shown on the PDF report, or "Not assigned". */
+    /** Class teacher shown on the PDF report, or "" (the PDF then shows "Not assigned" in the reader's language). */
     suspend fun getClassTeacherName(student: StudentModel?): String {
-        val notAssigned = "Not assigned"
+        val notAssigned = ""
         if (student == null) return notAssigned
 
         return try {
@@ -63,7 +64,7 @@ class ReportRepository @Inject constructor(
 
             if (classDocument == null || !classDocument.exists()) return notAssigned
 
-            classDocument.getString("classTeacherName")?.takeIf { it.isNotBlank() }
+            classDocument.getString("classTeacherName")?.takeIf { it.isNotBlank() && it != LEGACY_NOT_ASSIGNED }
                 ?: classDocument.getString("classTeacherId")
                     ?.takeIf { it.isNotBlank() }
                     ?.let { teacherId ->

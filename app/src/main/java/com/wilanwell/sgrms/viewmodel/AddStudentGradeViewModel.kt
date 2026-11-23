@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.NotificationText
 import com.wilanwell.sgrms.data.model.UserRole
 import com.wilanwell.sgrms.utils.Strings
 import com.wilanwell.sgrms.utils.UserMessageException
@@ -151,9 +152,12 @@ class AddStudentGradeViewModel @Inject constructor(
                         studentId = student.studentId,
                         title = if (item.existingGrade == null) strings.get(R.string.new_grade) else strings.get(R.string.grade_updated),
                         message = strings.get(R.string.your_grade_is_now, item.subjectName, GradeCalculator.formatMarks(marks), saved.gradeLetter),
-                        type = "GRADE_UPDATED",
+                        type = if (item.existingGrade == null) NotificationText.TYPE_GRADE_NEW else NotificationText.TYPE_GRADE_UPDATED,
                         relatedGradeId = saved.gradeId,
                         relatedSubjectId = item.subjectId,
+                        subjectName = item.subjectName,
+                        marks = marks,
+                        gradeLetter = saved.gradeLetter,
                         isRead = false,
                         createdAt = System.currentTimeMillis()
                     )

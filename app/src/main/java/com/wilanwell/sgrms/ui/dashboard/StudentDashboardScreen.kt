@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.dashboard
 
+import com.wilanwell.sgrms.ui.components.rememberStrings
+import com.wilanwell.sgrms.utils.NotificationText
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
@@ -64,6 +66,7 @@ fun StudentDashboardScreen(
     onReportClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {}
 ) {
+    val strings = rememberStrings()
     val notificationsUnreadText = stringResource(R.string.notifications_unread)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
@@ -165,9 +168,9 @@ fun StudentDashboardScreen(
                     ) {
                         SgrmsIconTile(icon = Icons.Default.Notifications, tint = SgrmsColors.Orange, container = androidx.compose.ui.graphics.Color(0xFFFFEDD5))
                         Column(Modifier.weight(1f)) {
-                            Text(latestUnread.title.ifBlank { stringResource(R.string.new_notification) }, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(NotificationText.title(latestUnread, strings), style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(
-                                latestUnread.message,
+                                NotificationText.body(latestUnread, strings),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = androidx.compose.ui.graphics.Color(0xFF9A3412),
                                 maxLines = 1,
@@ -204,7 +207,7 @@ fun StudentDashboardScreen(
                             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Row {
                                     Text(
-                                        item.subjectName,
+                                        item.subjectName.ifBlank { stringResource(R.string.unknown_subject) },
                                         style = MaterialTheme.typography.titleSmall,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,

@@ -35,7 +35,8 @@ class StudentGradeSummaryTest {
             listOf(GradeModel(gradeId = "1", subjectId = "zz", marks = 50.0, status = "Complete")),
             subjects
         )
-        assertEquals("Unknown Subject", summary.items.single().subjectName)
+        // Unknown subjects come back blank; the screen shows the localized "Unknown Subject".
+        assertEquals("", summary.items.single().subjectName)
 
         val empty = studentGradeSummary(emptyList(), subjects)
         assertEquals(0.0, empty.averageMarks, 0.0)

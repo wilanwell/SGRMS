@@ -49,6 +49,7 @@ fun EditStudentScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noClassAvailableText = stringResource(R.string.no_class_available)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val uiState by studentViewModel.uiState.collectAsState()
@@ -64,7 +65,7 @@ fun EditStudentScreen(
     val classList = remember(classIdMap) { classIdMap.keys.sorted() }
 
     val classDropdownList = if (classList.isEmpty()) {
-        listOf("No class available")
+        listOf(noClassAvailableText)
     } else {
         classList
     }
@@ -238,7 +239,7 @@ fun EditStudentScreen(
                         },
                         items = classDropdownList,
                         onItemSelected = { selectedItem ->
-                            if (selectedItem != "No class available") {
+                            if (selectedItem != noClassAvailableText) {
                                 selectedClass = selectedItem
                                 selectedClassId = classIdMap[selectedItem].orEmpty()
                                 classError = false
@@ -312,7 +313,7 @@ fun EditStudentScreen(
                                         emailError = email.isBlank()
                                         phoneNumberError = phoneNumber.isBlank()
                                         classError = selectedClass.isBlank() ||
-                                                selectedClass == "No class available"
+                                                selectedClass == noClassAvailableText
                                         genderError = selectedGender.isBlank()
                                         statusError = selectedStatus.isBlank()
             

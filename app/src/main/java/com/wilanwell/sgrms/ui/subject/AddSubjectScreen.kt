@@ -52,6 +52,7 @@ fun AddSubjectScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noTeacherAvailableText = stringResource(R.string.no_teacher_available)
     val noStaffIdText = stringResource(R.string.no_staff_id)
     val text5Text = stringResource(R.string.format_with_brackets)
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
@@ -93,7 +94,7 @@ fun AddSubjectScreen(
     val teachers = teacherUiState.teachers.filter { access.isAdmin || it.teacherId == access.teacherId }
 
     val teacherDropdownItems = if (teachers.isEmpty()) {
-        listOf("No teacher available")
+        listOf(noTeacherAvailableText)
     } else {
         teachers.map { teacher ->
             val staffIdText = teacher.staffId.ifBlank { stringResource(R.string.no_staff_id) }
@@ -113,7 +114,7 @@ fun AddSubjectScreen(
         subjectCodeError = subjectCode.isBlank()
         subjectNameError = subjectName.isBlank()
         teacherError = selectedTeacherId.isBlank() ||
-                selectedTeacherDisplay == "No teacher available"
+                selectedTeacherDisplay == noTeacherAvailableText
         categoryError = selectedCategory.isBlank()
 
         return !subjectCodeError &&
@@ -198,7 +199,7 @@ fun AddSubjectScreen(
                     },
                     items = teacherDropdownItems,
                     onItemSelected = { selectedText ->
-                        if (selectedText != "No teacher available") {
+                        if (selectedText != noTeacherAvailableText) {
                             val selectedTeacher = teachers.find { teacher ->
                                 val staffIdText = teacher.staffId.ifBlank { noStaffIdText }
                                 "${teacher.teacherName} ($staffIdText)" == selectedText

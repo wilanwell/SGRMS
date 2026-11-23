@@ -12,3 +12,13 @@ data class ClassModel(
     val description: String = "",
     val createdAt: Long = System.currentTimeMillis()
 )
+
+/**
+ * Older versions saved this English text as classTeacherName when a class had no
+ * teacher. New saves store "" instead; screens show their own localized label.
+ */
+const val LEGACY_NOT_ASSIGNED = "Not assigned"
+
+/** The class teacher's name, or "" when there is none (including the legacy text). */
+val ClassModel.assignedTeacherName: String
+    get() = classTeacherName.takeUnless { it == LEGACY_NOT_ASSIGNED }.orEmpty()

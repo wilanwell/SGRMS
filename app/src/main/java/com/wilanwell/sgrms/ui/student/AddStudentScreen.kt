@@ -48,6 +48,7 @@ fun AddStudentScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noClassAvailableText = stringResource(R.string.no_class_available)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val uiState by studentViewModel.uiState.collectAsState()
@@ -63,7 +64,7 @@ fun AddStudentScreen(
     val classList = remember(classIdMap) { classIdMap.keys.sorted() }
 
     val classDropdownList = if (classList.isEmpty()) {
-        listOf("No class available")
+        listOf(noClassAvailableText)
     } else {
         classList
     }
@@ -122,7 +123,7 @@ fun AddStudentScreen(
         emailError = email.isBlank()
         phoneNumberError = phoneNumber.isBlank()
         passwordError = password.isBlank()
-        classError = selectedClass.isBlank() || selectedClass == "No class available"
+        classError = selectedClass.isBlank() || selectedClass == noClassAvailableText
         genderError = selectedGender.isBlank()
 
         return !studentNameError &&
@@ -235,7 +236,7 @@ fun AddStudentScreen(
                     },
                     items = classDropdownList,
                     onItemSelected = { className ->
-                        if (className != "No class available") {
+                        if (className != noClassAvailableText) {
                             selectedClass = className
                             selectedClassId = classIdMap[className].orEmpty()
                             classError = false

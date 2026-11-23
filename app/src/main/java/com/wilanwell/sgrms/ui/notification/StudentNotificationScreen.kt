@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.notification
 
+import com.wilanwell.sgrms.ui.components.rememberStrings
+import com.wilanwell.sgrms.utils.NotificationText
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -40,6 +42,7 @@ fun StudentNotificationScreen(
     studentId: String,
     onBackClick: () -> Unit = {}
 ) {
+    val strings = rememberStrings()
     val gradeUpdatesFromYourTeachersWillText = stringResource(R.string.grade_updates_from_your_teachers_will)
     val unreadText = stringResource(R.string.unread)
     val youReAllCaughtUpText = stringResource(R.string.you_re_all_caught_up)
@@ -65,8 +68,8 @@ fun StudentNotificationScreen(
         .filter { selectedFilter == "All" || !it.isRead }
         .filter {
             searchText.isBlank() ||
-                it.title.contains(searchText, ignoreCase = true) ||
-                it.message.contains(searchText, ignoreCase = true)
+                NotificationText.title(it, strings).contains(searchText, ignoreCase = true) ||
+                NotificationText.body(it, strings).contains(searchText, ignoreCase = true)
         }
         .sortedByDescending { it.createdAt }
 
@@ -97,8 +100,8 @@ fun StudentNotificationScreen(
         items(items = shown, key = { it.notificationId.ifBlank { "${it.createdAt}-${it.title}" } }) { notification ->
             Box(ListItemPadding) {
                 SgrmsListItemCard(
-                    title = notification.title.ifBlank { stringResource(R.string.notification) },
-                    subtitle = stringResource(R.string.format_two_lines, notification.message, formatNotificationDate(notification.createdAt)),
+                    title = NotificationText.title(notification, strings),
+                    subtitle = stringResource(R.string.format_two_lines, NotificationText.body(notification, strings), formatNotificationDate(notification.createdAt)),
                     subtitleMaxLines = 5,
                     leading = {
                         SgrmsIconTile(
@@ -119,7 +122,7 @@ fun StudentNotificationScreen(
                 ) {
                     if (!notification.isRead) SgrmsStatusChip(stringResource(R.string.new_label), ChipTone.Warning)
                     SgrmsOverflowMenu(
-                        contentDescription = stringResource(R.string.actions_for, notification.title),
+                        contentDescription = stringResource(R.string.actions_for, NotificationText.title(notification, strings)),
                         actions = listOf(
                             RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 notificationViewModel.deleteNotification(notificationId = notification.notificationId)

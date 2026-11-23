@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.student
 
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.R
 import android.content.Context
 import android.content.Intent
@@ -20,11 +21,11 @@ fun exportStudentListToCsv(
 
         students.forEach { student ->
             val row = listOf(
-                student.studentName.ifBlank { "Unknown Student" },
+                student.studentName.ifBlank { context.getString(R.string.unknown_student_title) },
                 student.studentCode.ifBlank { "-" },
                 student.email.ifBlank { notSpecified },
                 student.phoneNumber.ifBlank { notSpecified },
-                student.className.ifBlank { "Not assigned" },
+                student.className.ifBlank { context.getString(R.string.not_assigned) },
                 student.gender.ifBlank { notSpecified },
                 student.status.ifBlank { "Active" }
             )

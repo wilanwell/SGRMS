@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.data.model.assignedTeacherName
+import com.wilanwell.sgrms.data.model.LEGACY_NOT_ASSIGNED
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.padding
@@ -82,7 +84,7 @@ fun ClassDetailScreen(
     val availableStudents = students.filter { student ->
         student.classId.isBlank() ||
                 student.className.isBlank() ||
-                student.className == "Not assigned"
+                student.className == LEGACY_NOT_ASSIGNED
     }
 
     val currentClass = schoolClass
@@ -179,7 +181,7 @@ fun ClassDetailScreen(
         }
 
         SgrmsInfoSection(stringResource(R.string.details)) {
-            SgrmsInfoRow(icon = Icons.Default.Person, label = stringResource(R.string.class_teacher), value = schoolClass.classTeacherName.ifBlank { stringResource(R.string.not_assigned) })
+            SgrmsInfoRow(icon = Icons.Default.Person, label = stringResource(R.string.class_teacher), value = schoolClass.assignedTeacherName.ifBlank { stringResource(R.string.not_assigned) })
             if (schoolClass.description.isNotBlank()) {
                 SgrmsRowDivider()
                 SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.Notes, label = stringResource(R.string.description), value = schoolClass.description)

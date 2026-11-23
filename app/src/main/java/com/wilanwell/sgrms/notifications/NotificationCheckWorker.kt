@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.notifications
 
+import com.wilanwell.sgrms.utils.AndroidStrings
+import com.wilanwell.sgrms.utils.NotificationText
 import com.wilanwell.sgrms.R
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -62,6 +64,7 @@ class NotificationCheckWorker(
             return Result.retry()
         }
 
+        val strings = AndroidStrings(applicationContext)
         val fresh = notifications
             .filter { it.createdAt > lastChecked && !it.isRead }
             .sortedBy { it.createdAt }
@@ -69,8 +72,8 @@ class NotificationCheckWorker(
         fresh.forEach { notification ->
             GradeNotifications.show(
                 context = applicationContext,
-                title = notification.title.ifBlank { applicationContext.getString(R.string.app_name) },
-                body = notification.message.ifBlank { applicationContext.getString(R.string.notification_fallback_body) },
+                title = NotificationText.title(notification, strings),
+                body = NotificationText.body(notification, strings),
                 notificationKey = notification.notificationId
             )
         }

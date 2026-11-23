@@ -72,6 +72,8 @@ fun QuickAddGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noClassAvailableText = stringResource(R.string.no_class_available)
+    val noSubjectAvailableText = stringResource(R.string.no_subject_available)
     val noMarksChangedEnterOrChangeText = stringResource(R.string.no_marks_changed_enter_or_change)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
@@ -128,7 +130,7 @@ fun QuickAddGradeScreen(
         .sorted()
 
     val classDropdownList = if (classList.isEmpty()) {
-        listOf("No class available")
+        listOf(noClassAvailableText)
     } else {
         classList
     }
@@ -144,7 +146,7 @@ fun QuickAddGradeScreen(
         .sorted()
 
     val subjectDropdownList = if (subjectList.isEmpty()) {
-        listOf("No subject available")
+        listOf(noSubjectAvailableText)
     } else {
         subjectList
     }
@@ -175,9 +177,9 @@ fun QuickAddGradeScreen(
 
     val canShowStudents =
         selectedClassName.isNotBlank() &&
-                selectedClassName != "No class available" &&
+                selectedClassName != noClassAvailableText &&
                 selectedSubjectId.isNotBlank() &&
-                selectedSubjectName != "No subject available"
+                selectedSubjectName != noSubjectAvailableText
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -254,7 +256,7 @@ fun QuickAddGradeScreen(
                             },
                             items = classDropdownList,
                             onItemSelected = { className ->
-                                if (className != "No class available") {
+                                if (className != noClassAvailableText) {
                                     selectedClassName = className
                                     classError = false
                                     marksErrorMessage = ""
@@ -286,7 +288,7 @@ fun QuickAddGradeScreen(
                             },
                             items = subjectDropdownList,
                             onItemSelected = { subjectName ->
-                                if (subjectName != "No subject available") {
+                                if (subjectName != noSubjectAvailableText) {
                                     val selectedSubject = subjects.find { subject ->
                                         subject.subjectName == subjectName
                                     }
@@ -317,7 +319,7 @@ fun QuickAddGradeScreen(
                         SgrmsInfoRow(
                             icon = Icons.Default.Person,
                             label = stringResource(R.string.students_found),
-                            value = if (selectedClassName.isBlank() || selectedClassName == "No class available") {
+                            value = if (selectedClassName.isBlank() || selectedClassName == noClassAvailableText) {
                                 "-"
                             } else {
                                 classStudents.size.toString()
@@ -424,10 +426,10 @@ fun QuickAddGradeScreen(
                         Button(
                             onClick = {
                                 classError = selectedClassName.isBlank() ||
-                                        selectedClassName == "No class available"
+                                        selectedClassName == noClassAvailableText
 
                                 subjectError = selectedSubjectId.isBlank() ||
-                                        selectedSubjectName == "No subject available"
+                                        selectedSubjectName == noSubjectAvailableText
 
                                 marksErrorMessage = ""
 

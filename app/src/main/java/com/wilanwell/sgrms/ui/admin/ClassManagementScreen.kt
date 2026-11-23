@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.data.model.assignedTeacherName
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.size
@@ -196,7 +197,7 @@ fun ClassManagementScreen(
                     title = schoolClass.className.ifBlank { stringResource(R.string.unnamed_class) },
                     subtitle = listOf(
                         schoolClass.academicYear,
-                        "Teacher: " + schoolClass.classTeacherName.ifBlank { stringResource(R.string.not_assigned) }
+                        stringResource(R.string.teacher_value, schoolClass.assignedTeacherName.ifBlank { stringResource(R.string.not_assigned) })
                     ).filter { it.isNotBlank() }.joinToString(" · "),
                     leading = {
                         SgrmsIconTile(

@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.NotificationText
 import com.wilanwell.sgrms.utils.Strings
 import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.utils.GradeCalculator
@@ -525,9 +526,12 @@ class GradeFirebaseViewModel @Inject constructor(
                 studentId = grade.studentId,
                 title = if (isNew) strings.get(R.string.new_grade) else strings.get(R.string.grade_updated),
                 message = strings.get(R.string.your_grade_is_now, displaySubjectName, GradeCalculator.formatMarks(grade.marks), grade.gradeLetter),
-                type = "GRADE_UPDATED",
+                type = if (isNew) NotificationText.TYPE_GRADE_NEW else NotificationText.TYPE_GRADE_UPDATED,
                 relatedGradeId = grade.gradeId,
                 relatedSubjectId = grade.subjectId,
+                subjectName = subjectName,
+                marks = grade.marks,
+                gradeLetter = grade.gradeLetter,
                 isRead = false,
                 createdAt = System.currentTimeMillis()
             )

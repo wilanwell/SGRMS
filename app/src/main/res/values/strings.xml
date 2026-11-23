@@ -81,6 +81,7 @@
     <string name="class_teacher">Class teacher</string>
     <string name="class_teacher_title">Class Teacher</string>
     <string name="class_updated_successfully">Class updated successfully</string>
+    <string name="class_value">Class: %1$s</string>
     <string name="classes">Classes</string>
     <string name="classes_count">%1$s classes</string>
     <string name="classes_students">%1$s classes · %2$s students</string>
@@ -102,6 +103,7 @@
     <string name="csv_student_header">Student Name,Student Code,Email,Phone Number,Class,Gender,Status</string>
     <string name="csv_teacher_header">Teacher Name,Staff ID,Email,Department,Position</string>
     <string name="current">%1$s (current)</string>
+    <string name="current_class_value">Current Class: %1$s</string>
     <string name="current_password">Current Password</string>
     <string name="current_password_is_incorrect">Current password is incorrect</string>
     <string name="current_password_is_required">Current password is required</string>
@@ -297,6 +299,7 @@
     <string name="no_averages_yet">No averages yet</string>
     <string name="no_class">No class</string>
     <string name="no_class_assigned">No class assigned</string>
+    <string name="no_class_available">No class available</string>
     <string name="no_classes_yet">No classes yet</string>
     <string name="no_completed_subject_grade_records_found">No completed subject grade records found.</string>
     <string name="no_grade_dash">-</string>
@@ -313,6 +316,7 @@
     <string name="no_reports_yet">No reports yet</string>
     <string name="no_specific_remarks_from_grade_records">No specific remarks from grade records.</string>
     <string name="no_staff_id">No Staff ID</string>
+    <string name="no_student_available">No student available</string>
     <string name="no_student_found">No student found</string>
     <string name="no_student_in_this_class">No student in this class</string>
     <string name="no_student_matches_your_search">No student matches your search.</string>
@@ -321,8 +325,10 @@
     <string name="no_students_in_this_class_yet">No students in this class yet.</string>
     <string name="no_students_yet_use_add_student">No students yet. Use Add student to enrol one.</string>
     <string name="no_subject_assigned">No subject assigned</string>
+    <string name="no_subject_available">No subject available</string>
     <string name="no_subjects_found">No subjects found</string>
     <string name="no_teacher">No teacher</string>
+    <string name="no_teacher_available">No teacher available</string>
     <string name="no_teachers_found">No teachers found</string>
     <string name="no_unassigned_students_are_available">No unassigned students are available.</string>
     <string name="no_users_found">No users found</string>
@@ -538,6 +544,7 @@
     <string name="teacher_profile_not_found_after_creation">Teacher profile not found after creation.</string>
     <string name="teacher_s_remarks">Teacher\'s remarks</string>
     <string name="teacher_updated_successfully">Teacher updated successfully</string>
+    <string name="teacher_value">Teacher: %1$s</string>
     <string name="teachers">Teachers</string>
     <string name="teaching">Teaching</string>
     <string name="the_report_is_hidden_from_this">The report is hidden from this list until you refresh. Grade records are not deleted.</string>

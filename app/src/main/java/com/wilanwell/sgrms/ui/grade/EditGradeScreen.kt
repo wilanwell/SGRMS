@@ -51,6 +51,9 @@ fun EditGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noStudentAvailableText = stringResource(R.string.no_student_available)
+    val noSubjectAvailableText = stringResource(R.string.no_subject_available)
+    val notAssignedText = stringResource(R.string.not_assigned)
     val invalidGradeIdText = stringResource(R.string.invalid_grade_id)
     val saveChangesText = stringResource(R.string.save_changes)
     val text4Text = stringResource(R.string.format_name_detail_extra)
@@ -107,7 +110,7 @@ fun EditGradeScreen(
     }
 
     val studentDropdownItems = if (studentList.isEmpty()) {
-        listOf("No student available")
+        listOf(noStudentAvailableText)
     } else {
         studentList.map { student ->
             val className = student.className.ifBlank { stringResource(R.string.not_assigned) }
@@ -116,7 +119,7 @@ fun EditGradeScreen(
     }
 
     val subjectDropdownItems = if (subjectList.isEmpty()) {
-        listOf("No subject available")
+        listOf(noSubjectAvailableText)
     } else {
         subjectList.map { subject ->
             text5Text.format(subject.subjectName, subject.subjectCode)
@@ -146,7 +149,7 @@ fun EditGradeScreen(
             }
 
             selectedStudentDisplay = if (student != null) {
-                val className = student.className.ifBlank { "Not assigned" }
+                val className = student.className.ifBlank { notAssignedText }
                 text4Text.format(student.studentName, student.studentCode, className)
             } else {
                 ""
@@ -221,9 +224,9 @@ fun EditGradeScreen(
                     },
                     items = studentDropdownItems,
                     onItemSelected = { selectedText ->
-                        if (selectedText != "No student available") {
+                        if (selectedText != noStudentAvailableText) {
                             val selectedStudent = studentList.find { student ->
-                                val className = student.className.ifBlank { "Not assigned" }
+                                val className = student.className.ifBlank { notAssignedText }
                                 "${student.studentName} (${student.studentCode}) - $className" == selectedText
                             }
 
@@ -253,7 +256,7 @@ fun EditGradeScreen(
                     },
                     items = subjectDropdownItems,
                     onItemSelected = { selectedText ->
-                        if (selectedText != "No subject available") {
+                        if (selectedText != noSubjectAvailableText) {
                             val selectedSubject = subjectList.find { subject ->
                                 "${subject.subjectName} (${subject.subjectCode})" == selectedText
                             }
@@ -371,10 +374,10 @@ clearMessages()
                                     val marksValue = marks.toDoubleOrNull()
             
                                     studentError = selectedStudentId.isBlank() ||
-                                            selectedStudentDisplay == "No student available"
+                                            selectedStudentDisplay == noStudentAvailableText
             
                                     subjectError = selectedSubjectId.isBlank() ||
-                                            selectedSubjectDisplay == "No subject available"
+                                            selectedSubjectDisplay == noSubjectAvailableText
             
                                     marksError = marksValue == null ||
                                             marksValue < 0.0 ||

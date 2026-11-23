@@ -34,7 +34,7 @@ fun studentGradeSummary(
             StudentDashboardGradeItem(
                 gradeId = grade.gradeId,
                 subjectId = grade.subjectId,
-                subjectName = names[grade.subjectId] ?: "Unknown Subject",
+                subjectName = names[grade.subjectId].orEmpty(),
                 marks = grade.marks,
                 gradeLetter = grade.gradeLetter.ifBlank { GradeCalculator.gradeLetter(grade.marks) }
             )
