@@ -2,7 +2,6 @@ package com.example.sgrms.utils
 
 import android.content.ContentValues
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
@@ -12,6 +11,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.example.sgrms.R
 import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.StudentModel
@@ -55,8 +55,8 @@ object ReportPdfGenerator {
     private const val LEFT = 40f
     private const val RIGHT = 555f
 
-    private const val PRIMARY_BLUE = 0xFF1565C0.toInt()
-    private const val LIGHT_BLUE = 0xFFEAF3FF.toInt()
+    private const val PRIMARY_BLUE = 0xFF4F46E5.toInt() // brand indigo
+    private const val LIGHT_BLUE = 0xFFEEF2FF.toInt() // brand indigo, light
     private const val LIGHT_GREY = 0xFFF4F6F8.toInt()
     private const val BORDER_GREY = 0xFFBDBDBD.toInt()
     private const val TEXT_DARK = 0xFF212121.toInt()
@@ -859,25 +859,11 @@ object ReportPdfGenerator {
         y: Float
     ) {
         try {
-            val bitmap = BitmapFactory.decodeResource(
-                context.resources,
-                R.drawable.sgrms_logo
-            )
+            val logo = ContextCompat.getDrawable(context, R.drawable.sgrms_logo)
 
-            if (bitmap != null) {
-                val destination = RectF(
-                    x,
-                    y,
-                    x + 58f,
-                    y + 58f
-                )
-
-                canvas.drawBitmap(
-                    bitmap,
-                    null,
-                    destination,
-                    Paint(Paint.ANTI_ALIAS_FLAG)
-                )
+            if (logo != null) {
+                logo.setBounds(x.toInt(), y.toInt(), (x + 58f).toInt(), (y + 58f).toInt())
+                logo.draw(canvas)
             } else {
                 drawLogoPlaceholder(
                     canvas = canvas,

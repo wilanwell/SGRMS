@@ -19,9 +19,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import com.example.sgrms.R
+import androidx.compose.ui.res.painterResource
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -109,7 +111,7 @@ fun LoginScreen() {
                 color = MaterialTheme.colorScheme.primary
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.School, contentDescription = "SGRMS logo", tint = Color.White, modifier = Modifier.size(34.dp))
+                    Image(painterResource(R.drawable.sgrms_logo), contentDescription = "SGRMS logo", modifier = Modifier.size(44.dp))
                 }
             }
 
