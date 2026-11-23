@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Firestore fills these classes by reflection (DocumentSnapshot.toObject),
+# matching document fields to property names. Keep their names and the
+# no-argument constructors, or R8 renames them and reads come back empty.
+-keep class com.wilanwell.sgrms.data.model.** { *; }
+-keepclassmembers class com.wilanwell.sgrms.data.model.** { <init>(); }
+
+# Needed for generic types and annotations such as @IgnoreExtraProperties.
+-keepattributes Signature,*Annotation*,InnerClasses,EnclosingMethod
