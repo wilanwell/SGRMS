@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.NotificationModel
@@ -21,6 +23,7 @@ data class NotificationFirebaseUiState(
 
 @HiltViewModel
 class NotificationFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val notificationRepository: NotificationFirebaseRepository
 ) : ViewModel() {
 
@@ -34,7 +37,7 @@ class NotificationFirebaseViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(
                 notifications = emptyList(),
                 isLoading = false,
-                errorMessage = "Invalid student ID",
+                errorMessage = strings.get(R.string.invalid_student_id),
                 successMessage = ""
             )
             return
@@ -59,7 +62,7 @@ class NotificationFirebaseViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = exception.toUserMessage("Failed to load notifications"),
+                    errorMessage = exception.toUserMessage(strings, R.string.failed_to_load_notifications),
                     successMessage = ""
                 )
             }
@@ -72,7 +75,7 @@ class NotificationFirebaseViewModel @Inject constructor(
     ) {
         if (notificationId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Notification ID is missing",
+                errorMessage = strings.get(R.string.notification_id_is_missing),
                 successMessage = ""
             )
             return
@@ -89,7 +92,7 @@ class NotificationFirebaseViewModel @Inject constructor(
                 }
             },
             errorMessage = "",
-            successMessage = "Notification marked as read"
+            successMessage = strings.get(R.string.notification_marked_as_read)
         )
 
         viewModelScope.launch {
@@ -103,13 +106,13 @@ class NotificationFirebaseViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         notifications = refreshedNotifications,
                         errorMessage = "",
-                        successMessage = "Notification marked as read"
+                        successMessage = strings.get(R.string.notification_marked_as_read)
                     )
                 }
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.toUserMessage("Failed to mark notification as read"),
+                    errorMessage = exception.toUserMessage(strings, R.string.failed_to_mark_notification_as_read),
                     successMessage = ""
                 )
             }
@@ -121,7 +124,7 @@ class NotificationFirebaseViewModel @Inject constructor(
     ) {
         if (studentId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Invalid student ID",
+                errorMessage = strings.get(R.string.invalid_student_id),
                 successMessage = ""
             )
             return
@@ -134,7 +137,7 @@ class NotificationFirebaseViewModel @Inject constructor(
                 notification.copy(isRead = true)
             },
             errorMessage = "",
-            successMessage = "All notifications marked as read"
+            successMessage = strings.get(R.string.all_notifications_marked_as_read)
         )
 
         viewModelScope.launch {
@@ -147,12 +150,12 @@ class NotificationFirebaseViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     notifications = refreshedNotifications,
                     errorMessage = "",
-                    successMessage = "All notifications marked as read"
+                    successMessage = strings.get(R.string.all_notifications_marked_as_read)
                 )
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.toUserMessage("Failed to mark all notifications as read"),
+                    errorMessage = exception.toUserMessage(strings, R.string.failed_to_mark_all_notifications_as),
                     successMessage = ""
                 )
             }
@@ -164,7 +167,7 @@ class NotificationFirebaseViewModel @Inject constructor(
     ) {
         if (notificationId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Notification ID is missing",
+                errorMessage = strings.get(R.string.notification_id_is_missing),
                 successMessage = ""
             )
             return
@@ -177,7 +180,7 @@ class NotificationFirebaseViewModel @Inject constructor(
                 notification.notificationId != notificationId
             },
             errorMessage = "",
-            successMessage = "Notification deleted"
+            successMessage = strings.get(R.string.notification_deleted)
         )
 
         viewModelScope.launch {
@@ -186,7 +189,7 @@ class NotificationFirebaseViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     notifications = previousNotifications,
-                    errorMessage = exception.toUserMessage("Failed to delete notification"),
+                    errorMessage = exception.toUserMessage(strings, R.string.failed_to_delete_notification),
                     successMessage = ""
                 )
             }

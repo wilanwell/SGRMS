@@ -48,9 +48,9 @@ fun ClassDetailScreen(
     onBackClick: () -> Unit = {},
     onAddStudentClick: () -> Unit = {}
 ) {
-    val academicYear2Text = stringResource(R.string.academic_year_2)
+    val academicYear2Text = stringResource(R.string.academic_year_value)
     val noStudentsInThisClassYetText = stringResource(R.string.no_students_in_this_class_yet)
-    val students3Text = stringResource(R.string.students_3)
+    val students3Text = stringResource(R.string.students_count)
     val t1StudentText = stringResource(R.string.t_1_student)
     val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 

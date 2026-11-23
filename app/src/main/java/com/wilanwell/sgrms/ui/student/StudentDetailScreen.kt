@@ -89,7 +89,7 @@ fun StudentDetailScreen(
         subject.subjectName
     }
 
-    val studentName = student?.studentName ?: stringResource(R.string.unknown_student)
+    val studentName = student?.studentName ?: stringResource(R.string.unknown_student_title)
     val studentCode = student?.studentCode ?: "-"
     val email = student?.email ?: "-"
     val phoneNumber = student?.phoneNumber ?: "-"
@@ -149,7 +149,7 @@ fun StudentDetailScreen(
 
         SgrmsDetailHero(
             title = studentName,
-            subtitle = stringResource(R.string.text, studentCode, className),
+            subtitle = stringResource(R.string.format_dot_pair, studentCode, className),
             leading = {
                 SgrmsAvatar(
                     name = studentName,
@@ -176,7 +176,7 @@ fun StudentDetailScreen(
 
         if (student.guardianName.isNotBlank() || student.guardianPhone.isNotBlank() || student.address.isNotBlank() || student.dateOfBirth.isNotBlank()) {
             SgrmsInfoSection(stringResource(R.string.personal)) {
-                SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth_2), value = student.dateOfBirth)
+                SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth), value = student.dateOfBirth)
                 SgrmsRowDivider()
                 SgrmsInfoRow(icon = Icons.Default.FamilyRestroom, label = stringResource(R.string.guardian), value = listOf(student.guardianName, student.guardianPhone).filter { it.isNotBlank() }.joinToString(" · "))
                 SgrmsRowDivider()

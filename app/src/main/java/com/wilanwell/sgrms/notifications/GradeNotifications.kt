@@ -61,7 +61,7 @@ object GradeNotifications {
         val manager = context.getSystemService(NotificationManager::class.java)
         if (manager.getNotificationChannel(CHANNEL_ID) == null) {
             manager.createNotificationChannel(
-                NotificationChannel(CHANNEL_ID, "Grade Notifications", NotificationManager.IMPORTANCE_HIGH)
+                NotificationChannel(CHANNEL_ID, context.getString(R.string.notification_channel_grades), NotificationManager.IMPORTANCE_HIGH)
             )
         }
     }

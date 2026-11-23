@@ -1,16 +1,18 @@
 package com.wilanwell.sgrms.utils
 
+import com.wilanwell.sgrms.R
+import androidx.annotation.StringRes
 import com.wilanwell.sgrms.data.model.GradeModel
 
 /**
  * Performance band for a mark or an average, used for colours and labels.
  */
-enum class PerformanceLevel(val label: String) {
-    EXCELLENT("Excellent"),
-    GOOD("Good"),
-    SATISFACTORY("Satisfactory"),
-    NEEDS_IMPROVEMENT("Needs Improvement"),
-    AT_RISK("At Risk")
+enum class PerformanceLevel(@StringRes val labelRes: Int) {
+    EXCELLENT(R.string.performance_excellent),
+    GOOD(R.string.performance_good),
+    SATISFACTORY(R.string.performance_satisfactory),
+    NEEDS_IMPROVEMENT(R.string.performance_needs_improvement),
+    AT_RISK(R.string.performance_at_risk)
 }
 
 /**
@@ -73,12 +75,13 @@ object GradeCalculator {
         }
     }
 
-    /** Performance label for an average; [NO_GRADE] when there are no marks. */
+    /** Performance label (a string resource) for an average; a dash when there are no marks. */
+    @StringRes
     fun performanceStatus(
         averageMarks: Double,
         hasGrades: Boolean = averageMarks > 0
-    ): String {
-        return if (hasGrades) performanceLevel(averageMarks).label else NO_GRADE
+    ): Int {
+        return if (hasGrades) performanceLevel(averageMarks).labelRes else R.string.no_grade_dash
     }
 
     fun averageMarks(grades: List<GradeModel>): Double {

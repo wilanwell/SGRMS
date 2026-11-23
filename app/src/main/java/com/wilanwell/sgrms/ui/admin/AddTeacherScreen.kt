@@ -122,7 +122,7 @@ fun AddTeacherScreen(
         },
         topBar = {
             TopBar(
-                title = stringResource(R.string.add_teacher),
+                title = stringResource(R.string.add_teacher_title),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false

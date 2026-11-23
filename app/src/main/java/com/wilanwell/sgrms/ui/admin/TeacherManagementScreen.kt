@@ -94,7 +94,7 @@ fun TeacherManagementScreen(
     if (showDeleteDialog && selectedTeacherToDelete != null) {
         SgrmsDeleteDialog(
             title = stringResource(R.string.delete_teacher),
-            message = stringResource(R.string.are_you_sure_you_want_to_3),
+            message = stringResource(R.string.are_you_sure_you_want_to_delete_this),
             onConfirmClick = {
                 selectedTeacherToDelete?.let { teacher ->
                     teacherViewModel.deleteTeacher(
@@ -123,7 +123,7 @@ fun TeacherManagementScreen(
         isEmpty = filteredTeachers.isEmpty(),
         empty = EmptyContent(stringResource(R.string.no_teachers_found), addATeacherAccountOrChangeText, Icons.Default.SupervisorAccount),
         chipGroups = listOf(ChipGroup(departmentList, selectedDepartment) { selectedDepartment = it }),
-        fab = ListFab(stringResource(R.string.add_teacher_2), Icons.Default.PersonAdd, onAddTeacherClick),
+        fab = ListFab(stringResource(R.string.add_teacher), Icons.Default.PersonAdd, onAddTeacherClick),
         headerActions = {
             SgrmsOverflowMenu(
                 contentDescription = stringResource(R.string.export),
@@ -182,7 +182,7 @@ fun exportTeacherListToCsv(
 
         teachers.forEach { teacher ->
             val row = listOf(
-                teacher.teacherName.ifBlank { context.getString(R.string.unknown_teacher) },
+                teacher.teacherName.ifBlank { context.getString(R.string.unknown_teacher_title) },
                 teacher.staffId.ifBlank { notSpecified },
                 teacher.email.ifBlank { notSpecified },
                 teacher.department.ifBlank { notSpecified },

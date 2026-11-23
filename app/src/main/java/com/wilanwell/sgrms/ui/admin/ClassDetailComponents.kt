@@ -71,7 +71,7 @@ fun AddStudentToClassDialog(
         title = {
             Column {
                 Text(
-                    text = stringResource(R.string.add_student_2),
+                    text = stringResource(R.string.add_student_title),
                     fontWeight = FontWeight.Bold
                 )
 
@@ -206,7 +206,7 @@ fun AddStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
-                    contentDescription = stringResource(R.string.add_student_2),
+                    contentDescription = stringResource(R.string.add_student_title),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )

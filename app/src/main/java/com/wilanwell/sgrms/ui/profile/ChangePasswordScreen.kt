@@ -66,7 +66,7 @@ fun ChangePasswordScreen(
     val currentPasswordIsRequiredText = stringResource(R.string.current_password_is_required)
     val newPasswordIsRequiredText = stringResource(R.string.new_password_is_required)
     val newPasswordMustBeDifferentText = stringResource(R.string.new_password_must_be_different)
-    val passwordMustBeAtLeast6Text = stringResource(R.string.password_must_be_at_least_6)
+    val passwordMustBeAtLeast6Text = stringResource(R.string.password_must_be_at_least_6_characters)
     val passwordUpdatedSuccessfullyText = stringResource(R.string.password_updated_successfully)
     val passwordsDoNotMatchText = stringResource(R.string.passwords_do_not_match)
     val pleaseConfirmYourNewPasswordText = stringResource(R.string.please_confirm_your_new_password)
@@ -177,7 +177,7 @@ fun ChangePasswordScreen(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.are_you_sure_you_want_to_4)
+                    text = stringResource(R.string.are_you_sure_you_want_to_change)
                 )
             },
             confirmButton = {
@@ -227,7 +227,7 @@ fun ChangePasswordScreen(
             .navigationBarsPadding()
     ) {
         TopBar(
-            title = stringResource(R.string.change_password_2),
+            title = stringResource(R.string.change_password_title),
             showBack = true,
             onBackClick = onBackClick
         )

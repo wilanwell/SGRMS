@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.utils
 
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.GradeModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -38,12 +39,12 @@ class GradeCalculatorTest {
 
     @Test
     fun performanceStatus_labels() {
-        assertEquals("Excellent", GradeCalculator.performanceStatus(80.0))
-        assertEquals("Good", GradeCalculator.performanceStatus(70.0))
-        assertEquals("Satisfactory", GradeCalculator.performanceStatus(60.0))
-        assertEquals("Needs Improvement", GradeCalculator.performanceStatus(50.0))
-        assertEquals("At Risk", GradeCalculator.performanceStatus(10.0))
-        assertEquals("-", GradeCalculator.performanceStatus(0.0))
+        assertEquals(R.string.performance_excellent, GradeCalculator.performanceStatus(80.0))
+        assertEquals(R.string.performance_good, GradeCalculator.performanceStatus(70.0))
+        assertEquals(R.string.performance_satisfactory, GradeCalculator.performanceStatus(60.0))
+        assertEquals(R.string.performance_needs_improvement, GradeCalculator.performanceStatus(50.0))
+        assertEquals(R.string.performance_at_risk, GradeCalculator.performanceStatus(10.0))
+        assertEquals(R.string.no_grade_dash, GradeCalculator.performanceStatus(0.0))
     }
 
     @Test

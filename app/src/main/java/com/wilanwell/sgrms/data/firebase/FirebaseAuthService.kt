@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.firebase
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.UserModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
@@ -24,7 +26,7 @@ class FirebaseAuthService @Inject constructor(
             .await()
 
         val firebaseUser = authResult.user
-            ?: throw IllegalStateException("Login failed. User not found.")
+            ?: throw UserMessageException(R.string.login_failed_user_not_found)
 
         val userDocument = usersCollection
             .document(firebaseUser.uid)
@@ -32,7 +34,7 @@ class FirebaseAuthService @Inject constructor(
             .await()
 
         val userModel = userDocument.toObject(UserModel::class.java)
-            ?: throw IllegalStateException("User profile not found.")
+            ?: throw UserMessageException(R.string.user_profile_not_found)
 
         return userModel.copy(
             userId = firebaseUser.uid
@@ -78,7 +80,7 @@ class FirebaseAuthService @Inject constructor(
         val email = firebaseUser?.email
 
         if (firebaseUser == null || email.isNullOrBlank()) {
-            throw IllegalStateException("User session not found. Please log in again.")
+            throw UserMessageException(R.string.user_session_not_found_please_log)
         }
 
         firebaseUser

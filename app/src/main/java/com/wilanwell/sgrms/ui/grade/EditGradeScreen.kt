@@ -52,8 +52,8 @@ fun EditGradeScreen(
 ) {
     val invalidGradeIdText = stringResource(R.string.invalid_grade_id)
     val saveChangesText = stringResource(R.string.save_changes)
-    val text4Text = stringResource(R.string.text_4)
-    val text5Text = stringResource(R.string.text_5)
+    val text4Text = stringResource(R.string.format_name_detail_extra)
+    val text5Text = stringResource(R.string.format_with_brackets)
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -186,7 +186,7 @@ fun EditGradeScreen(
             .imePadding()
     ) {
         TopBar(
-            title = stringResource(R.string.edit_grade),
+            title = stringResource(R.string.edit_grade_title),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false

@@ -180,7 +180,7 @@ fun AdminDashboardScreen(
 
             SgrmsSectionTitle(stringResource(R.string.quick_actions))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickAction(text = stringResource(R.string.add_teacher_2), icon = Icons.Default.PersonAdd, onClick = onAddTeacherClick, modifier = Modifier.weight(1f))
+                QuickAction(text = stringResource(R.string.add_teacher), icon = Icons.Default.PersonAdd, onClick = onAddTeacherClick, modifier = Modifier.weight(1f))
                 QuickAction(text = stringResource(R.string.add_student), icon = Icons.Default.PersonAdd, onClick = onAddStudentAccountClick, modifier = Modifier.weight(1f))
             }
 
@@ -224,7 +224,7 @@ private fun AccountsHeroCard(
     classes: Int,
     loaded: Boolean
 ) {
-    val classes3Text = stringResource(R.string.classes_3)
+    val classes3Text = stringResource(R.string.classes_count)
     val t1ClassText = stringResource(R.string.t_1_class)
     Surface(
         shape = RoundedCornerShape(SgrmsRadius.Hero),
@@ -257,9 +257,9 @@ private fun AccountsHeroCard(
             }
 
             if (loaded) Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text(stringResource(R.string.admin_2, admins), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
-                Text(stringResource(R.string.teachers_2, teachers), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
-                Text(stringResource(R.string.students_2, students), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.hero_admins, admins), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.hero_teachers, teachers), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.hero_students, students), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
             }
         }
     }

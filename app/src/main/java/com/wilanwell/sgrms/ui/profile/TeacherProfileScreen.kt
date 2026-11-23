@@ -98,7 +98,7 @@ fun TeacherProfileScreen(
         }
 
         SgrmsInfoSection(stringResource(R.string.teaching)) {
-            SgrmsInfoRow(icon = Icons.Default.School, label = stringResource(R.string.classes_2, classCount), value = assignedClassNames.ifBlank { stringResource(R.string.no_class_assigned) })
+            SgrmsInfoRow(icon = Icons.Default.School, label = stringResource(R.string.classes_with_count, classCount), value = assignedClassNames.ifBlank { stringResource(R.string.no_class_assigned) })
             SgrmsRowDivider()
             SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.MenuBook, label = stringResource(R.string.subjects), value = assignedSubjectNames.ifBlank { stringResource(R.string.no_subject_assigned) })
             SgrmsRowDivider()

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.firebase
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import android.content.Context
 import com.wilanwell.sgrms.data.model.UserRole
 import com.google.firebase.FirebaseApp
@@ -143,7 +145,7 @@ class AccountService @Inject constructor(
             val user = users.document(uid).get().await()
 
             if (user.getString("role") == UserRole.ADMIN.value) {
-                throw IllegalStateException("Admin accounts cannot be deleted from the app.")
+                throw UserMessageException(R.string.admin_accounts_cannot_be_deleted_from)
             }
 
             if (tId.isBlank()) tId = user.getString("teacherId").orEmpty()
@@ -151,7 +153,7 @@ class AccountService @Inject constructor(
         }
 
         if (uid.isNotBlank() && uid == firebaseAuth.currentUser?.uid) {
-            throw IllegalStateException("You cannot delete your own account.")
+            throw UserMessageException(R.string.you_cannot_delete_your_own_account)
         }
 
         // Linked records first, so a failure never leaves orphans behind a
@@ -196,7 +198,7 @@ class AccountService @Inject constructor(
         val result = creatorAuth
             .createUserWithEmailAndPassword(email.trim(), password)
             .await()
-        val newUser = result.user ?: throw IllegalStateException("Failed to create the login account.")
+        val newUser = result.user ?: throw UserMessageException(R.string.failed_to_create_the_login_account)
 
         try {
             writeProfile(newUser.uid)

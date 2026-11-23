@@ -73,7 +73,7 @@ fun AddStudentToSubjectDialog(
         title = {
             Column {
                 Text(
-                    text = stringResource(R.string.add_student_2),
+                    text = stringResource(R.string.add_student_title),
                     fontWeight = FontWeight.Bold
                 )
 
@@ -185,7 +185,7 @@ fun AddSubjectStudentSelectionCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
+                    text = student.studentName.ifBlank { stringResource(R.string.unknown_student_title) },
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -212,7 +212,7 @@ fun AddSubjectStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
-                    contentDescription = stringResource(R.string.add_student_2),
+                    contentDescription = stringResource(R.string.add_student_title),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )

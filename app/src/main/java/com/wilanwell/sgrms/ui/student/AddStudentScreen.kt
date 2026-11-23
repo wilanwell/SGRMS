@@ -141,7 +141,7 @@ fun AddStudentScreen(
             .imePadding()
     ) {
         TopBar(
-            title = stringResource(R.string.add_student_2),
+            title = stringResource(R.string.add_student_title),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -170,7 +170,7 @@ fun AddStudentScreen(
                         studentNameError = false
                         clearMessages()
                     },
-                    label = stringResource(R.string.student_name),
+                    label = stringResource(R.string.student_name_title),
                     placeholder = stringResource(R.string.enter_student_name),
                     isError = studentNameError,
                     errorMessage = stringResource(R.string.student_name_is_required)
@@ -185,7 +185,7 @@ fun AddStudentScreen(
                         studentCodeError = false
                         clearMessages()
                     },
-                    label = stringResource(R.string.student_code),
+                    label = stringResource(R.string.student_code_title),
                     placeholder = stringResource(R.string.example_s001),
                     isError = studentCodeError,
                     errorMessage = stringResource(R.string.student_code_is_required)

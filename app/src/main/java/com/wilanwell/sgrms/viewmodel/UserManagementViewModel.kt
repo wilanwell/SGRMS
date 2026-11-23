@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.UserModel
@@ -21,6 +23,7 @@ data class UserManagementUiState(
 
 @HiltViewModel
 class UserManagementViewModel @Inject constructor(
+    private val strings: Strings,
     private val userRepository: UserFirebaseRepository
 ) : ViewModel() {
 
@@ -36,7 +39,7 @@ class UserManagementViewModel @Inject constructor(
                 _uiState.update { it.copy(users = users, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load users."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_users))
                 }
             }
         }
@@ -52,7 +55,7 @@ class UserManagementViewModel @Inject constructor(
                     state.copy(users = state.users.filterNot { it.userId == user.userId })
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.toUserMessage("Failed to delete user.")) }
+                _uiState.update { it.copy(errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_user)) }
             }
         }
     }

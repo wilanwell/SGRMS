@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.firebase
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.NotificationModel
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -63,7 +65,7 @@ class NotificationFirebaseService @Inject constructor(
         notificationId: String
     ) {
         if (notificationId.isBlank()) {
-            throw IllegalArgumentException("Notification ID is missing")
+            throw UserMessageException(R.string.notification_id_is_missing)
         }
 
         notificationsCollection
@@ -81,7 +83,7 @@ class NotificationFirebaseService @Inject constructor(
         studentId: String
     ) {
         if (studentId.isBlank()) {
-            throw IllegalArgumentException("Student ID is missing")
+            throw UserMessageException(R.string.student_id_is_missing)
         }
 
         val unreadNotificationDocuments = notificationsCollection
@@ -120,7 +122,7 @@ class NotificationFirebaseService @Inject constructor(
         notificationId: String
     ) {
         if (notificationId.isBlank()) {
-            throw IllegalArgumentException("Notification ID is missing")
+            throw UserMessageException(R.string.notification_id_is_missing)
         }
 
         notificationsCollection

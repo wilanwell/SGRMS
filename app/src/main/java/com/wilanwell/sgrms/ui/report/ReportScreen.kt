@@ -60,6 +60,7 @@ fun ReportScreen(
     onDownloadPdfClick: (String) -> Unit = {},
     onUpdateReportClick: (String) -> Unit = {}
 ) {
+    val remarkTextsValue = remarkTexts()
     val currentText = stringResource(R.string.current)
     val needsUpdateText = stringResource(R.string.needs_update)
     val reportsAppearOnceStudentsHaveCompletedText = stringResource(R.string.reports_appear_once_students_have_completed)
@@ -180,7 +181,7 @@ fun ReportScreen(
                 "-"
             }
 
-            val reportRemarks = ReportCalculator.buildRemarks(allStudentGrades) { subjectNames[it] }
+            val reportRemarks = ReportCalculator.buildRemarks(allStudentGrades, remarkTextsValue) { subjectNames[it] }
 
             val report = ReportPdfData(
                 reportId = student.studentId,
@@ -196,7 +197,7 @@ fun ReportScreen(
                 report = report,
                 student = student,
                 gradeItems = gradeItems,
-                studentName = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
+                studentName = student.studentName.ifBlank { stringResource(R.string.unknown_student_title) },
                 studentCode = student.studentCode.ifBlank { "-" },
                 className = student.className.ifBlank { stringResource(R.string.not_assigned) },
                 status = if (hasPendingGrades || completedGrades.isEmpty()) {

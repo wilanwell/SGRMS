@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.utils
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -19,7 +21,7 @@ fun compressImageUri(
 ): ByteArray {
     val originalBitmap = context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
         BitmapFactory.decodeStream(inputStream)
-    } ?: throw IllegalArgumentException("Unable to open selected image.")
+    } ?: throw UserMessageException(R.string.unable_to_open_selected_image)
 
     val resizedBitmap = resizeBitmap(
         bitmap = originalBitmap,

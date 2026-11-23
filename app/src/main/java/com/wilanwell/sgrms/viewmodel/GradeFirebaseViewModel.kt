@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.utils.GradeCalculator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -65,6 +67,7 @@ fun bulkGradeRecord(existing: GradeModel?, entry: GradeBulkEntry, teacherId: Str
 
 @HiltViewModel
 class GradeFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val gradeRepository: GradeFirebaseRepository,
     private val notificationRepository: NotificationFirebaseRepository,
     private val sessionManager: SessionManager
@@ -90,7 +93,7 @@ class GradeFirebaseViewModel @Inject constructor(
                 _uiState.update { it.copy(grades = page.items, hasMore = page.hasMore, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(grades = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage("Failed to load grades"))
+                    it.copy(grades = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_grades))
                 }
             }
         }
@@ -114,7 +117,7 @@ class GradeFirebaseViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoadingMore = false, errorMessage = e.toUserMessage("Failed to load more grades")) }
+                _uiState.update { it.copy(isLoadingMore = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_more_grades)) }
             }
         }
     }
@@ -137,7 +140,7 @@ class GradeFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load grades")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_grades)
                 )
             }
         }
@@ -149,7 +152,7 @@ class GradeFirebaseViewModel @Inject constructor(
         if (gradeId.isBlank()) {
             _uiState.value = _uiState.value.copy(
                 selectedGrade = null,
-                errorMessage = "Invalid grade ID"
+                errorMessage = strings.get(R.string.invalid_grade_id)
             )
             return
         }
@@ -176,7 +179,7 @@ class GradeFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load grade")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_grade)
                 )
             }
         }
@@ -188,7 +191,7 @@ class GradeFirebaseViewModel @Inject constructor(
         if (studentId.isBlank()) {
             _uiState.value = _uiState.value.copy(
                 grades = emptyList(),
-                errorMessage = "Invalid student ID"
+                errorMessage = strings.get(R.string.invalid_student_id)
             )
             return
         }
@@ -210,7 +213,7 @@ class GradeFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load student grades")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_student_grades)
                 )
             }
         }
@@ -222,7 +225,7 @@ class GradeFirebaseViewModel @Inject constructor(
         if (subjectId.isBlank()) {
             _uiState.value = _uiState.value.copy(
                 grades = emptyList(),
-                errorMessage = "Invalid subject ID"
+                errorMessage = strings.get(R.string.invalid_subject_id)
             )
             return
         }
@@ -244,7 +247,7 @@ class GradeFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load subject grades")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_subject_grades)
                 )
             }
         }
@@ -256,7 +259,7 @@ class GradeFirebaseViewModel @Inject constructor(
     ) {
         if (grade.studentId.isBlank() || grade.subjectId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Student and subject are required"
+                errorMessage = strings.get(R.string.student_and_subject_are_required)
             )
             return
         }
@@ -273,14 +276,14 @@ class GradeFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Grade added successfully"
+                    successMessage = strings.get(R.string.grade_added_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to add grade")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_add_grade)
                 )
             }
         }
@@ -292,7 +295,7 @@ class GradeFirebaseViewModel @Inject constructor(
     ) {
         if (gradeEntries.isEmpty()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "No grades to save"
+                errorMessage = strings.get(R.string.no_grades_to_save)
             )
             return
         }
@@ -337,14 +340,14 @@ class GradeFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Grades saved successfully"
+                    successMessage = strings.get(R.string.grades_saved_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to save grades")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_save_grades)
                 )
             }
         }
@@ -362,7 +365,7 @@ class GradeFirebaseViewModel @Inject constructor(
     ) {
         if (studentId.isBlank() || subjectId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Student and subject are required"
+                errorMessage = strings.get(R.string.student_and_subject_are_required)
             )
             return
         }
@@ -414,14 +417,14 @@ class GradeFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Grade saved successfully"
+                    successMessage = strings.get(R.string.grade_saved_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to save grade")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_save_grade)
                 )
             }
         }
@@ -434,7 +437,7 @@ class GradeFirebaseViewModel @Inject constructor(
     ) {
         if (grade.studentId.isBlank() || grade.subjectId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Student and subject are required"
+                errorMessage = strings.get(R.string.student_and_subject_are_required)
             )
             return
         }
@@ -456,14 +459,14 @@ class GradeFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Grade updated successfully"
+                    successMessage = strings.get(R.string.grade_updated_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to update grade")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_update_grade)
                 )
             }
         }
@@ -475,7 +478,7 @@ class GradeFirebaseViewModel @Inject constructor(
     ) {
         if (gradeId.isBlank()) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "Invalid grade ID"
+                errorMessage = strings.get(R.string.invalid_grade_id)
             )
             return
         }
@@ -493,14 +496,14 @@ class GradeFirebaseViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     grades = _uiState.value.grades.filterNot { it.gradeId == gradeId },
                     isLoading = false,
-                    successMessage = "Grade deleted successfully"
+                    successMessage = strings.get(R.string.grade_deleted_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to delete grade")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_grade)
                 )
             }
         }
@@ -520,8 +523,8 @@ class GradeFirebaseViewModel @Inject constructor(
         repository.addNotification(
             NotificationModel(
                 studentId = grade.studentId,
-                title = if (isNew) "New grade" else "Grade updated",
-                message = "Your $displaySubjectName grade is now ${GradeCalculator.formatMarks(grade.marks)} (${grade.gradeLetter}).",
+                title = if (isNew) strings.get(R.string.new_grade) else strings.get(R.string.grade_updated),
+                message = strings.get(R.string.your_grade_is_now, displaySubjectName, GradeCalculator.formatMarks(grade.marks), grade.gradeLetter),
                 type = "GRADE_UPDATED",
                 relatedGradeId = grade.gradeId,
                 relatedSubjectId = grade.subjectId,

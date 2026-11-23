@@ -108,7 +108,7 @@ fun StudentProfileScreen(
                 if (totalSubjects == 0) noGradesText else overallText.format(overallGrade),
                 if (totalSubjects == 0) ChipTone.Neutral else toneForGrade(overallGrade)
             )
-            SgrmsStatusChip(stringResource(R.string.subjects_2, totalSubjects), ChipTone.Primary)
+            SgrmsStatusChip(stringResource(R.string.subjects_count, totalSubjects), ChipTone.Primary)
         }
 
         SgrmsInfoSection(stringResource(R.string.contact)) {
@@ -120,7 +120,7 @@ fun StudentProfileScreen(
         }
 
         SgrmsInfoSection(stringResource(R.string.family)) {
-            SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth_2), value = student?.dateOfBirth.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth), value = student?.dateOfBirth.orEmpty())
             SgrmsRowDivider()
             SgrmsInfoRow(
                 icon = Icons.Default.FamilyRestroom,
@@ -128,7 +128,7 @@ fun StudentProfileScreen(
                 value = listOfNotNull(student?.guardianName, student?.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ")
             )
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.emergency_contact_2), value = student?.emergencyContact.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.emergency_contact), value = student?.emergencyContact.orEmpty())
         }
 
         SgrmsGroupedCard {

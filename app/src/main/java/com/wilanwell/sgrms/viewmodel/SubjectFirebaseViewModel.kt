@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.SubjectModel
@@ -22,6 +24,7 @@ data class SubjectFirebaseUiState(
 
 @HiltViewModel
 class SubjectFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val subjectRepository: SubjectFirebaseRepository
 ) : ViewModel() {
 
@@ -54,14 +57,14 @@ class SubjectFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Subject added successfully"
+                    successMessage = strings.get(R.string.subject_added_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to add subject")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_add_subject)
                 )
             }
         }
@@ -85,7 +88,7 @@ class SubjectFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load subjects")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_subjects)
                 )
             }
         }
@@ -109,7 +112,7 @@ class SubjectFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load subject")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_subject)
                 )
             }
         }
@@ -131,14 +134,14 @@ class SubjectFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Subject updated successfully"
+                    successMessage = strings.get(R.string.subject_updated_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to update subject")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_update_subject)
                 )
             }
         }
@@ -160,14 +163,14 @@ class SubjectFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Subject deleted successfully"
+                    successMessage = strings.get(R.string.subject_deleted_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to delete subject")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_subject)
                 )
             }
         }

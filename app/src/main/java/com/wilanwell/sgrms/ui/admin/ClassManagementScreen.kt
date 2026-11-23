@@ -45,7 +45,7 @@ fun ClassManagementScreen(
     onAddStudentClick: () -> Unit = {}
 ) {
     val createAClassThenAddStudentsText = stringResource(R.string.create_a_class_then_add_students)
-    val students3Text = stringResource(R.string.students_3)
+    val students3Text = stringResource(R.string.students_count)
     val t1StudentText = stringResource(R.string.t_1_student)
     val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 
@@ -133,7 +133,7 @@ fun ClassManagementScreen(
     if (showDeleteDialog && selectedClassToDelete != null) {
         SgrmsDeleteDialog(
             title = stringResource(R.string.delete_class),
-            message = stringResource(R.string.are_you_sure_you_want_to_2),
+            message = stringResource(R.string.are_you_sure_you_want_to_delete),
             onConfirmClick = {
                 selectedClassToDelete?.let { schoolClass ->
                     classViewModel.deleteClass(
@@ -187,7 +187,7 @@ fun ClassManagementScreen(
         errorMessage = uiState.errorMessage,
         isEmpty = filteredClasses.isEmpty(),
         empty = EmptyContent(stringResource(R.string.no_classes_yet), createAClassThenAddStudentsText, Icons.Default.School),
-        fab = ListFab(stringResource(R.string.add_class_2), Icons.Default.Add) { showAddDialog = true }
+        fab = ListFab(stringResource(R.string.add_class), Icons.Default.Add) { showAddDialog = true }
     ) {
         items(items = filteredClasses, key = { it.classId }) { schoolClass ->
             val count = studentCountByClass[schoolClass.classId] ?: 0

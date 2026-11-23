@@ -179,8 +179,8 @@ fun EditStudentScreen(
                     SgrmsTextField(
                         value = studentName,
                         onValueChange = {},
-                        label = stringResource(R.string.student_name),
-                        placeholder = stringResource(R.string.student_name_2),
+                        label = stringResource(R.string.student_name_title),
+                        placeholder = stringResource(R.string.student_name),
                         readOnly = true
                     )
 
@@ -189,8 +189,8 @@ fun EditStudentScreen(
                     SgrmsTextField(
                         value = studentCode,
                         onValueChange = {},
-                        label = stringResource(R.string.student_code),
-                        placeholder = stringResource(R.string.student_code_2),
+                        label = stringResource(R.string.student_code_title),
+                        placeholder = stringResource(R.string.student_code),
                         readOnly = true
                     )
 

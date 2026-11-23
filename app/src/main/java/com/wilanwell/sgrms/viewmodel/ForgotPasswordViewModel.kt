@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.repository.AuthRepository
@@ -23,6 +25,7 @@ sealed interface PasswordResetState {
 
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
+    private val strings: Strings,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -33,7 +36,7 @@ class ForgotPasswordViewModel @Inject constructor(
         val email = rawEmail.trim()
 
         if (!isValidEmail(email)) {
-            _state.value = PasswordResetState.InvalidEmail("Enter a valid email address")
+            _state.value = PasswordResetState.InvalidEmail(strings.get(R.string.enter_a_valid_email_address))
             return
         }
 
@@ -48,7 +51,7 @@ class ForgotPasswordViewModel @Inject constructor(
                 // cannot be used to find out which emails are registered.
                 PasswordResetState.Sent(email)
             } catch (e: Exception) {
-                PasswordResetState.Error(e.toUserMessage("Could not send the reset email. Please try again."))
+                PasswordResetState.Error(e.toUserMessage(strings, R.string.could_not_send_the_reset_email))
             }
         }
     }

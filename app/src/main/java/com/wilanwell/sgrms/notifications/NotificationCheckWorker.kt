@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.notifications
 
+import com.wilanwell.sgrms.R
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -68,8 +69,8 @@ class NotificationCheckWorker(
         fresh.forEach { notification ->
             GradeNotifications.show(
                 context = applicationContext,
-                title = notification.title.ifBlank { "SGRMS" },
-                body = notification.message.ifBlank { "You have a new notification." },
+                title = notification.title.ifBlank { applicationContext.getString(R.string.app_name) },
+                body = notification.message.ifBlank { applicationContext.getString(R.string.notification_fallback_body) },
                 notificationKey = notification.notificationId
             )
         }

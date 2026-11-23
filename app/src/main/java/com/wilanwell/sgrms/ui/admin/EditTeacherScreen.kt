@@ -157,7 +157,7 @@ fun EditTeacherScreen(
         },
         topBar = {
             TopBar(
-                title = stringResource(R.string.edit_teacher),
+                title = stringResource(R.string.edit_teacher_title),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false

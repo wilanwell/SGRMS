@@ -55,7 +55,8 @@ fun ReportDetailScreen(
     onSaveReportClick: () -> Unit = {},
     onUpdateReportClick: () -> Unit = {}
 ) {
-    val additionalRemarks2Text = stringResource(R.string.additional_remarks_2)
+    val remarkTextsValue = remarkTexts()
+    val additionalRemarks2Text = stringResource(R.string.remarks_with_additional)
     val needsUpdateText = stringResource(R.string.needs_update)
     val upToDateText = stringResource(R.string.up_to_date)
     val context = LocalContext.current
@@ -159,7 +160,7 @@ fun ReportDetailScreen(
     }
 
     val subjectNames = subjects.associate { it.subjectId to it.subjectName }
-    val generatedRemarks = ReportCalculator.buildRemarks(allGrades) { subjectNames[it] }
+    val generatedRemarks = ReportCalculator.buildRemarks(allGrades, remarkTextsValue) { subjectNames[it] }
 
     val reportRemarks = if (additionalRemarks.isNotBlank()) {
         additionalRemarks2Text.format(generatedRemarks, additionalRemarks)
@@ -222,7 +223,7 @@ fun ReportDetailScreen(
         }
 
         SgrmsDetailHero(
-            title = student?.studentName ?: stringResource(R.string.unknown_student_2),
+            title = student?.studentName ?: stringResource(R.string.unknown_student),
             subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),
             leading = {
                 SgrmsAvatar(

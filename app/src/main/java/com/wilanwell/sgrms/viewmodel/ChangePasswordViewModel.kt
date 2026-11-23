@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.repository.AuthRepository
@@ -23,6 +25,7 @@ sealed interface ChangePasswordResult {
 
 @HiltViewModel
 class ChangePasswordViewModel @Inject constructor(
+    private val strings: Strings,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -41,11 +44,11 @@ class ChangePasswordViewModel @Inject constructor(
                 ChangePasswordResult.Success
             } catch (e: FirebaseAuthWeakPasswordException) {
                 // Subclass of InvalidCredentials, so it must be caught first.
-                ChangePasswordResult.Error(e.toUserMessage())
+                ChangePasswordResult.Error(e.toUserMessage(strings))
             } catch (e: FirebaseAuthInvalidCredentialsException) {
                 ChangePasswordResult.WrongCurrentPassword
             } catch (e: Exception) {
-                ChangePasswordResult.Error(e.toUserMessage("Failed to update password."))
+                ChangePasswordResult.Error(e.toUserMessage(strings, R.string.failed_to_update_password))
             }
         }
     }

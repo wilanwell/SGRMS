@@ -353,7 +353,7 @@ fun EditStudentProfileScreen(
                         SgrmsTextField(
                             value = student?.studentName ?: "",
                             onValueChange = {},
-                            label = stringResource(R.string.student_name),
+                            label = stringResource(R.string.student_name_title),
                             leadingIcon = Icons.Default.Person,
                             enabled = false
                         )
@@ -394,7 +394,7 @@ fun EditStudentProfileScreen(
                             SgrmsTextField(
                                 value = dateOfBirth,
                                 onValueChange = {},
-                                label = stringResource(R.string.date_of_birth),
+                                label = stringResource(R.string.date_of_birth_title),
                                 placeholder = stringResource(R.string.tap_to_choose_a_date),
                                 leadingIcon = Icons.Default.CalendarMonth,
                                 readOnly = true
@@ -484,7 +484,7 @@ fun EditStudentProfileScreen(
                                 emergencyContactError = ""
                                 generalError = ""
                             },
-                            label = stringResource(R.string.emergency_contact),
+                            label = stringResource(R.string.emergency_contact_title),
                             leadingIcon = Icons.Default.Emergency,
                             isError = emergencyContactError.isNotBlank(),
                             errorMessage = emergencyContactError,

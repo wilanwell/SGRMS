@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.repository.AdminSummary
@@ -42,6 +44,7 @@ fun recentAccounts(users: List<UserModel>, limit: Int = RECENT_ACCOUNTS): List<U
 
 @HiltViewModel
 class AdminDashboardViewModel @Inject constructor(
+    private val strings: Strings,
     private val dashboardRepository: DashboardRepository,
     private val userRepository: UserFirebaseRepository
 ) : ViewModel() {
@@ -78,7 +81,7 @@ class AdminDashboardViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load dashboard data."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_dashboard_data))
                 }
             }
         }
@@ -98,6 +101,7 @@ data class TeacherDashboardUiState(
 
 @HiltViewModel
 class TeacherDashboardViewModel @Inject constructor(
+    private val strings: Strings,
     private val dashboardRepository: DashboardRepository,
     private val teacherRepository: TeacherFirebaseRepository,
     private val sessionManager: SessionManager
@@ -105,7 +109,7 @@ class TeacherDashboardViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(
         TeacherDashboardUiState(
-            teacherName = sessionManager.currentUser?.fullName?.ifBlank { null } ?: "Teacher"
+            teacherName = sessionManager.currentUser?.fullName?.ifBlank { null } ?: strings.get(R.string.teacher)
         )
     )
     val uiState: StateFlow<TeacherDashboardUiState> = _uiState.asStateFlow()
@@ -138,7 +142,7 @@ class TeacherDashboardViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load dashboard data."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_dashboard_data))
                 }
             }
         }

@@ -78,7 +78,7 @@ fun StudentGradeDetailScreen(
 
     val subjects = subjectUiState.subjects
 
-    val studentName = student?.studentName ?: stringResource(R.string.unknown_student)
+    val studentName = student?.studentName ?: stringResource(R.string.unknown_student_title)
     val className = student?.className ?: stringResource(R.string.unknown_class)
 
     val gradeDisplayList = allGrades.map { grade ->

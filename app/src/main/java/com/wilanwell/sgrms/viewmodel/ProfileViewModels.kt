@@ -1,5 +1,9 @@
 package com.wilanwell.sgrms.viewmodel
 
+import androidx.annotation.StringRes
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -45,6 +49,7 @@ data class ProfileUiState<T>(
 
 /** Photo upload / removal and save plumbing shared by the three profiles. */
 abstract class BaseProfileViewModel<T>(
+    protected val strings: Strings,
     private val profileImageRepository: ProfileImageRepository,
     protected val sessionManager: SessionManager
 ) : ViewModel() {
@@ -62,7 +67,7 @@ abstract class BaseProfileViewModel<T>(
         val profile = profileState.value.profile ?: return
         val userId = sessionManager.currentUserId
 
-        runImageChange("Profile picture updated successfully", "Failed to save profile picture.") {
+        runImageChange(strings.get(R.string.profile_picture_updated_successfully), R.string.failed_to_save_profile_picture) {
             val url = profileImageRepository.uploadProfileImage(userId = userId, imageUri = imageUri)
             writeImageUrl(profile, url)
             url
@@ -73,7 +78,7 @@ abstract class BaseProfileViewModel<T>(
         val profile = profileState.value.profile ?: return
         val userId = sessionManager.currentUserId
 
-        runImageChange("Profile picture removed successfully", "Failed to remove profile picture.") {
+        runImageChange(strings.get(R.string.profile_picture_removed_successfully), R.string.failed_to_remove_profile_picture) {
             writeImageUrl(profile, "")
             profileImageRepository.deleteProfileImage(userId)
             ""
@@ -84,7 +89,7 @@ abstract class BaseProfileViewModel<T>(
         profileState.update { it.copy(message = "", errorMessage = "") }
     }
 
-    protected fun load(fallbackError: String, block: suspend () -> T?) {
+    protected fun load(@StringRes fallbackError: Int, block: suspend () -> T?) {
         viewModelScope.launch {
             profileState.update { it.copy(isLoading = true, errorMessage = "") }
 
@@ -94,11 +99,11 @@ abstract class BaseProfileViewModel<T>(
                     it.copy(
                         profile = profile,
                         isLoading = false,
-                        errorMessage = if (profile == null) "Profile not found." else ""
+                        errorMessage = if (profile == null) strings.get(R.string.profile_not_found) else ""
                     )
                 }
             } catch (e: Exception) {
-                profileState.update { it.copy(isLoading = false, errorMessage = e.toUserMessage(fallbackError)) }
+                profileState.update { it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, fallbackError)) }
             }
         }
     }
@@ -117,18 +122,18 @@ abstract class BaseProfileViewModel<T>(
                         profile = profile.transform(),
                         isSaving = false,
                         saved = true,
-                        message = "Profile updated successfully"
+                        message = strings.get(R.string.profile_updated_successfully)
                     )
                 }
             } catch (e: Exception) {
-                profileState.update { it.copy(isSaving = false, errorMessage = e.toUserMessage("Failed to update profile.")) }
+                profileState.update { it.copy(isSaving = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_update_profile)) }
             }
         }
     }
 
     private fun runImageChange(
         successMessage: String,
-        fallbackError: String,
+        @StringRes fallbackError: Int,
         block: suspend () -> String
     ) {
         viewModelScope.launch {
@@ -146,7 +151,7 @@ abstract class BaseProfileViewModel<T>(
                     )
                 }
             } catch (e: Exception) {
-                profileState.update { it.copy(isUploadingImage = false, errorMessage = e.toUserMessage(fallbackError)) }
+                profileState.update { it.copy(isUploadingImage = false, errorMessage = e.toUserMessage(strings, fallbackError)) }
             }
         }
     }
@@ -156,11 +161,12 @@ abstract class BaseProfileViewModel<T>(
 
 @HiltViewModel
 class AdminProfileViewModel @Inject constructor(
+    strings: Strings,
     private val userRepository: UserFirebaseRepository,
     private val dashboardRepository: DashboardRepository,
     profileImageRepository: ProfileImageRepository,
     sessionManager: SessionManager
-) : BaseProfileViewModel<UserModel>(profileImageRepository, sessionManager) {
+) : BaseProfileViewModel<UserModel>(strings, profileImageRepository, sessionManager) {
 
     private val _summary = MutableStateFlow(AdminSummary())
     val summary: StateFlow<AdminSummary> = _summary.asStateFlow()
@@ -171,7 +177,7 @@ class AdminProfileViewModel @Inject constructor(
 
     /** Loads the profile; also called when coming back from the edit screen. */
     fun refresh() {
-        load("Failed to load admin profile.") {
+        load(R.string.failed_to_load_admin_profile) {
             userRepository.getUser(sessionManager.currentUserId)
         }
         viewModelScope.launch {
@@ -203,12 +209,13 @@ class AdminProfileViewModel @Inject constructor(
 
 @HiltViewModel
 class TeacherProfileViewModel @Inject constructor(
+    strings: Strings,
     private val teacherRepository: TeacherFirebaseRepository,
     private val userRepository: UserFirebaseRepository,
     private val dashboardRepository: DashboardRepository,
     profileImageRepository: ProfileImageRepository,
     sessionManager: SessionManager
-) : BaseProfileViewModel<TeacherModel>(profileImageRepository, sessionManager) {
+) : BaseProfileViewModel<TeacherModel>(strings, profileImageRepository, sessionManager) {
 
     private val _assignments = MutableStateFlow(TeacherAssignments())
     val assignments: StateFlow<TeacherAssignments> = _assignments.asStateFlow()
@@ -219,12 +226,12 @@ class TeacherProfileViewModel @Inject constructor(
 
     /** Loads the profile; also called when coming back from the edit screen. */
     fun refresh() {
-        load("Failed to load teacher profile.") {
+        load(R.string.failed_to_load_teacher_profile) {
             val teacher = sessionManager.currentTeacherId
                 .takeIf { it.isNotBlank() }
                 ?.let { teacherRepository.getTeacherById(it) }
                 ?: teacherRepository.getTeacherByUserId(sessionManager.currentUserId)
-                ?: throw IllegalStateException("The teacher account is not linked to a teacher profile.")
+                ?: throw UserMessageException(R.string.the_teacher_account_is_not_linked)
 
             viewModelScope.launch {
                 runCatching { dashboardRepository.getTeacherAssignments(teacher) }
@@ -270,12 +277,13 @@ data class StudentProfileExtras(
 
 @HiltViewModel
 class StudentProfileViewModel @Inject constructor(
+    strings: Strings,
     private val studentRepository: StudentFirebaseRepository,
     private val userRepository: UserFirebaseRepository,
     private val gradeRepository: GradeFirebaseRepository,
     profileImageRepository: ProfileImageRepository,
     sessionManager: SessionManager
-) : BaseProfileViewModel<StudentModel>(profileImageRepository, sessionManager) {
+) : BaseProfileViewModel<StudentModel>(strings, profileImageRepository, sessionManager) {
 
     private val _extras = MutableStateFlow(StudentProfileExtras(account = sessionManager.currentUser))
     val extras: StateFlow<StudentProfileExtras> = _extras.asStateFlow()
@@ -286,10 +294,10 @@ class StudentProfileViewModel @Inject constructor(
 
     /** Loads the profile; also called when coming back from the edit screen. */
     fun refresh() {
-        load("Failed to load student profile.") {
+        load(R.string.failed_to_load_student_profile) {
             val studentId = sessionManager.currentStudentId
             if (studentId.isBlank()) {
-                throw IllegalStateException("The student account is not linked to a student profile.")
+                throw UserMessageException(R.string.the_student_account_is_not_linked)
             }
 
             viewModelScope.launch {

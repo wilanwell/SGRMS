@@ -52,7 +52,7 @@ fun AddSubjectScreen(
     onSaveClick: () -> Unit = {}
 ) {
     val noStaffIdText = stringResource(R.string.no_staff_id)
-    val text5Text = stringResource(R.string.text_5)
+    val text5Text = stringResource(R.string.format_with_brackets)
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()

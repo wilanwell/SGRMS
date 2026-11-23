@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.repository
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
@@ -35,7 +37,7 @@ class ProfileImageRepository @Inject constructor(
         userId: String,
         imageUri: Uri
     ): String {
-        require(userId.isNotBlank()) { "User account is not linked." }
+        if (!(userId.isNotBlank())) throw UserMessageException(R.string.user_account_is_not_linked)
 
         val bytes = withContext(Dispatchers.IO) {
             compressImageUri(context = context, imageUri = imageUri, maxSize = MAX_SIZE_PX, quality = JPEG_QUALITY)

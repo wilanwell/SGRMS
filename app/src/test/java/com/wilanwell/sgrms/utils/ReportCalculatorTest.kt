@@ -9,6 +9,12 @@ import java.util.Calendar
 
 class ReportCalculatorTest {
 
+    private val texts = RemarkTexts(
+        unknownSubject = "Unknown Subject",
+        noRemarks = "No specific remarks from completed grade records.",
+        pending = { count -> "Needs update: $count subject grade record(s) are still pending." }
+    )
+
     private val names = mapOf("bm" to "Bahasa Melayu", "math" to "Matematik")
 
     @Test
@@ -37,7 +43,7 @@ class ReportCalculatorTest {
             GradeModel(subjectId = "sci", status = "Pending", remarks = "ignored")
         )
 
-        val remarks = ReportCalculator.buildRemarks(grades) { names[it] }
+        val remarks = ReportCalculator.buildRemarks(grades, texts) { names[it] }
 
         assertEquals(
             "Bahasa Melayu: Bagus\n" +
@@ -50,8 +56,8 @@ class ReportCalculatorTest {
     @Test
     fun buildRemarks_unknownSubjectAndEmpty() {
         val grades = listOf(GradeModel(subjectId = "x", status = "Complete", remarks = "Ok"))
-        assertEquals("Unknown Subject: Ok", ReportCalculator.buildRemarks(grades) { null })
-        assertEquals(ReportCalculator.NO_REMARKS, ReportCalculator.buildRemarks(emptyList()) { null })
+        assertEquals("Unknown Subject: Ok", ReportCalculator.buildRemarks(grades, texts) { null })
+        assertEquals(texts.noRemarks, ReportCalculator.buildRemarks(emptyList(), texts) { null })
     }
 
     @Test

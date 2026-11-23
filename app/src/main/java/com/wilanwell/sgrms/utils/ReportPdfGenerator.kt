@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.utils
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.utils.AndroidStrings
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Color
@@ -49,6 +51,9 @@ data class ReportPdfGradeItem(
 
 object ReportPdfGenerator {
 
+    /** Text for the report; set from the caller's Context at the start of [saveReportAsPdf]. */
+    private lateinit var pdfStrings: Strings
+
     private const val PAGE_WIDTH = 595
     private const val PAGE_HEIGHT = 842
 
@@ -71,6 +76,7 @@ object ReportPdfGenerator {
         student: StudentModel?,
         gradeItems: List<ReportPdfGradeItem>
     ) {
+        pdfStrings = AndroidStrings(context.applicationContext)
         val pdfDocument = PdfDocument()
 
         try {
@@ -112,7 +118,7 @@ object ReportPdfGenerator {
             drawSectionTitle(
                 canvas = canvas,
                 paints = paints,
-                title = "Subject Performance",
+                title = pdfStrings.get(R.string.subject_performance),
                 y = y
             )
 
@@ -126,7 +132,7 @@ object ReportPdfGenerator {
 
             if (gradeItems.isEmpty()) {
                 canvas.drawText(
-                    "No completed subject grade records found.",
+                    pdfStrings.get(R.string.no_completed_subject_grade_records_found),
                     LEFT,
                     y,
                     paints.bodyGrey
@@ -161,7 +167,7 @@ object ReportPdfGenerator {
                         drawSectionTitle(
                             canvas = canvas,
                             paints = paints,
-                            title = "Subject Performance Continued",
+                            title = pdfStrings.get(R.string.subject_performance_continued),
                             y = y
                         )
 
@@ -266,7 +272,7 @@ object ReportPdfGenerator {
         } catch (e: Exception) {
             Toast.makeText(
                 context,
-                "Failed to save PDF: ${e.message}",
+                e.toUserMessage(pdfStrings, R.string.failed_to_create_pdf_file),
                 Toast.LENGTH_LONG
             ).show()
         } finally {
@@ -307,14 +313,14 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "SCHOOL GRADE RECORD MANAGEMENT SYSTEM",
+            pdfStrings.get(R.string.school_grade_record_management_system),
             118f,
             40f,
             paints.headerTitle
         )
 
         canvas.drawText(
-            "Official Academic Performance Report",
+            pdfStrings.get(R.string.official_academic_performance_report),
             118f,
             62f,
             paints.headerSubtitle
@@ -338,7 +344,7 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "REPORT ID",
+            pdfStrings.get(R.string.report_id),
             420f,
             64f,
             paints.tinyWhiteLabel
@@ -352,7 +358,7 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Academic Report",
+            pdfStrings.get(R.string.academic_report),
             LEFT,
             135f,
             paints.documentTitle
@@ -382,7 +388,7 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "SGRMS Academic Report",
+            pdfStrings.get(R.string.sgrms_academic_report),
             LEFT,
             38f,
             paints.headerTitle
@@ -396,7 +402,7 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Page $pageNumber",
+            pdfStrings.get(R.string.page, pageNumber),
             500f,
             48f,
             paints.headerSmall
@@ -413,7 +419,7 @@ object ReportPdfGenerator {
         drawSectionTitle(
             canvas = canvas,
             paints = paints,
-            title = "Student Information",
+            title = pdfStrings.get(R.string.student_information),
             y = y
         )
 
@@ -431,21 +437,21 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Student Name",
+            pdfStrings.get(R.string.student_name_title),
             58f,
             top + 30f,
             paints.label
         )
 
         canvas.drawText(
-            student?.studentName?.ifBlank { "-" } ?: "Unknown Student",
+            student?.studentName?.ifBlank { "-" } ?: pdfStrings.get(R.string.unknown_student_title),
             58f,
             top + 52f,
             paints.valueBold
         )
 
         canvas.drawText(
-            "Student ID",
+            pdfStrings.get(R.string.student_id),
             58f,
             top + 80f,
             paints.label
@@ -459,21 +465,21 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Class",
+            pdfStrings.get(R.string.class_label),
             300f,
             top + 30f,
             paints.label
         )
 
         canvas.drawText(
-            student?.className?.ifBlank { "-" } ?: "Unknown Class",
+            student?.className?.ifBlank { "-" } ?: pdfStrings.get(R.string.unknown_class),
             300f,
             top + 52f,
             paints.valueBold
         )
 
         canvas.drawText(
-            "Report Date",
+            pdfStrings.get(R.string.report_date_label),
             300f,
             top + 80f,
             paints.label
@@ -487,14 +493,14 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Class Teacher",
+            pdfStrings.get(R.string.class_teacher_title),
             58f,
             top + 126f,
             paints.label
         )
 
         canvas.drawText(
-            report.classTeacherName.ifBlank { "Not assigned" },
+            report.classTeacherName.ifBlank { pdfStrings.get(R.string.not_assigned) },
             145f,
             top + 126f,
             paints.valueBold
@@ -513,7 +519,7 @@ object ReportPdfGenerator {
         drawSectionTitle(
             canvas = canvas,
             paints = paints,
-            title = "Academic Summary",
+            title = pdfStrings.get(R.string.academic_summary),
             y = y
         )
 
@@ -523,10 +529,10 @@ object ReportPdfGenerator {
         val boxHeight = 72f
 
         val items = listOf(
-            SummaryItem("Subjects", totalSubjects.toString(), LIGHT_BLUE),
-            SummaryItem("Total Marks", "%.2f".format(report.totalMarks), LIGHT_GREY),
-            SummaryItem("Average", "%.2f%%".format(report.averageMarks), LIGHT_BLUE),
-            SummaryItem("Grade", report.overallGrade.ifBlank { "-" }, LIGHT_GREY)
+            SummaryItem(pdfStrings.get(R.string.subjects), totalSubjects.toString(), LIGHT_BLUE),
+            SummaryItem(pdfStrings.get(R.string.total_marks_title), "%.2f".format(report.totalMarks), LIGHT_GREY),
+            SummaryItem(pdfStrings.get(R.string.average), "%.2f%%".format(report.averageMarks), LIGHT_BLUE),
+            SummaryItem(pdfStrings.get(R.string.grade), report.overallGrade.ifBlank { "-" }, LIGHT_GREY)
         )
 
         items.forEachIndexed { index, item ->
@@ -563,7 +569,7 @@ object ReportPdfGenerator {
             )
         }
 
-        val status = GradeCalculator.performanceStatus(report.averageMarks)
+        val status = pdfStrings.get(GradeCalculator.performanceStatus(report.averageMarks))
         val statusColor = getStatusColor(report.averageMarks)
 
         val statusPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -573,7 +579,7 @@ object ReportPdfGenerator {
         }
 
         canvas.drawText(
-            "Performance Status: $status",
+            pdfStrings.get(R.string.performance_status, status),
             LEFT,
             top + boxHeight + 26f,
             statusPaint
@@ -608,35 +614,35 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Subject",
+            pdfStrings.get(R.string.subject),
             92f,
             headerY,
             paints.cleanTableHeader
         )
 
         canvas.drawText(
-            "Code",
+            pdfStrings.get(R.string.code_header),
             310f,
             headerY,
             paints.cleanTableHeader
         )
 
         canvas.drawText(
-            "Marks",
+            pdfStrings.get(R.string.marks),
             380f,
             headerY,
             paints.cleanTableHeader
         )
 
         canvas.drawText(
-            "Grade",
+            pdfStrings.get(R.string.grade),
             440f,
             headerY,
             paints.cleanTableHeader
         )
 
         canvas.drawText(
-            "Status",
+            pdfStrings.get(R.string.status),
             490f,
             headerY,
             paints.cleanTableHeader
@@ -714,7 +720,7 @@ object ReportPdfGenerator {
         drawSectionTitle(
             canvas = canvas,
             paints = paints,
-            title = "Report Remarks",
+            title = pdfStrings.get(R.string.report_remarks),
             y = y
         )
 
@@ -732,7 +738,7 @@ object ReportPdfGenerator {
         )
 
         val remarksText = remarks.ifBlank {
-            "No specific remarks from grade records."
+            pdfStrings.get(R.string.no_specific_remarks_from_grade_records)
         }
 
         val lines = splitTextByWidth(
@@ -766,7 +772,7 @@ object ReportPdfGenerator {
         val lineY = top + 58f
 
         canvas.drawText(
-            "Prepared By",
+            pdfStrings.get(R.string.prepared_by),
             70f,
             top + 18f,
             paints.label
@@ -781,14 +787,14 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "Teacher / Academic Officer",
+            pdfStrings.get(R.string.teacher_academic_officer),
             72f,
             lineY + 20f,
             paints.smallGrey
         )
 
         canvas.drawText(
-            "Verified By",
+            pdfStrings.get(R.string.verified_by),
             360f,
             top + 18f,
             paints.label
@@ -803,7 +809,7 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "School Administrator",
+            pdfStrings.get(R.string.school_administrator),
             380f,
             lineY + 20f,
             paints.smallGrey
@@ -824,14 +830,14 @@ object ReportPdfGenerator {
         )
 
         canvas.drawText(
-            "This report is generated by SGRMS. Please verify academic records with the school office if required.",
+            pdfStrings.get(R.string.this_report_is_generated_by_sgrms),
             LEFT,
             790f,
             paints.footerText
         )
 
         canvas.drawText(
-            "Page $pageNumber",
+            pdfStrings.get(R.string.page, pageNumber),
             505f,
             812f,
             paints.footerText
@@ -1000,13 +1006,13 @@ object ReportPdfGenerator {
 
                 Toast.makeText(
                     context,
-                    "Report saved as PDF in Downloads",
+                    pdfStrings.get(R.string.report_saved_as_pdf_in_downloads),
                     Toast.LENGTH_LONG
                 ).show()
             } else {
                 Toast.makeText(
                     context,
-                    "Failed to create PDF file",
+                    pdfStrings.get(R.string.failed_to_create_pdf_file),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -1024,7 +1030,7 @@ object ReportPdfGenerator {
 
             Toast.makeText(
                 context,
-                "Report saved as PDF in Downloads",
+                pdfStrings.get(R.string.report_saved_as_pdf_in_downloads),
                 Toast.LENGTH_LONG
             ).show()
         }

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.session
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.UserModel
 import com.wilanwell.sgrms.data.model.UserRole
 import com.wilanwell.sgrms.data.model.userRole
@@ -78,7 +80,7 @@ class SessionManager @Inject constructor(
         val state = loggedInOrOut(user)
 
         if (state is SessionState.LoggedOut) {
-            throw IllegalStateException("This account has no valid role. Contact the admin.")
+            throw UserMessageException(R.string.this_account_has_no_valid_role)
         }
 
         _state.value = state

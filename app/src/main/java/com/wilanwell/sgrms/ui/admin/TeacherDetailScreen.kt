@@ -58,7 +58,7 @@ fun TeacherDetailScreen(
         isLoading = uiState.isLoading && teacher == null,
         errorMessage = if (teacher != null) uiState.errorMessage else "",
         bottomBar = if (teacher != null) {
-            { SgrmsPrimaryButton(text = stringResource(R.string.edit_teacher_2), icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f)) }
+            { SgrmsPrimaryButton(text = stringResource(R.string.edit_teacher), icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f)) }
         } else {
             null
         }

@@ -157,7 +157,7 @@ fun AddStudentGradeScreen(
                                 modifier = Modifier.padding(18.dp)
                             ) {
                                 Text(
-                                    text = student?.studentName ?: stringResource(R.string.unknown_student),
+                                    text = student?.studentName ?: stringResource(R.string.unknown_student_title),
                                     color = Color.White,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold

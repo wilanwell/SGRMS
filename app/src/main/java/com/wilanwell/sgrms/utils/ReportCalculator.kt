@@ -14,10 +14,15 @@ object GradeStatus {
 val GradeModel.isComplete: Boolean
     get() = status.equals(GradeStatus.COMPLETE, ignoreCase = true)
 
+/** The words [ReportCalculator.buildRemarks] uses, so they can come from strings.xml. */
+class RemarkTexts(
+    val unknownSubject: String,
+    val noRemarks: String,
+    val pending: (count: Int) -> String
+)
+
 /** Report rules shared by the report list, report detail, student summary and PDF. */
 object ReportCalculator {
-
-    const val NO_REMARKS = "No specific remarks from completed grade records."
 
     /**
      * One line per completed grade that has teacher remarks, plus a line
@@ -27,22 +32,23 @@ object ReportCalculator {
      */
     fun buildRemarks(
         grades: List<GradeModel>,
+        texts: RemarkTexts,
         subjectNameOf: (String) -> String?
     ): String {
         val lines = grades
             .filter { it.isComplete && it.remarks.isNotBlank() }
             .map { grade ->
-                val subjectName = subjectNameOf(grade.subjectId) ?: "Unknown Subject"
+                val subjectName = subjectNameOf(grade.subjectId) ?: texts.unknownSubject
                 "$subjectName: ${grade.remarks}"
             }
             .toMutableList()
 
         val pendingCount = grades.count { !it.isComplete }
         if (pendingCount > 0) {
-            lines += "Needs update: $pendingCount subject grade record(s) are still pending."
+            lines += texts.pending(pendingCount)
         }
 
-        return lines.joinToString(separator = "\n").ifBlank { NO_REMARKS }
+        return lines.joinToString(separator = "\n").ifBlank { texts.noRemarks }
     }
 
     /**

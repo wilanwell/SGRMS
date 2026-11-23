@@ -270,7 +270,7 @@ private fun OverallCard(
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(stringResource(R.string.overall_average), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    if (gradedCount > 0) GradeCalculator.performanceStatus(averageMarks, hasGrades = true) else noGradesYetText,
+                    if (gradedCount > 0) stringResource(GradeCalculator.performanceStatus(averageMarks, hasGrades = true)) else noGradesYetText,
                     style = MaterialTheme.typography.titleLarge
                 )
                 if (totalCount > 0) {

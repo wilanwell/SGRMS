@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.firebase
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.StudentModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -48,7 +50,7 @@ class StudentFirebaseService @Inject constructor(
         )
 
         return getStudentById(studentId)
-            ?: throw IllegalStateException("Student profile not found after creation.")
+            ?: throw UserMessageException(R.string.student_profile_not_found_after_creation)
     }
 
     suspend fun getAllStudents(): List<StudentModel> {

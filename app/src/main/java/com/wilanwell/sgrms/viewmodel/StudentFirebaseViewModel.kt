@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.StudentModel
@@ -27,6 +29,7 @@ data class StudentFirebaseUiState(
 
 @HiltViewModel
 class StudentFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val studentRepository: StudentFirebaseRepository
 ) : ViewModel() {
 
@@ -50,7 +53,7 @@ class StudentFirebaseViewModel @Inject constructor(
                 _uiState.update { it.copy(students = page.items, hasMore = page.hasMore, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(students = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage("Failed to load students"))
+                    it.copy(students = emptyList(), hasMore = false, isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_students))
                 }
             }
         }
@@ -74,7 +77,7 @@ class StudentFirebaseViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoadingMore = false, errorMessage = e.toUserMessage("Failed to load more students")) }
+                _uiState.update { it.copy(isLoadingMore = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_more_students)) }
             }
         }
     }
@@ -97,7 +100,7 @@ class StudentFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load students")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_students)
                 )
             }
         }
@@ -123,7 +126,7 @@ class StudentFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load student")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_student)
                 )
             }
         }
@@ -163,14 +166,14 @@ class StudentFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Student added successfully"
+                    successMessage = strings.get(R.string.student_added_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to add student")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_add_student)
                 )
             }
         }
@@ -192,14 +195,14 @@ class StudentFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Student updated successfully"
+                    successMessage = strings.get(R.string.student_updated_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to update student")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_update_student)
                 )
             }
         }
@@ -222,14 +225,14 @@ class StudentFirebaseViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     students = _uiState.value.students.filterNot { it.studentId == studentId },
                     isLoading = false,
-                    successMessage = "Student deleted successfully"
+                    successMessage = strings.get(R.string.student_deleted_successfully)
                 )
 
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to delete student")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_student)
                 )
             }
         }

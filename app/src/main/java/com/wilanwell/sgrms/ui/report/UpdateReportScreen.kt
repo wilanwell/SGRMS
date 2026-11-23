@@ -193,10 +193,10 @@ fun UpdateReportScreen(
                         icon = Icons.Default.Edit
                     ) {
                         SgrmsTextField(
-                            value = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
+                            value = student.studentName.ifBlank { stringResource(R.string.unknown_student_title) },
                             onValueChange = {},
-                            label = stringResource(R.string.student_name),
-                            placeholder = stringResource(R.string.student_name_2),
+                            label = stringResource(R.string.student_name_title),
+                            placeholder = stringResource(R.string.student_name),
                             readOnly = true
                         )
 
@@ -215,8 +215,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = completedGrades.size.toString(),
                             onValueChange = {},
-                            label = stringResource(R.string.completed_subjects),
-                            placeholder = stringResource(R.string.completed_subjects_2),
+                            label = stringResource(R.string.completed_subjects_title),
+                            placeholder = stringResource(R.string.completed_subjects),
                             readOnly = true
                         )
 
@@ -225,8 +225,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = "%.2f".format(totalMarks),
                             onValueChange = {},
-                            label = stringResource(R.string.total_marks),
-                            placeholder = stringResource(R.string.total_marks_2),
+                            label = stringResource(R.string.total_marks_title),
+                            placeholder = stringResource(R.string.total_marks),
                             readOnly = true
                         )
 
@@ -235,8 +235,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = "%.2f%%".format(averageMarks),
                             onValueChange = {},
-                            label = stringResource(R.string.average_marks),
-                            placeholder = stringResource(R.string.average_marks_2),
+                            label = stringResource(R.string.average_marks_title),
+                            placeholder = stringResource(R.string.average_marks),
                             readOnly = true
                         )
 
@@ -245,7 +245,7 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = overallGrade,
                             onValueChange = {},
-                            label = stringResource(R.string.overall_grade_2),
+                            label = stringResource(R.string.overall_grade_title),
                             placeholder = stringResource(R.string.overall_grade),
                             readOnly = true
                         )

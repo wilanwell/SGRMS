@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.StudentModel
@@ -24,6 +26,7 @@ data class ReportRemarksUiState(
 
 @HiltViewModel
 class ReportRemarksViewModel @Inject constructor(
+    private val strings: Strings,
     private val reportRepository: ReportRepository
 ) : ViewModel() {
 
@@ -41,7 +44,7 @@ class ReportRemarksViewModel @Inject constructor(
                 _uiState.update { it.copy(remarks = remarks, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load report remarks."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_report_remarks))
                 }
             }
         }
@@ -58,12 +61,12 @@ class ReportRemarksViewModel @Inject constructor(
                         remarks = remarks.trim(),
                         isSaving = false,
                         saved = true,
-                        successMessage = "Report remarks updated successfully"
+                        successMessage = strings.get(R.string.report_remarks_updated_successfully)
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isSaving = false, errorMessage = e.toUserMessage("Failed to save report remarks."))
+                    it.copy(isSaving = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_save_report_remarks))
                 }
             }
         }

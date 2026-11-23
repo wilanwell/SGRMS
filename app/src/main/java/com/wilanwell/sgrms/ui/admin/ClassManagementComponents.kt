@@ -94,7 +94,7 @@ fun AddClassDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = stringResource(R.string.add_class),
+                text = stringResource(R.string.add_class_title),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -132,7 +132,7 @@ fun AddClassDialog(
 
                 SgrmsDropdownField(
                     value = selectedTeacherName.ifBlank { stringResource(R.string.not_assigned) },
-                    label = stringResource(R.string.class_teacher_2),
+                    label = stringResource(R.string.class_teacher_title),
                     placeholder = stringResource(R.string.select_class_teacher),
                     expanded = teacherExpanded,
                     onExpandedChange = {
@@ -280,7 +280,7 @@ fun EditClassDialog(
 
                 SgrmsDropdownField(
                     value = selectedTeacherName.ifBlank { stringResource(R.string.not_assigned) },
-                    label = stringResource(R.string.class_teacher_2),
+                    label = stringResource(R.string.class_teacher_title),
                     placeholder = stringResource(R.string.select_class_teacher),
                     expanded = teacherExpanded,
                     onExpandedChange = {
@@ -396,7 +396,7 @@ fun ClassStudentsDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.PersonAdd,
-                        contentDescription = stringResource(R.string.add_student_2),
+                        contentDescription = stringResource(R.string.add_student_title),
                         tint = Color.White
                     )
 

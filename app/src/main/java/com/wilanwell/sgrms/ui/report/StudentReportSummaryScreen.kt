@@ -50,6 +50,7 @@ fun StudentReportSummaryScreen(
     onBackClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
+    val remarkTextsValue = remarkTexts()
     val reportDateText = stringResource(R.string.report_date)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -113,12 +114,14 @@ fun StudentReportSummaryScreen(
         "-"
     }
 
-    val performanceStatus = GradeCalculator.performanceStatus(
-        averageMarks = averageMarks,
-        hasGrades = completedSubjectItems.isNotEmpty()
+    val performanceStatus = stringResource(
+        GradeCalculator.performanceStatus(
+            averageMarks = averageMarks,
+            hasGrades = completedSubjectItems.isNotEmpty()
+        )
     )
 
-    val reportRemarks = ReportCalculator.buildRemarks(subjectItems.map { it.grade }) { subjectId ->
+    val reportRemarks = ReportCalculator.buildRemarks(subjectItems.map { it.grade }, remarkTextsValue) { subjectId ->
         subjectItems.firstOrNull { it.grade.subjectId == subjectId }?.subjectName
     }
 
@@ -199,7 +202,7 @@ fun StudentReportSummaryScreen(
             )
             SgrmsStatCard(
                 value = "%.1f%%".format(averageMarks),
-                label = stringResource(R.string.subjects_2, totalSubjects),
+                label = stringResource(R.string.subjects_count, totalSubjects),
                 icon = Icons.Default.Assessment,
                 tint = com.wilanwell.sgrms.ui.theme.SgrmsColors.Success,
                 container = com.wilanwell.sgrms.ui.theme.SgrmsColors.SuccessContainer,

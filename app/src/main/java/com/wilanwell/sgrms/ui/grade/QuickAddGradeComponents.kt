@@ -104,7 +104,7 @@ fun QuickGradeStudentCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
+                        text = student.studentName.ifBlank { stringResource(R.string.unknown_student_title) },
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )

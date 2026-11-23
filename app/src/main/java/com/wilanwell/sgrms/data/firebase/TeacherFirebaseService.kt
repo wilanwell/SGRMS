@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.data.firebase
 
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import com.wilanwell.sgrms.data.model.TeacherModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
@@ -41,7 +43,7 @@ class TeacherFirebaseService @Inject constructor(
         )
 
         return getTeacherById(teacherId)
-            ?: throw IllegalStateException("Teacher profile not found after creation.")
+            ?: throw UserMessageException(R.string.teacher_profile_not_found_after_creation)
     }
 
     suspend fun getAllTeachers(): List<TeacherModel> {

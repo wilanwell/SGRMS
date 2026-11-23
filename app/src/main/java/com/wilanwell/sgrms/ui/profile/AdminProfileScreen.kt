@@ -43,7 +43,7 @@ fun AdminProfileScreen(
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
-    val adminTeachersStudents2Text = stringResource(R.string.admin_teachers_students_2)
+    val adminTeachersStudents2Text = stringResource(R.string.accounts_breakdown_long)
     val classesSubjectsTeachersStudentsText = stringResource(R.string.classes_subjects_teachers_students)
     val viewModel: AdminProfileViewModel = hiltViewModel()
     OnReturnToScreen { viewModel.refresh() }

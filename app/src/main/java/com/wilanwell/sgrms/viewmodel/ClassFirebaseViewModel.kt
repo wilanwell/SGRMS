@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.ClassModel
@@ -22,6 +24,7 @@ data class ClassFirebaseUiState(
 
 @HiltViewModel
 class ClassFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val classRepository: ClassFirebaseRepository
 ) : ViewModel() {
 
@@ -46,7 +49,7 @@ class ClassFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load classes")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_classes)
                 )
             }
         }
@@ -72,7 +75,7 @@ class ClassFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load class")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_class)
                 )
             }
         }
@@ -104,7 +107,7 @@ class ClassFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Class added successfully"
+                    successMessage = strings.get(R.string.class_added_successfully)
                 )
 
                 loadClasses()
@@ -112,7 +115,7 @@ class ClassFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to add class")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_add_class)
                 )
             }
         }
@@ -134,7 +137,7 @@ class ClassFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Class updated successfully"
+                    successMessage = strings.get(R.string.class_updated_successfully)
                 )
 
                 loadClasses()
@@ -142,7 +145,7 @@ class ClassFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to update class")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_update_class)
                 )
             }
         }
@@ -164,7 +167,7 @@ class ClassFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Class deleted successfully"
+                    successMessage = strings.get(R.string.class_deleted_successfully)
                 )
 
                 loadClasses()
@@ -172,7 +175,7 @@ class ClassFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to delete class")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_class)
                 )
             }
         }

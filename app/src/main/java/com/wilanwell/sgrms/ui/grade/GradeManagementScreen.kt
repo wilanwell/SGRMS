@@ -107,7 +107,7 @@ fun GradeManagementScreen(
 
         GradeDisplayItem(
             grade = grade,
-            studentName = student?.studentName ?: stringResource(R.string.unknown_student),
+            studentName = student?.studentName ?: stringResource(R.string.unknown_student_title),
             className = student?.className ?: stringResource(R.string.unknown_class),
             subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
@@ -190,7 +190,7 @@ fun GradeManagementScreen(
             Box(ListItemPadding) {
                 SgrmsListItemCard(
                     title = item.studentName,
-                    subtitle = stringResource(R.string.text, item.subjectName, item.className),
+                    subtitle = stringResource(R.string.format_dot_pair, item.subjectName, item.className),
                     leading = { SgrmsAvatar(name = item.studentName, size = 44.dp) },
                     onClick = { onStudentDetailClick(item.grade.studentId) }
                 ) {
@@ -205,7 +205,7 @@ fun GradeManagementScreen(
                         contentDescription = stringResource(R.string.actions_for, item.studentName),
                         actions = listOf(
                             RowAction(stringResource(R.string.view_student), Icons.Default.Visibility) { onStudentDetailClick(item.grade.studentId) },
-                            RowAction(stringResource(R.string.edit_grade_2), Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) },
+                            RowAction(stringResource(R.string.edit_grade), Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) },
                             RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedGradeToDelete = item.grade
                                 showDeleteDialog = true

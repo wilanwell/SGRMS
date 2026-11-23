@@ -82,6 +82,7 @@ flowchart LR
 
 - **Screens** are stateless where possible and built from shared components in `ui/components`: page header, list and detail templates, stat cards, status chips and form fields.
 - **ViewModels** hold screen state as `StateFlow` and map exceptions to readable messages (`toUserMessage()`).
+- **Text** lives in `res/values/strings.xml`. Screens use `stringResource`, ViewModels get an injected `Strings` interface, and the data layer throws `UserMessageException(R.string.…)`, so it never needs a `Context`.
 - **Business rules** live in plain Kotlin objects that are unit tested: `GradeCalculator`, `ReportCalculator`, `ValidationUtils`, `bulkGradeRecord`.
 - **Access control** is defined in `firestore.rules`. The emulator test suite covers role-based read and write permissions.
 
@@ -144,7 +145,7 @@ cd firestore-tests && npm install && npm test
 
 ## Roadmap
 
-- Move UI strings to `strings.xml` and add a Bahasa Melayu translation
+- Bahasa Melayu translation (`values-ms/strings.xml`); all user-facing text is already in `strings.xml`
 - Release build: R8 shrinking and signing configuration
 - Compose UI tests for the main flows
 - Split `ReportPdfGenerator` into smaller pieces

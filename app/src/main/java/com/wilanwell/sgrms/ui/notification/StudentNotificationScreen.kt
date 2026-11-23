@@ -98,7 +98,7 @@ fun StudentNotificationScreen(
             Box(ListItemPadding) {
                 SgrmsListItemCard(
                     title = notification.title.ifBlank { stringResource(R.string.notification) },
-                    subtitle = stringResource(R.string.text_3, notification.message, formatNotificationDate(notification.createdAt)),
+                    subtitle = stringResource(R.string.format_two_lines, notification.message, formatNotificationDate(notification.createdAt)),
                     subtitleMaxLines = 5,
                     leading = {
                         SgrmsIconTile(

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.TeacherModel
@@ -22,6 +24,7 @@ data class TeacherFirebaseUiState(
 
 @HiltViewModel
 class TeacherFirebaseViewModel @Inject constructor(
+    private val strings: Strings,
     private val teacherRepository: TeacherFirebaseRepository
 ) : ViewModel() {
 
@@ -46,7 +49,7 @@ class TeacherFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load teachers")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_teachers)
                 )
             }
         }
@@ -72,7 +75,7 @@ class TeacherFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to load teacher")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_load_teacher)
                 )
             }
         }
@@ -108,7 +111,7 @@ class TeacherFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Teacher added successfully"
+                    successMessage = strings.get(R.string.teacher_added_successfully)
                 )
 
                 loadTeachers()
@@ -116,7 +119,7 @@ class TeacherFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to add teacher")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_add_teacher)
                 )
             }
         }
@@ -138,7 +141,7 @@ class TeacherFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Teacher updated successfully"
+                    successMessage = strings.get(R.string.teacher_updated_successfully)
                 )
 
                 loadTeachers()
@@ -146,7 +149,7 @@ class TeacherFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to update teacher")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_update_teacher)
                 )
             }
         }
@@ -168,7 +171,7 @@ class TeacherFirebaseViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    successMessage = "Teacher deleted successfully"
+                    successMessage = strings.get(R.string.teacher_deleted_successfully)
                 )
 
                 loadTeachers()
@@ -176,7 +179,7 @@ class TeacherFirebaseViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMessage = e.toUserMessage("Failed to delete teacher")
+                    errorMessage = e.toUserMessage(strings, R.string.failed_to_delete_teacher)
                 )
             }
         }

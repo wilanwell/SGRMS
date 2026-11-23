@@ -1,5 +1,8 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.utils.UserMessageException
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.model.GradeModel
@@ -45,6 +48,7 @@ data class AddStudentGradeUiState(
 /** Enter or update one student's marks subject by subject. */
 @HiltViewModel
 class AddStudentGradeViewModel @Inject constructor(
+    private val strings: Strings,
     private val studentRepository: StudentFirebaseRepository,
     private val subjectRepository: SubjectFirebaseRepository,
     private val gradeRepository: GradeFirebaseRepository,
@@ -57,7 +61,7 @@ class AddStudentGradeViewModel @Inject constructor(
 
     fun load(studentId: String) {
         if (studentId.isBlank()) {
-            _uiState.value = AddStudentGradeUiState(isLoading = false, errorMessage = "Student ID is missing.")
+            _uiState.value = AddStudentGradeUiState(isLoading = false, errorMessage = strings.get(R.string.student_id_is_missing))
             return
         }
 
@@ -66,7 +70,7 @@ class AddStudentGradeViewModel @Inject constructor(
 
             try {
                 val student = studentRepository.getStudentById(studentId)
-                    ?: throw IllegalStateException("Student not found.")
+                    ?: throw UserMessageException(R.string.student_not_found_2)
 
                 val subjects = async { subjectRepository.getAllSubjects() }
                 val grades = async { gradeRepository.getGradesByStudentId(studentId) }
@@ -82,7 +86,7 @@ class AddStudentGradeViewModel @Inject constructor(
                         existingGrade = grade,
                         marksText = grade?.marks?.takeIf { it > 0 }?.toString().orEmpty(),
                         remarks = grade?.remarks.orEmpty(),
-                        status = grade?.status ?: "Pending"
+                        status = grade?.status ?: strings.get(R.string.pending)
                     )
                 }
 
@@ -93,7 +97,7 @@ class AddStudentGradeViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Failed to load subjects."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.failed_to_load_subjects))
                 }
             }
         }
@@ -112,7 +116,7 @@ class AddStudentGradeViewModel @Inject constructor(
 
         val marks = item.marksText.trim().toDoubleOrNull()
         if (marks == null || !GradeCalculator.isValidMarks(marks)) {
-            updateItem(index) { it.copy(message = "Please enter marks between 0 and 100.") }
+            updateItem(index) { it.copy(message = strings.get(R.string.please_enter_marks_between_0_and)) }
             return
         }
 
@@ -138,8 +142,8 @@ class AddStudentGradeViewModel @Inject constructor(
                 notificationRepository.addNotification(
                     NotificationModel(
                         studentId = student.studentId,
-                        title = if (item.existingGrade == null) "New grade" else "Grade updated",
-                        message = "Your ${item.subjectName} grade is now ${GradeCalculator.formatMarks(marks)} (${saved.gradeLetter}).",
+                        title = if (item.existingGrade == null) strings.get(R.string.new_grade) else strings.get(R.string.grade_updated),
+                        message = strings.get(R.string.your_grade_is_now, item.subjectName, GradeCalculator.formatMarks(marks), saved.gradeLetter),
                         type = "GRADE_UPDATED",
                         relatedGradeId = saved.gradeId,
                         relatedSubjectId = item.subjectId,
@@ -153,12 +157,12 @@ class AddStudentGradeViewModel @Inject constructor(
                         existingGrade = saved,
                         status = "Complete",
                         isSaving = false,
-                        message = "Grade saved successfully."
+                        message = strings.get(R.string.grade_saved_successfully)
                     )
                 }
             } catch (e: Exception) {
                 updateItem(index) {
-                    it.copy(isSaving = false, message = e.toUserMessage("Failed to save grade."))
+                    it.copy(isSaving = false, message = e.toUserMessage(strings, R.string.failed_to_save_grade))
                 }
             }
         }

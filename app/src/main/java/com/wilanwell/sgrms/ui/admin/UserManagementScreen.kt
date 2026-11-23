@@ -159,7 +159,7 @@ fun UserManagementScreen(
             SgrmsOverflowMenu(
                 contentDescription = stringResource(R.string.add_account),
                 actions = listOf(
-                    RowAction(stringResource(R.string.add_teacher_2), Icons.Default.PersonAdd, onClick = onAddTeacherClick),
+                    RowAction(stringResource(R.string.add_teacher), Icons.Default.PersonAdd, onClick = onAddTeacherClick),
                     RowAction(stringResource(R.string.add_student), Icons.Default.PersonAdd, onClick = onAddStudentAccountClick)
                 )
             )

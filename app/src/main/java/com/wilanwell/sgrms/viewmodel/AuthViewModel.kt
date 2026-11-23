@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.utils.Strings
+import com.wilanwell.sgrms.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wilanwell.sgrms.data.session.SessionManager
@@ -20,6 +22,7 @@ data class LoginUiState(
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val strings: Strings,
     private val sessionManager: SessionManager
 ) : ViewModel() {
 
@@ -36,7 +39,7 @@ class AuthViewModel @Inject constructor(
 
     fun login(email: String, password: String) {
         if (email.isBlank() || password.isBlank()) {
-            _loginUiState.update { it.copy(errorMessage = "Please enter your email and password.") }
+            _loginUiState.update { it.copy(errorMessage = strings.get(R.string.please_enter_your_email_and_password)) }
             return
         }
 
@@ -48,7 +51,7 @@ class AuthViewModel @Inject constructor(
                 _loginUiState.value = LoginUiState()
             } catch (e: Exception) {
                 _loginUiState.update {
-                    it.copy(isLoading = false, errorMessage = e.toUserMessage("Login failed."))
+                    it.copy(isLoading = false, errorMessage = e.toUserMessage(strings, R.string.login_failed))
                 }
             }
         }

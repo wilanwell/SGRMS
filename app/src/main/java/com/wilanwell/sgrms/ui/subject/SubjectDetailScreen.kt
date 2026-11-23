@@ -168,7 +168,7 @@ fun SubjectDetailScreen(
             }
         ) {
             if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
-            SgrmsStatusChip(stringResource(R.string.students_3, studentsTakingSubject.size), ChipTone.Primary)
+            SgrmsStatusChip(stringResource(R.string.students_count, studentsTakingSubject.size), ChipTone.Primary)
         }
 
         SgrmsInfoSection(stringResource(R.string.details)) {
