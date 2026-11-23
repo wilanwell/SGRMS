@@ -32,3 +32,6 @@ app/src/main/java/**/*.zip
 
 # Firebase client config: each developer uses their own (see README)
 app/google-services.json
+
+# Android Studio project files (machine- and device-specific)
+/.idea/
