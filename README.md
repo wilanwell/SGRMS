@@ -2,7 +2,7 @@
   <img src="docs/logo/sgrms-app-icon.svg" width="96" alt="SGRMS logo">
 </p>
 
-<h1 align="center">SGRMS — Student Grade Record Management System</h1>
+<h1 align="center">SGRMS: Student Grade Record Management System</h1>
 
 <p align="center">
   An Android app for schools to record grades, build report cards and keep students informed,
@@ -28,24 +28,28 @@
 ## Features
 
 **Admin**
+
 - Dashboard with account totals, a role breakdown and the newest accounts
-- Create and delete teacher and student login accounts
+- Create teacher and student login accounts; remove profiles and related records when deleting accounts
 - Manage teachers, classes, students and subjects, with search and filter chips
 - Reports overview for every student
 
 **Teacher**
+
 - Dashboard with students taught, grade records, ready reports and per-subject averages
 - Bulk grade entry for a whole class and subject; it shows the marks already saved and only saves the ones that changed
 - Grade list, student details and report cards with teacher remarks
 - PDF report cards saved to the phone
 
 **Student**
+
 - Dashboard with an overall-average ring and a mark bar per subject
 - Personal report card with PDF download
-- Grade notifications, both in the app and as phone notifications
+- Grade notifications in the app and periodic phone notifications
 - Profile with a photo and family / contact details
 
 **Everyone**
+
 - Email sign-in, forgot password (reset email) and change password
 - Session restore on launch and role-based route guards
 - A consistent "Indigo Clean" design system, with a navigation rail in landscape
@@ -79,7 +83,7 @@ flowchart LR
 - **Screens** are stateless where possible and built from shared components in `ui/components`: page header, list and detail templates, stat cards, status chips and form fields.
 - **ViewModels** hold screen state as `StateFlow` and map exceptions to readable messages (`toUserMessage()`).
 - **Business rules** live in plain Kotlin objects that are unit tested: `GradeCalculator`, `ReportCalculator`, `ValidationUtils`, `bulkGradeRecord`.
-- **Security** is enforced server-side by `firestore.rules`, not by hiding buttons. Each role can only read and write what it should, and 44 emulator tests prove it.
+- **Access control** is defined in `firestore.rules`. The emulator test suite covers role-based read and write permissions.
 
 ### Design decisions
 
@@ -88,11 +92,11 @@ SGRMS is built to run entirely on Firebase's **free Spark plan**, which has no C
 | Need | Approach on Spark |
 |---|---|
 | Admin creates a login for someone else | `AccountService` signs up the new user on a **second `FirebaseApp`**, so the Admin stays signed in |
-| Push notifications without a server | `NotificationCheckWorker` checks Firestore about every 15 minutes and shows new grades as phone notifications |
+| Phone notifications without a server | `NotificationCheckWorker` checks Firestore periodically, with a target interval of about 15 minutes; delivery timing depends on Android background scheduling |
 | Profile photos without Cloud Storage | Compressed images in a `profileImages/{uid}` Firestore document |
 | Dashboard numbers without reading every document | Firestore `count()` / `average()` aggregation queries with composite indexes |
 
-The optional Cloud Functions in [`functions/`](functions/README.md) show how the same features would work on the paid Blaze plan.
+On Spark, deleting an account removes its profile and related records, but the Firebase Authentication login remains. The app and database rules deny access without a valid profile. The optional Cloud Functions in [`functions/`](functions/README.md) include server-side Auth deletion for a Blaze deployment.
 
 ## Project structure
 
@@ -141,7 +145,7 @@ cd firestore-tests && npm install && npm test
 ## Roadmap
 
 - Move UI strings to `strings.xml` and add a Bahasa Melayu translation
-- Release build: R8 shrinking, signing config and a real application ID
+- Release build: R8 shrinking and signing configuration
 - Compose UI tests for the main flows
 - Split `ReportPdfGenerator` into smaller pieces
 - Dark theme

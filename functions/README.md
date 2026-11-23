@@ -6,7 +6,7 @@ SGRMS runs on the free **Spark** plan without these functions:
 |---|---|---|
 | Create accounts | `AccountService` on a second `FirebaseApp` | `createTeacherAccount`, `createStudentAccount` |
 | Delete accounts | Profile + records deleted; Auth login stays but has no access | `deleteUserAccount` also deletes the Auth login |
-| Phone notifications | `NotificationCheckWorker`, about every 15 minutes | `sendNotificationPush`, instant FCM push |
+| Phone notifications | `NotificationCheckWorker`, about every 15 minutes | `sendNotificationPush`, event-driven FCM push |
 
 The code is kept so the project can switch later. To use it:
 
