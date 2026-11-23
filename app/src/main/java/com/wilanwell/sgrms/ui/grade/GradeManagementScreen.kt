@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.ui.components.LocalSessionAccess
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
@@ -61,6 +62,8 @@ fun GradeManagementScreen(
     val grades = gradeUiState.grades
     val students = studentUiState.students
     val subjects = subjectUiState.subjects
+    val access = LocalSessionAccess.current
+    val subjectTeacher = subjects.associate { it.subjectId to it.teacherId }
 
     val isLoading = gradeUiState.isLoading || studentUiState.isLoading || subjectUiState.isLoading
     val errorMessage = listOf(
@@ -203,13 +206,17 @@ fun GradeManagementScreen(
                     }
                     SgrmsOverflowMenu(
                         contentDescription = stringResource(R.string.actions_for, item.studentName),
-                        actions = listOf(
+                        actions = listOfNotNull(
                             RowAction(stringResource(R.string.view_student), Icons.Default.Visibility) { onStudentDetailClick(item.grade.studentId) },
-                            RowAction(stringResource(R.string.edit_grade), Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) },
-                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
-                                selectedGradeToDelete = item.grade
-                                showDeleteDialog = true
-                            }
+                            if (access.canWriteSubject(subjectTeacher[item.grade.subjectId].orEmpty())) {
+                                RowAction(stringResource(R.string.edit_grade), Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) }
+                            } else null,
+                            if (access.canWriteSubject(subjectTeacher[item.grade.subjectId].orEmpty())) {
+                                RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
+                                    selectedGradeToDelete = item.grade
+                                    showDeleteDialog = true
+                                }
+                            } else null
                         )
                     )
                 }

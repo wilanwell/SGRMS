@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.ui.components.LocalSessionAccess
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -87,7 +88,9 @@ fun AddSubjectScreen(
         teacherViewModel.loadTeachers()
     }
 
-    val teachers = teacherUiState.teachers
+    // A teacher may only assign a subject to themselves (firestore.rules).
+    val access = LocalSessionAccess.current
+    val teachers = teacherUiState.teachers.filter { access.isAdmin || it.teacherId == access.teacherId }
 
     val teacherDropdownItems = if (teachers.isEmpty()) {
         listOf("No teacher available")

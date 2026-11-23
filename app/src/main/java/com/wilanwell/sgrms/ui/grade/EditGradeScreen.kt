@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.ui.components.LocalSessionAccess
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
@@ -66,7 +67,9 @@ fun EditGradeScreen(
 
     val selectedGrade = gradeUiState.selectedGrade
     val studentList = studentUiState.students
-    val subjectList = subjectUiState.subjects
+    // Teachers grade only the subjects they teach (enforced by firestore.rules).
+    val access = LocalSessionAccess.current
+    val subjectList = subjectUiState.subjects.filter { access.canWriteSubject(it.teacherId) }
 
     val statusList = listOf(
         "Complete",

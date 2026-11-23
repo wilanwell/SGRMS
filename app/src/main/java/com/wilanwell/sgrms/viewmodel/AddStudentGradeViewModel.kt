@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.viewmodel
 
+import com.wilanwell.sgrms.data.model.UserRole
 import com.wilanwell.sgrms.utils.Strings
 import com.wilanwell.sgrms.utils.UserMessageException
 import com.wilanwell.sgrms.R
@@ -76,7 +77,13 @@ class AddStudentGradeViewModel @Inject constructor(
                 val grades = async { gradeRepository.getGradesByStudentId(studentId) }
                 val gradesBySubject = grades.await().associateBy { it.subjectId }
 
-                val items = subjects.await().map { subject ->
+                // Teachers grade only the subjects they teach (enforced by firestore.rules).
+                val gradable = subjects.await().filter { subject ->
+                    sessionManager.currentRole != UserRole.TEACHER ||
+                        (sessionManager.currentTeacherId.isNotBlank() && subject.teacherId == sessionManager.currentTeacherId)
+                }
+
+                val items = gradable.map { subject ->
                     val grade = gradesBySubject[subject.subjectId]
 
                     AddStudentGradeSubjectItem(

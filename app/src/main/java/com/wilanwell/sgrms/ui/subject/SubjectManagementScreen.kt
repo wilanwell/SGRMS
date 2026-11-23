@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.ui.components.LocalSessionAccess
 import com.wilanwell.sgrms.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
@@ -46,6 +47,7 @@ fun SubjectManagementScreen(
     onSubjectDetailClick: (String) -> Unit = {},
     onEditSubjectClick: (String) -> Unit = {}
 ) {
+    val access = LocalSessionAccess.current
     val addASubjectOrChangeTheText = stringResource(R.string.add_a_subject_or_change_the)
     val allCategoriesText = stringResource(R.string.all_categories)
     val sortByCurrentText = stringResource(R.string.sort_by_current)
@@ -174,13 +176,17 @@ fun SubjectManagementScreen(
                     if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
                     SgrmsOverflowMenu(
                         contentDescription = stringResource(R.string.actions_for, subject.subjectName),
-                        actions = listOf(
+                        actions = listOfNotNull(
                             RowAction(stringResource(R.string.view), Icons.Default.Visibility) { onSubjectDetailClick(subject.subjectId) },
-                            RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditSubjectClick(subject.subjectId) },
-                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
-                                selectedSubjectToDelete = subject
-                                showDeleteDialog = true
-                            }
+                            if (access.canWriteSubject(subject.teacherId)) {
+                                RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditSubjectClick(subject.subjectId) }
+                            } else null,
+                            if (access.canWriteSubject(subject.teacherId)) {
+                                RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
+                                    selectedSubjectToDelete = subject
+                                    showDeleteDialog = true
+                                }
+                            } else null
                         )
                     )
                 }
