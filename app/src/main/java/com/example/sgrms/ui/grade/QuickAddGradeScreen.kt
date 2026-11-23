@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -399,6 +400,18 @@ fun QuickAddGradeScreen(
                                 }
                             }
                         )
+                    }
+
+                    // Repeat the marks message next to the button, where the teacher is looking.
+                    if (marksErrorMessage.isNotBlank()) {
+                        item {
+                            Text(
+                                text = marksErrorMessage,
+                                color = SgrmsColors.Error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
 
                     item {
