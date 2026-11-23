@@ -10,8 +10,8 @@
       "port": 4520
     },
     "firestore": {
-      "port": 8280,
-      "websocketPort": 9260
+      "port": 8380,
+      "websocketPort": 9360
     },
     "ui": {
       "enabled": false

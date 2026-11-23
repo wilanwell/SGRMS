@@ -78,10 +78,12 @@ beforeEach(async () => {
     });
 
     await setDoc(doc(db, "classes", "c1"), {classId: "c1", className: "5A"});
-    await setDoc(doc(db, "subjects", "sub1"), {subjectId: "sub1", teacherId: "t1"});
+    await setDoc(doc(db, "subjects", "sub1"), {subjectId: "sub1", teacherId: "t1", subjectName: "BM"});
+    // taught by another teacher (t2): our teacher (t1) must not grade it
+    await setDoc(doc(db, "subjects", "sub2"), {subjectId: "sub2", teacherId: "t2", subjectName: "Math"});
 
-    await setDoc(doc(db, "grades", "g1"), {gradeId: "g1", studentId: "s1", marks: 70});
-    await setDoc(doc(db, "grades", "g2"), {gradeId: "g2", studentId: "s2", marks: 90});
+    await setDoc(doc(db, "grades", "g1"), {gradeId: "g1", studentId: "s1", subjectId: "sub1", marks: 70});
+    await setDoc(doc(db, "grades", "g2"), {gradeId: "g2", studentId: "s2", subjectId: "sub2", marks: 90});
 
     await setDoc(doc(db, "notifications", "n1"), {
       notificationId: "n1", studentId: "s1", title: "Grade", isRead: false,
@@ -114,6 +116,19 @@ describe("not signed in", () => {
     await assertFails(getDoc(doc(db, "students", "s1")));
     await assertFails(getDoc(doc(db, "grades", "g1")));
     await assertFails(setDoc(doc(db, "users", "uid-stranger"), {role: "Admin"}));
+  });
+
+  // A deleted account keeps its Firebase Auth login (Spark plan), but loses its
+  // users/{uid} profile. It must not be able to read or write anything.
+  test("a login without a profile (deleted account) cannot read school data", async () => {
+    const db = as("uid-stranger");
+    await assertFails(getDoc(doc(db, "teachers", "t1")));
+    await assertFails(getDocs(collection(db, "classes")));
+    await assertFails(getDocs(collection(db, "subjects")));
+    await env.withSecurityRulesDisabled((ctx) =>
+      setDoc(doc(ctx.firestore(), "profileImages", STUDENT), {userId: STUDENT, data: "x", updatedAt: 1}));
+    await assertFails(getDoc(doc(db, "profileImages", STUDENT)));
+    await assertFails(setDoc(doc(db, "profileImages", "uid-stranger"), {userId: "uid-stranger", data: "x", updatedAt: 1}));
   });
 });
 
@@ -254,9 +269,36 @@ describe("classes and subjects", () => {
     await assertFails(setDoc(doc(as(TEACHER), "classes", "c3"), {className: "5C"}));
   });
 
-  test("staff write subjects, students cannot", async () => {
-    await assertSucceeds(setDoc(doc(as(TEACHER), "subjects", "sub2"), {subjectName: "BM"}));
-    await assertFails(setDoc(doc(as(STUDENT), "subjects", "sub3"), {subjectName: "BI"}));
+  test("a teacher creates subjects only for themselves; students cannot", async () => {
+    await assertSucceeds(setDoc(doc(as(TEACHER), "subjects", "sub3"), {subjectName: "BI", teacherId: "t1"}));
+    await assertFails(setDoc(doc(as(TEACHER), "subjects", "sub4"), {subjectName: "Sains", teacherId: "t2"}));
+    await assertFails(setDoc(doc(as(TEACHER), "subjects", "sub5"), {subjectName: "Sejarah"}));
+    await assertFails(setDoc(doc(as(STUDENT), "subjects", "sub6"), {subjectName: "BI", teacherId: "t1"}));
+    await assertSucceeds(setDoc(doc(as(ADMIN), "subjects", "sub7"), {subjectName: "Geo", teacherId: "t2"}));
+  });
+
+  test("a subject with no teacher is not open to teachers", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, "subjects", "subX"), {subjectId: "subX", subjectName: "Pending"});
+      await setDoc(doc(db, "users", "uid-teacher-unlinked"), {
+        userId: "uid-teacher-unlinked", fullName: "New", role: "Teacher", studentId: "", teacherId: "",
+      });
+    });
+    const unlinked = as("uid-teacher-unlinked");
+    await assertFails(setDoc(doc(unlinked, "subjects", "subY"), {subjectName: "X"}));
+    await assertFails(updateDoc(doc(unlinked, "subjects", "subX"), {subjectName: "Y"}));
+    await assertFails(updateDoc(doc(as(TEACHER), "subjects", "subX"), {subjectName: "Y"}));
+    await assertFails(setDoc(doc(unlinked, "grades", "gX"), {studentId: "s1", subjectId: "subX", marks: 1}));
+  });
+
+  test("a teacher cannot take over or change another teacher's subject", async () => {
+    await assertFails(updateDoc(doc(as(TEACHER), "subjects", "sub2"), {teacherId: "t1"}));
+    await assertFails(updateDoc(doc(as(TEACHER), "subjects", "sub2"), {subjectName: "Maths"}));
+    await assertFails(deleteDoc(doc(as(TEACHER), "subjects", "sub2")));
+    await assertSucceeds(updateDoc(doc(as(TEACHER), "subjects", "sub1"), {subjectName: "Bahasa Melayu"}));
+    await assertFails(updateDoc(doc(as(TEACHER), "subjects", "sub1"), {teacherId: "t2"}));
+    await assertSucceeds(updateDoc(doc(as(ADMIN), "subjects", "sub2"), {teacherId: "t1"}));
   });
 });
 
@@ -273,9 +315,23 @@ describe("grades", () => {
     await assertFails(updateDoc(doc(as(STUDENT), "grades", "g1"), {marks: 100}));
   });
 
-  test("a teacher can add and edit grades", async () => {
-    await assertSucceeds(setDoc(doc(as(TEACHER), "grades", "g3"), {studentId: "s1", marks: 50}));
+  test("a teacher can add and edit grades for their own subject", async () => {
+    await assertSucceeds(setDoc(doc(as(TEACHER), "grades", "g3"), {studentId: "s1", subjectId: "sub1", marks: 50}));
     await assertSucceeds(updateDoc(doc(as(TEACHER), "grades", "g1"), {marks: 75}));
+    await assertSucceeds(deleteDoc(doc(as(TEACHER), "grades", "g1")));
+  });
+
+  test("a teacher cannot write grades for another teacher's subject", async () => {
+    await assertFails(setDoc(doc(as(TEACHER), "grades", "g4"), {studentId: "s1", subjectId: "sub2", marks: 50}));
+    await assertFails(setDoc(doc(as(TEACHER), "grades", "g5"), {studentId: "s1", marks: 50}));
+    await assertFails(setDoc(doc(as(TEACHER), "grades", "g6"), {studentId: "s1", subjectId: "missing", marks: 50}));
+    await assertFails(updateDoc(doc(as(TEACHER), "grades", "g2"), {marks: 100}));
+    await assertFails(updateDoc(doc(as(TEACHER), "grades", "g1"), {subjectId: "sub2"}));
+    await assertFails(deleteDoc(doc(as(TEACHER), "grades", "g2")));
+  });
+
+  test("an admin can still remove any grade (account deletion)", async () => {
+    await assertSucceeds(deleteDoc(doc(as(ADMIN), "grades", "g2")));
   });
 });
 

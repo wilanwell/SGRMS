@@ -7,6 +7,10 @@ rules_version = '2';
 // Admin's phone creates and deletes accounts itself (AccountService); these
 // rules make sure only an Admin can do that, only for the Teacher / Student
 // roles, and never for an Admin account.
+//
+// Every read needs a users/{uid} profile (hasProfile), not just a login:
+// deleting an account on Spark removes the profile but keeps the Auth login,
+// and that login must not see anything.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -51,6 +55,18 @@ service cloud.firestore {
 
     function myTeacherId() {
       return me().get("teacherId", "");
+    }
+
+    // A teacher id that belongs to the signed-in teacher. Never matches "",
+    // so an unlinked teacher account or a subject without a teacher is not "theirs".
+    function isMyTeacherId(teacherId) {
+      return isTeacher() && myTeacherId() != "" && teacherId == myTeacherId();
+    }
+
+    // The signed-in teacher is the assigned teacher of this subject.
+    // A missing subject denies (get() of a missing document fails).
+    function teachesSubject(subjectId) {
+      return isMyTeacherId(get(/databases/$(database)/documents/subjects/$(subjectId)).data.get("teacherId", ""));
     }
 
     function isOwnStudent(studentId) {
@@ -102,7 +118,7 @@ service cloud.firestore {
     // ----- teachers ------------------------------------------------------
 
     match /teachers/{teacherId} {
-      allow read: if signedIn();
+      allow read: if hasProfile();
       allow create: if isNewAccountBy("teacherId", teacherId);
       allow delete: if isAdmin();
 
@@ -135,27 +151,33 @@ service cloud.firestore {
     // Small JPEGs as Base64 (Spark plan has no Cloud Storage), one per user.
 
     match /profileImages/{userId} {
-      allow read: if signedIn();
+      allow read: if hasProfile();
 
-      allow create, update: if signedIn() && request.auth.uid == userId
+      allow create, update: if hasProfile() && request.auth.uid == userId
         && request.resource.data.keys().hasOnly(["userId", "data", "updatedAt"])
         && request.resource.data.userId == userId
         && request.resource.data.data is string
         && request.resource.data.data.size() < 300000;
 
-      allow delete: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow delete: if hasProfile() && (request.auth.uid == userId || isAdmin());
     }
 
     // ----- classes & subjects -------------------------------------------
 
     match /classes/{classId} {
-      allow read: if signedIn();
+      allow read: if hasProfile();
       allow write: if isAdmin();
     }
 
+    // A teacher manages only subjects assigned to them, and can never move a
+    // subject to (or away from) themselves: grades depend on this assignment.
     match /subjects/{subjectId} {
-      allow read: if signedIn();
-      allow write: if isStaff();
+      allow read: if hasProfile();
+      allow create: if isAdmin() || isMyTeacherId(request.resource.data.get("teacherId", ""));
+      allow update: if isAdmin()
+        || (isMyTeacherId(resource.data.get("teacherId", ""))
+            && isMyTeacherId(request.resource.data.get("teacherId", "")));
+      allow delete: if isAdmin() || isMyTeacherId(resource.data.get("teacherId", ""));
     }
 
     // ----- grades --------------------------------------------------------
@@ -164,7 +186,14 @@ service cloud.firestore {
       // A student can only read (and query) their own grades:
       // the app must filter with whereEqualTo("studentId", <own id>).
       allow read: if isStaff() || isOwnStudent(resource.data.studentId);
-      allow write: if isStaff();
+
+      // Teachers write grades only for subjects they teach; a grade cannot be
+      // moved to another subject. Admins may delete (account deletion).
+      allow create: if isAdmin() || teachesSubject(request.resource.data.get("subjectId", ""));
+      allow update: if isAdmin()
+        || (teachesSubject(resource.data.get("subjectId", ""))
+            && request.resource.data.get("subjectId", "") == resource.data.get("subjectId", ""));
+      allow delete: if isAdmin() || teachesSubject(resource.data.get("subjectId", ""));
     }
 
     // ----- notifications -------------------------------------------------
