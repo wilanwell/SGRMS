@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -60,6 +62,9 @@ fun EditAdminProfileScreen(
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
+    val enterAValidPhoneNumberText = stringResource(R.string.enter_a_valid_phone_number)
+    val fullNameIsRequiredText = stringResource(R.string.full_name_is_required)
+    val usernameIsRequiredText = stringResource(R.string.username_is_required)
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -107,15 +112,15 @@ fun EditAdminProfileScreen(
         clearErrors()
 
         if (fullName.isBlank()) {
-            fullNameError = "Full name is required"
+            fullNameError = fullNameIsRequiredText
         }
 
         if (username.isBlank()) {
-            usernameError = "Username is required"
+            usernameError = usernameIsRequiredText
         }
 
         if (!isValidPhone(phoneNumber)) {
-            phoneNumberError = "Enter a valid phone number"
+            phoneNumberError = enterAValidPhoneNumberText
         }
 
         return fullNameError.isBlank() &&
@@ -166,7 +171,7 @@ fun EditAdminProfileScreen(
             .navigationBarsPadding()
     ) {
         TopBar(
-            title = "Edit Admin Profile",
+            title = stringResource(R.string.edit_admin_profile),
             showBack = true,
             onBackClick = onBackClick
         )
@@ -196,13 +201,13 @@ fun EditAdminProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Admin Information",
+                        text = stringResource(R.string.admin_information),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Update account, contact, and profile picture",
+                        text = stringResource(R.string.update_account_contact_and_profile_picture),
                         fontSize = 14.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -215,7 +220,7 @@ fun EditAdminProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "Loading admin profile...",
+                            text = stringResource(R.string.loading_admin_profile),
                             fontSize = 14.sp,
                             color = ColorOnSurfaceVariant
                         )
@@ -246,7 +251,7 @@ fun EditAdminProfileScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "Remove Picture",
+                                    text = stringResource(R.string.remove_picture),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -273,7 +278,7 @@ fun EditAdminProfileScreen(
                                 fullNameError = ""
                                 generalError = ""
                             },
-                            label = "Full Name",
+                            label = stringResource(R.string.full_name),
                             leadingIcon = Icons.Default.Person,
                             isError = fullNameError.isNotBlank(),
                             errorMessage = fullNameError,
@@ -289,7 +294,7 @@ fun EditAdminProfileScreen(
                                 usernameError = ""
                                 generalError = ""
                             },
-                            label = "Username",
+                            label = stringResource(R.string.username),
                             leadingIcon = Icons.Default.Badge,
                             isError = usernameError.isNotBlank(),
                             errorMessage = usernameError,
@@ -301,7 +306,7 @@ fun EditAdminProfileScreen(
                         SgrmsTextField(
                             value = email,
                             onValueChange = {},
-                            label = "Email",
+                            label = stringResource(R.string.email),
                             leadingIcon = Icons.Default.Email,
                             enabled = false
                         )
@@ -311,7 +316,7 @@ fun EditAdminProfileScreen(
                         SgrmsTextField(
                             value = role,
                             onValueChange = {},
-                            label = "Role",
+                            label = stringResource(R.string.role),
                             leadingIcon = Icons.Default.AdminPanelSettings,
                             enabled = false
                         )
@@ -321,7 +326,7 @@ fun EditAdminProfileScreen(
                         SgrmsTextField(
                             value = status,
                             onValueChange = {},
-                            label = "Status",
+                            label = stringResource(R.string.status),
                             leadingIcon = Icons.Default.Badge,
                             enabled = false
                         )
@@ -329,7 +334,7 @@ fun EditAdminProfileScreen(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         Text(
-                            text = "Contact Details",
+                            text = stringResource(R.string.contact_details),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth()
@@ -344,7 +349,7 @@ fun EditAdminProfileScreen(
                                 phoneNumberError = ""
                                 generalError = ""
                             },
-                            label = "Phone Number",
+                            label = stringResource(R.string.phone_number),
                             leadingIcon = Icons.Default.Phone,
                             isError = phoneNumberError.isNotBlank(),
                             errorMessage = phoneNumberError,
@@ -359,7 +364,7 @@ fun EditAdminProfileScreen(
                                 address = it
                                 clearErrors()
                             },
-                            label = "Address",
+                            label = stringResource(R.string.address),
                             leadingIcon = Icons.Default.Home,
                             singleLine = false,
                             minLines = 2,
@@ -374,7 +379,7 @@ fun EditAdminProfileScreen(
                                 profileNote = it
                                 clearErrors()
                             },
-                            label = "Profile Note",
+                            label = stringResource(R.string.profile_note),
                             leadingIcon = Icons.Default.Note,
                             singleLine = false,
                             minLines = 3,
@@ -413,7 +418,7 @@ fun EditAdminProfileScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Save Changes",
+                                    text = stringResource(R.string.save_changes),
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -435,7 +440,7 @@ fun EditAdminProfileScreen(
                             )
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
@@ -44,6 +46,11 @@ fun SubjectManagementScreen(
     onSubjectDetailClick: (String) -> Unit = {},
     onEditSubjectClick: (String) -> Unit = {}
 ) {
+    val addASubjectOrChangeTheText = stringResource(R.string.add_a_subject_or_change_the)
+    val allCategoriesText = stringResource(R.string.all_categories)
+    val sortByCurrentText = stringResource(R.string.sort_by_current)
+    val sortByText = stringResource(R.string.sort_by)
+    val willBeRemovedFromTheSubjectText = stringResource(R.string.will_be_removed_from_the_subject)
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val uiState by subjectViewModel.uiState.collectAsState()
@@ -63,7 +70,7 @@ fun SubjectManagementScreen(
     val subjects = uiState.subjects
 
     val categoryList = listOf(
-        "All Categories",
+        allCategoriesText,
         "Core",
         "Humanities",
         "Applied",
@@ -105,8 +112,8 @@ fun SubjectManagementScreen(
 
     if (showDeleteDialog && selectedSubjectToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete subject?",
-            message = "${selectedSubjectToDelete?.subjectName} will be removed from the subject list.",
+            title = stringResource(R.string.delete_subject),
+            message = willBeRemovedFromTheSubjectText.format(selectedSubjectToDelete?.subjectName),
             onConfirmClick = {
                 selectedSubjectToDelete?.let { subject ->
                     subjectViewModel.deleteSubject(
@@ -125,22 +132,22 @@ fun SubjectManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Subjects",
-        subtitle = "${filteredSubjects.size} of ${subjects.size} subjects",
+        title = stringResource(R.string.subjects),
+        subtitle = stringResource(R.string.of_subjects, filteredSubjects.size, subjects.size),
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search subject name, code or teacher",
+        searchPlaceholder = stringResource(R.string.search_subject_name_code_or_teacher),
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         isEmpty = filteredSubjects.isEmpty(),
-        empty = EmptyContent("No subjects found", "Add a subject or change the filter.", Icons.AutoMirrored.Filled.MenuBook),
+        empty = EmptyContent(stringResource(R.string.no_subjects_found), addASubjectOrChangeTheText, Icons.AutoMirrored.Filled.MenuBook),
         chipGroups = listOf(ChipGroup(categoryList, selectedCategory) { selectedCategory = it }),
-        fab = ListFab("Add subject", Icons.Default.Add, onAddSubjectClick),
+        fab = ListFab(stringResource(R.string.add_subject), Icons.Default.Add, onAddSubjectClick),
         headerActions = {
             SgrmsOverflowMenu(
-                contentDescription = "Sort",
+                contentDescription = stringResource(R.string.sort),
                 actions = sortList.map { option ->
-                    RowAction(if (option == selectedSort) "Sort by $option (current)" else "Sort by $option", Icons.AutoMirrored.Filled.Sort) {
+                    RowAction(if (option == selectedSort) sortByCurrentText.format(option) else sortByText.format(option), Icons.AutoMirrored.Filled.Sort) {
                         selectedSort = option
                     }
                 }
@@ -150,8 +157,8 @@ fun SubjectManagementScreen(
         items(items = filteredSubjects, key = { it.subjectId }) { subject ->
             Box(ListItemPadding) {
                 SgrmsListItemCard(
-                    title = subject.subjectName.ifBlank { "Unnamed subject" },
-                    subtitle = listOf(subject.subjectCode, subject.teacherName.ifBlank { "No teacher" })
+                    title = subject.subjectName.ifBlank { stringResource(R.string.unnamed_subject) },
+                    subtitle = listOf(subject.subjectCode, subject.teacherName.ifBlank { stringResource(R.string.no_teacher) })
                         .filter { it.isNotBlank() }
                         .joinToString(" · "),
                     leading = {
@@ -166,11 +173,11 @@ fun SubjectManagementScreen(
                 ) {
                     if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${subject.subjectName}",
+                        contentDescription = stringResource(R.string.actions_for, subject.subjectName),
                         actions = listOf(
-                            RowAction("View", Icons.Default.Visibility) { onSubjectDetailClick(subject.subjectId) },
-                            RowAction("Edit", Icons.Default.Edit) { onEditSubjectClick(subject.subjectId) },
-                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.view), Icons.Default.Visibility) { onSubjectDetailClick(subject.subjectId) },
+                            RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditSubjectClick(subject.subjectId) },
+                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedSubjectToDelete = subject
                                 showDeleteDialog = true
                             }

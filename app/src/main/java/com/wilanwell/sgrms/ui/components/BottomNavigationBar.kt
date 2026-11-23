@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.statusBarsPadding

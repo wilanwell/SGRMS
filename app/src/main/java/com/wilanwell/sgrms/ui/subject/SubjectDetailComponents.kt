@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +56,8 @@ fun AddStudentToSubjectDialog(
     onDismiss: () -> Unit,
     onStudentSelected: (StudentModel) -> Unit
 ) {
+    val allStudentsAreAlreadyAddedToText = stringResource(R.string.all_students_are_already_added_to)
+    val noStudentMatchesYourSearchText = stringResource(R.string.no_student_matches_your_search)
     var searchText by remember { mutableStateOf("") }
 
     val filteredStudents = students.filter { student ->
@@ -69,12 +73,12 @@ fun AddStudentToSubjectDialog(
         title = {
             Column {
                 Text(
-                    text = "Add Student",
+                    text = stringResource(R.string.add_student_2),
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "Choose a student to add into $subjectName",
+                    text = stringResource(R.string.choose_a_student_to_add_into, subjectName),
                     fontSize = 13.sp,
                     color = ColorOnSurfaceVariant
                 )
@@ -87,8 +91,8 @@ fun AddStudentToSubjectDialog(
                     onValueChange = {
                         searchText = it
                     },
-                    label = "Search Student",
-                    placeholder = "Search by name, code, or class"
+                    label = stringResource(R.string.search_student),
+                    placeholder = stringResource(R.string.search_by_name_code_or_class)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -96,11 +100,11 @@ fun AddStudentToSubjectDialog(
                 if (filteredStudents.isEmpty()) {
                     SgrmsEmptyStateCard(
                         icon = Icons.Default.Group,
-                        title = "No student found",
+                        title = stringResource(R.string.no_student_found),
                         message = if (searchText.isBlank()) {
-                            "All students are already added to this subject."
+                            allStudentsAreAlreadyAddedToText
                         } else {
-                            "No student matches your search."
+                            noStudentMatchesYourSearchText
                         }
                     )
                 } else {
@@ -130,7 +134,7 @@ fun AddStudentToSubjectDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.close),
                     color = ColorPrimary
                 )
             }
@@ -170,7 +174,7 @@ fun AddSubjectStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
+                    contentDescription = stringResource(R.string.student),
                     tint = Color.White
                 )
             }
@@ -181,7 +185,7 @@ fun AddSubjectStudentSelectionCard(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = student.studentName.ifBlank { "Unknown Student" },
+                    text = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -208,7 +212,7 @@ fun AddSubjectStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Student",
+                    contentDescription = stringResource(R.string.add_student_2),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )

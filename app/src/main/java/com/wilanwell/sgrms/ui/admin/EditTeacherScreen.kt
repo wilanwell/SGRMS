@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -59,6 +61,8 @@ fun EditTeacherScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val headTeacherText = stringResource(R.string.head_teacher)
+    val seniorTeacherText = stringResource(R.string.senior_teacher)
     val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
 
     val uiState by teacherViewModel.uiState.collectAsState()
@@ -74,8 +78,8 @@ fun EditTeacherScreen(
 
     val positionList = listOf(
         "Teacher",
-        "Head Teacher",
-        "Senior Teacher"
+        headTeacherText,
+        seniorTeacherText
     )
 
     var staffIdError by remember { mutableStateOf(false) }
@@ -112,7 +116,7 @@ fun EditTeacherScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                cancelText = "Cancel",
+                                cancelText = stringResource(R.string.cancel),
                                 confirmText = if (uiState.isLoading) {
                                     "Saving..."
                                 } else {
@@ -153,7 +157,7 @@ fun EditTeacherScreen(
         },
         topBar = {
             TopBar(
-                title = "Edit Teacher",
+                title = stringResource(R.string.edit_teacher),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false
@@ -191,8 +195,8 @@ fun EditTeacherScreen(
                 teacher == null -> {
                     SgrmsEmptyStateCard(
                         icon = Icons.Default.SupervisorAccount,
-                        title = "Teacher not found",
-                        message = "The selected teacher account could not be loaded."
+                        title = stringResource(R.string.teacher_not_found),
+                        message = stringResource(R.string.the_selected_teacher_account_could_not)
                     )
                 }
 
@@ -207,13 +211,13 @@ fun EditTeacherScreen(
                             modifier = Modifier.padding(18.dp)
                         ) {
                             Text(
-                                text = "Teacher Information",
+                                text = stringResource(R.string.teacher_information),
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
-                                text = "Update teacher profile information",
+                                text = stringResource(R.string.update_teacher_profile_information),
                                 fontSize = 14.sp,
                                 color = ColorOnSurfaceVariant
                             )
@@ -227,11 +231,11 @@ fun EditTeacherScreen(
                                     staffIdError = false
                                     teacherViewModel.clearMessage()
                                 },
-                                label = "Staff ID",
-                                placeholder = "Example: STF001",
+                                label = stringResource(R.string.staff_id),
+                                placeholder = stringResource(R.string.example_stf001),
                                 icon = Icons.Default.Badge,
                                 isError = staffIdError,
-                                errorMessage = "Staff ID is required"
+                                errorMessage = stringResource(R.string.staff_id_is_required)
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -243,11 +247,11 @@ fun EditTeacherScreen(
                                     teacherNameError = false
                                     teacherViewModel.clearMessage()
                                 },
-                                label = "Teacher Name",
-                                placeholder = "Enter teacher full name",
+                                label = stringResource(R.string.teacher_name),
+                                placeholder = stringResource(R.string.enter_teacher_full_name),
                                 icon = Icons.Default.Person,
                                 isError = teacherNameError,
-                                errorMessage = "Teacher name is required"
+                                errorMessage = stringResource(R.string.teacher_name_is_required)
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -259,11 +263,11 @@ fun EditTeacherScreen(
                                     emailError = false
                                     teacherViewModel.clearMessage()
                                 },
-                                label = "Email",
-                                placeholder = "Example: teacher@sgrms.com",
+                                label = stringResource(R.string.email),
+                                placeholder = stringResource(R.string.example_teacher_sgrms_com),
                                 icon = Icons.Default.Email,
                                 isError = emailError,
-                                errorMessage = "Email is required"
+                                errorMessage = stringResource(R.string.email_is_required)
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
@@ -274,8 +278,8 @@ fun EditTeacherScreen(
                                     phoneNumber = it
                                     teacherViewModel.clearMessage()
                                 },
-                                label = "Phone Number",
-                                placeholder = "Example: 0123456789",
+                                label = stringResource(R.string.phone_number),
+                                placeholder = stringResource(R.string.example_0123456789),
                                 icon = Icons.Default.Phone
                             )
 
@@ -287,17 +291,17 @@ fun EditTeacherScreen(
                                     department = it
                                     teacherViewModel.clearMessage()
                                 },
-                                label = "Department",
-                                placeholder = "Example: Academic Department",
+                                label = stringResource(R.string.department),
+                                placeholder = stringResource(R.string.example_academic_department),
                                 icon = Icons.Default.Work
                             )
 
                             Spacer(modifier = Modifier.height(14.dp))
 
                             SgrmsDropdownField(
-                                value = position.ifBlank { "Teacher" },
-                                label = "Position",
-                                placeholder = "Select position",
+                                value = position.ifBlank { stringResource(R.string.teacher) },
+                                label = stringResource(R.string.position),
+                                placeholder = stringResource(R.string.select_position),
                                 expanded = positionExpanded,
                                 onExpandedChange = {
                                     positionExpanded = it

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,6 +54,8 @@ fun StudentProfileScreen(
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
+    val noGradesText = stringResource(R.string.no_grades)
+    val overallText = stringResource(R.string.overall)
     val viewModel: StudentProfileViewModel = hiltViewModel()
     OnReturnToScreen { viewModel.refresh() }
     val uiState by viewModel.profileUiState.collectAsState()
@@ -87,12 +91,12 @@ fun StudentProfileScreen(
     }
 
     SgrmsDetailScreen(
-        title = "Profile",
+        title = stringResource(R.string.profile),
         onBack = null,
         isLoading = uiState.isLoading && student == null,
         errorMessage = uiState.errorMessage
     ) {
-        val name = student?.studentName?.ifBlank { null } ?: userFullName.ifBlank { "Student" }
+        val name = student?.studentName?.ifBlank { null } ?: userFullName.ifBlank { stringResource(R.string.student) }
         SgrmsDetailHero(
             title = name,
             subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),
@@ -101,40 +105,40 @@ fun StudentProfileScreen(
             }
         ) {
             SgrmsStatusChip(
-                if (totalSubjects == 0) "No grades" else "Overall $overallGrade",
+                if (totalSubjects == 0) noGradesText else overallText.format(overallGrade),
                 if (totalSubjects == 0) ChipTone.Neutral else toneForGrade(overallGrade)
             )
-            SgrmsStatusChip("$totalSubjects subjects", ChipTone.Primary)
+            SgrmsStatusChip(stringResource(R.string.subjects_2, totalSubjects), ChipTone.Primary)
         }
 
-        SgrmsInfoSection("Contact") {
-            SgrmsInfoRow(icon = Icons.Default.Email, label = "Email", value = userEmail)
+        SgrmsInfoSection(stringResource(R.string.contact)) {
+            SgrmsInfoRow(icon = Icons.Default.Email, label = stringResource(R.string.email), value = userEmail)
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = student?.phoneNumber.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = student?.phoneNumber.orEmpty())
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Home, label = "Address", value = student?.address.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Home, label = stringResource(R.string.address), value = student?.address.orEmpty())
         }
 
-        SgrmsInfoSection("Family") {
-            SgrmsInfoRow(icon = Icons.Default.Cake, label = "Date of birth", value = student?.dateOfBirth.orEmpty())
+        SgrmsInfoSection(stringResource(R.string.family)) {
+            SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth_2), value = student?.dateOfBirth.orEmpty())
             SgrmsRowDivider()
             SgrmsInfoRow(
                 icon = Icons.Default.FamilyRestroom,
-                label = "Guardian",
+                label = stringResource(R.string.guardian),
                 value = listOfNotNull(student?.guardianName, student?.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ")
             )
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Emergency contact", value = student?.emergencyContact.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.emergency_contact_2), value = student?.emergencyContact.orEmpty())
         }
 
         SgrmsGroupedCard {
-            SgrmsSettingsRow("Edit profile", Icons.Default.Edit, onEditProfileClick)
+            SgrmsSettingsRow(stringResource(R.string.edit_profile), Icons.Default.Edit, onEditProfileClick)
             SgrmsRowDivider()
-            SgrmsSettingsRow("Change password", Icons.Default.Lock, onChangePasswordClick)
+            SgrmsSettingsRow(stringResource(R.string.change_password), Icons.Default.Lock, onChangePasswordClick)
         }
 
         SgrmsGroupedCard {
-            SgrmsSettingsRow("Log out", Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
+            SgrmsSettingsRow(stringResource(R.string.log_out), Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
         }
     }
 }

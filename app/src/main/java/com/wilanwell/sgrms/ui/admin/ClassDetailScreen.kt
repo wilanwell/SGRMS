@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -46,6 +48,10 @@ fun ClassDetailScreen(
     onBackClick: () -> Unit = {},
     onAddStudentClick: () -> Unit = {}
 ) {
+    val academicYear2Text = stringResource(R.string.academic_year_2)
+    val noStudentsInThisClassYetText = stringResource(R.string.no_students_in_this_class_yet)
+    val students3Text = stringResource(R.string.students_3)
+    val t1StudentText = stringResource(R.string.t_1_student)
     val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -135,14 +141,14 @@ fun ClassDetailScreen(
     }
 
     SgrmsDetailScreen(
-        title = "Class",
+        title = stringResource(R.string.class_label),
         onBack = onBackClick,
         isLoading = classUiState.isLoading && schoolClass == null,
         errorMessage = classUiState.errorMessage.ifBlank { studentUiState.errorMessage },
         bottomBar = if (schoolClass != null) {
             {
                 SgrmsPrimaryButton(
-                    text = "Add student to class",
+                    text = stringResource(R.string.add_student_to_class),
                     icon = Icons.Default.PersonAdd,
                     onClick = { showAddStudentDialog = true },
                     modifier = Modifier.weight(1f)
@@ -153,13 +159,13 @@ fun ClassDetailScreen(
         }
     ) {
         if (schoolClass == null) {
-            SgrmsEmptyState(title = "Class not found", message = "The selected class could not be loaded.", icon = Icons.Default.School)
+            SgrmsEmptyState(title = stringResource(R.string.class_not_found), message = stringResource(R.string.the_selected_class_could_not_be), icon = Icons.Default.School)
             return@SgrmsDetailScreen
         }
 
         SgrmsDetailHero(
-            title = schoolClass.className.ifBlank { "Unnamed class" },
-            subtitle = schoolClass.academicYear.ifBlank { null }?.let { "Academic year $it" },
+            title = schoolClass.className.ifBlank { stringResource(R.string.unnamed_class) },
+            subtitle = schoolClass.academicYear.ifBlank { null }?.let { academicYear2Text.format(it) },
             leading = {
                 SgrmsIconTile(
                     icon = Icons.Default.School,
@@ -169,21 +175,21 @@ fun ClassDetailScreen(
                 )
             }
         ) {
-            SgrmsStatusChip(if (classStudents.size == 1) "1 student" else "${classStudents.size} students", ChipTone.Primary)
+            SgrmsStatusChip(if (classStudents.size == 1) t1StudentText else students3Text.format(classStudents.size), ChipTone.Primary)
         }
 
-        SgrmsInfoSection("Details") {
-            SgrmsInfoRow(icon = Icons.Default.Person, label = "Class teacher", value = schoolClass.classTeacherName.ifBlank { "Not assigned" })
+        SgrmsInfoSection(stringResource(R.string.details)) {
+            SgrmsInfoRow(icon = Icons.Default.Person, label = stringResource(R.string.class_teacher), value = schoolClass.classTeacherName.ifBlank { stringResource(R.string.not_assigned) })
             if (schoolClass.description.isNotBlank()) {
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.Notes, label = "Description", value = schoolClass.description)
+                SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.Notes, label = stringResource(R.string.description), value = schoolClass.description)
             }
         }
 
-        SgrmsInfoSection("Students") {
+        SgrmsInfoSection(stringResource(R.string.students)) {
             if (classStudents.isEmpty()) {
                 Text(
-                    "No students in this class yet.",
+                    noStudentsInThisClassYetText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)
@@ -204,9 +210,9 @@ fun ClassDetailScreen(
                         },
                         trailing = {
                             SgrmsOverflowMenu(
-                                contentDescription = "Actions for ${student.studentName}",
+                                contentDescription = stringResource(R.string.actions_for, student.studentName),
                                 actions = listOf(
-                                    RowAction("Remove from class", Icons.Default.PersonRemove, destructive = true) {
+                                    RowAction(stringResource(R.string.remove_from_class), Icons.Default.PersonRemove, destructive = true) {
                                         selectedStudentToRemove = student
                                         showRemoveDialog = true
                                     }

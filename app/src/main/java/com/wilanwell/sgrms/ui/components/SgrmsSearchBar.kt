@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,7 +22,7 @@ fun SgrmsSearchBar(
     value: String,
     onValueChange: (String) -> Unit,
     label: String = "Search",
-    placeholder: String = "Search here",
+    placeholder: String = stringResource(R.string.search_here),
     modifier: Modifier = Modifier
 ) {
     OutlinedTextField(
@@ -35,7 +37,7 @@ fun SgrmsSearchBar(
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = stringResource(R.string.search),
                 tint = ColorOnSurfaceVariant
             )
         },

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +49,9 @@ fun AddGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val saveGradeText = stringResource(R.string.save_grade)
+    val text4Text = stringResource(R.string.text_4)
+    val text5Text = stringResource(R.string.text_5)
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -87,8 +92,8 @@ fun AddGradeScreen(
         listOf("No student available")
     } else {
         students.map { student ->
-            val className = student.className.ifBlank { "Not assigned" }
-            "${student.studentName} (${student.studentCode}) - $className"
+            val className = student.className.ifBlank { stringResource(R.string.not_assigned) }
+            text4Text.format(student.studentName, student.studentCode, className)
         }
     }
 
@@ -96,7 +101,7 @@ fun AddGradeScreen(
         listOf("No subject available")
     } else {
         subjects.map { subject ->
-            "${subject.subjectName} (${subject.subjectCode})"
+            text5Text.format(subject.subjectName, subject.subjectCode)
         }
     }
 
@@ -125,7 +130,7 @@ fun AddGradeScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Add New Grade",
+            title = stringResource(R.string.add_new_grade),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -143,14 +148,14 @@ fun AddGradeScreen(
                 )
         ) {
             SgrmsFormCard(
-                title = "Grade Information",
-                subtitle = "Enter student subject mark and grade",
+                title = stringResource(R.string.grade_information),
+                subtitle = stringResource(R.string.enter_student_subject_mark_and_grade),
                 icon = Icons.Default.Grade
             ) {
                 SgrmsDropdownField(
-                    value = selectedStudentDisplay.ifBlank { "Select student" },
-                    label = "Student",
-                    placeholder = "Select student",
+                    value = selectedStudentDisplay.ifBlank { stringResource(R.string.select_student) },
+                    label = stringResource(R.string.student),
+                    placeholder = stringResource(R.string.select_student),
                     expanded = studentExpanded,
                     onExpandedChange = {
                         studentExpanded = it
@@ -174,15 +179,15 @@ fun AddGradeScreen(
                         studentExpanded = false
                     },
                     isError = studentError,
-                    errorMessage = "Student is required"
+                    errorMessage = stringResource(R.string.student_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsDropdownField(
-                    value = selectedSubjectDisplay.ifBlank { "Select subject" },
-                    label = "Subject",
-                    placeholder = "Select subject",
+                    value = selectedSubjectDisplay.ifBlank { stringResource(R.string.select_subject) },
+                    label = stringResource(R.string.subject),
+                    placeholder = stringResource(R.string.select_subject),
                     expanded = subjectExpanded,
                     onExpandedChange = {
                         subjectExpanded = it
@@ -205,7 +210,7 @@ fun AddGradeScreen(
                         subjectExpanded = false
                     },
                     isError = subjectError,
-                    errorMessage = "Subject is required"
+                    errorMessage = stringResource(R.string.subject_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -227,10 +232,10 @@ fun AddGradeScreen(
                             }
                         }
                     },
-                    label = "Marks",
-                    placeholder = "Enter marks",
+                    label = stringResource(R.string.marks),
+                    placeholder = stringResource(R.string.enter_marks),
                     isError = marksError,
-                    errorMessage = "Marks must be between 0 and 100",
+                    errorMessage = stringResource(R.string.marks_must_be_between_0_and),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal
                     )
@@ -243,8 +248,8 @@ fun AddGradeScreen(
                     onValueChange = {
                         gradeLetter = it
                     },
-                    label = "Grade Letter",
-                    placeholder = "Auto generated grade",
+                    label = stringResource(R.string.grade_letter),
+                    placeholder = stringResource(R.string.auto_generated_grade),
                     readOnly = true
                 )
 
@@ -256,8 +261,8 @@ fun AddGradeScreen(
                         remarks = it
                         clearMessages()
                     },
-                    label = "Remarks",
-                    placeholder = "Optional notes",
+                    label = stringResource(R.string.remarks),
+                    placeholder = stringResource(R.string.optional_notes),
                     singleLine = false,
                     modifier = Modifier.height(110.dp)
                 )
@@ -281,11 +286,11 @@ fun AddGradeScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                cancelText = "Cancel",
+                                cancelText = stringResource(R.string.cancel),
                                 confirmText = if (isLoading) {
                                     "Saving..."
                                 } else {
-                                    "Save Grade"
+                                    saveGradeText
                                 },
                                 onCancelClick = onBackClick,
                                 onConfirmClick = {

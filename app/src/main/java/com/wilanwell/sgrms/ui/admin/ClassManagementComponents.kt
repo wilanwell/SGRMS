@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -92,7 +94,7 @@ fun AddClassDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Add Class",
+                text = stringResource(R.string.add_class),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -104,11 +106,11 @@ fun AddClassDialog(
                         className = it
                         classNameError = false
                     },
-                    label = "Class Name",
-                    placeholder = "Example: 5 Amanah",
+                    label = stringResource(R.string.class_name),
+                    placeholder = stringResource(R.string.example_5_amanah),
                     icon = Icons.Default.School,
                     isError = classNameError,
-                    errorMessage = "Class name is required"
+                    errorMessage = stringResource(R.string.class_name_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -119,19 +121,19 @@ fun AddClassDialog(
                         academicYear = it
                         academicYearError = false
                     },
-                    label = "Academic Year",
-                    placeholder = "Example: 2024/2025",
+                    label = stringResource(R.string.academic_year),
+                    placeholder = stringResource(R.string.example_2024_2025),
                     icon = Icons.Default.Badge,
                     isError = academicYearError,
-                    errorMessage = "Academic year is required"
+                    errorMessage = stringResource(R.string.academic_year_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 SgrmsDropdownField(
-                    value = selectedTeacherName.ifBlank { "Not assigned" },
-                    label = "Class Teacher",
-                    placeholder = "Select class teacher",
+                    value = selectedTeacherName.ifBlank { stringResource(R.string.not_assigned) },
+                    label = stringResource(R.string.class_teacher_2),
+                    placeholder = stringResource(R.string.select_class_teacher),
                     expanded = teacherExpanded,
                     onExpandedChange = {
                         teacherExpanded = it
@@ -159,8 +161,8 @@ fun AddClassDialog(
                     onValueChange = {
                         description = it
                     },
-                    label = "Description",
-                    placeholder = "Optional class description",
+                    label = stringResource(R.string.description),
+                    placeholder = stringResource(R.string.optional_class_description),
                     icon = Icons.Default.MenuBook,
                     singleLine = false,
                     modifier = Modifier.height(100.dp)
@@ -190,7 +192,7 @@ fun AddClassDialog(
                 )
             ) {
                 Text(
-                    text = "Save",
+                    text = stringResource(R.string.save),
                     color = Color.White
                 )
             }
@@ -200,7 +202,7 @@ fun AddClassDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     color = ColorPrimary
                 )
             }
@@ -240,7 +242,7 @@ fun EditClassDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Edit Class",
+                text = stringResource(R.string.edit_class),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -252,11 +254,11 @@ fun EditClassDialog(
                         className = it
                         classNameError = false
                     },
-                    label = "Class Name",
-                    placeholder = "Example: 5 Amanah",
+                    label = stringResource(R.string.class_name),
+                    placeholder = stringResource(R.string.example_5_amanah),
                     icon = Icons.Default.School,
                     isError = classNameError,
-                    errorMessage = "Class name is required"
+                    errorMessage = stringResource(R.string.class_name_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -267,19 +269,19 @@ fun EditClassDialog(
                         academicYear = it
                         academicYearError = false
                     },
-                    label = "Academic Year",
-                    placeholder = "Example: 2024/2025",
+                    label = stringResource(R.string.academic_year),
+                    placeholder = stringResource(R.string.example_2024_2025),
                     icon = Icons.Default.Badge,
                     isError = academicYearError,
-                    errorMessage = "Academic year is required"
+                    errorMessage = stringResource(R.string.academic_year_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 SgrmsDropdownField(
-                    value = selectedTeacherName.ifBlank { "Not assigned" },
-                    label = "Class Teacher",
-                    placeholder = "Select class teacher",
+                    value = selectedTeacherName.ifBlank { stringResource(R.string.not_assigned) },
+                    label = stringResource(R.string.class_teacher_2),
+                    placeholder = stringResource(R.string.select_class_teacher),
                     expanded = teacherExpanded,
                     onExpandedChange = {
                         teacherExpanded = it
@@ -307,8 +309,8 @@ fun EditClassDialog(
                     onValueChange = {
                         description = it
                     },
-                    label = "Description",
-                    placeholder = "Optional class description",
+                    label = stringResource(R.string.description),
+                    placeholder = stringResource(R.string.optional_class_description),
                     icon = Icons.Default.MenuBook,
                     singleLine = false,
                     modifier = Modifier.height(100.dp)
@@ -342,7 +344,7 @@ fun EditClassDialog(
                 )
             ) {
                 Text(
-                    text = "Save Changes",
+                    text = stringResource(R.string.save_changes),
                     color = Color.White
                 )
             }
@@ -352,7 +354,7 @@ fun EditClassDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     color = ColorPrimary
                 )
             }
@@ -377,7 +379,7 @@ fun ClassStudentsDialog(
                 )
 
                 Text(
-                    text = "Students in this class (${students.size})",
+                    text = stringResource(R.string.students_in_this_class, students.size),
                     fontSize = 13.sp,
                     color = ColorOnSurfaceVariant
                 )
@@ -394,14 +396,14 @@ fun ClassStudentsDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.PersonAdd,
-                        contentDescription = "Add Student",
+                        contentDescription = stringResource(R.string.add_student_2),
                         tint = Color.White
                     )
 
                     Spacer(modifier = Modifier.size(8.dp))
 
                     Text(
-                        text = "Add Student in This Class",
+                        text = stringResource(R.string.add_student_in_this_class),
                         color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
@@ -412,8 +414,8 @@ fun ClassStudentsDialog(
                 if (students.isEmpty()) {
                     SgrmsEmptyStateCard(
                         icon = Icons.Default.Group,
-                        title = "No student in this class",
-                        message = "Tap the button above to add a student."
+                        title = stringResource(R.string.no_student_in_this_class),
+                        message = stringResource(R.string.tap_the_button_above_to_add)
                     )
                 } else {
                     LazyColumn(
@@ -437,7 +439,7 @@ fun ClassStudentsDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.close),
                     color = ColorPrimary
                 )
             }
@@ -477,7 +479,7 @@ fun StudentInClassCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
+                    contentDescription = stringResource(R.string.student),
                     tint = Color.White
                 )
             }

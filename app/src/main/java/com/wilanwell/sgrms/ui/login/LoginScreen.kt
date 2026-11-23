@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.login
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -60,6 +61,10 @@ import com.wilanwell.sgrms.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen() {
+    val emailIsRequiredText = stringResource(R.string.email_is_required)
+    val enterAValidEmailAddressText = stringResource(R.string.enter_a_valid_email_address)
+    val hidePasswordText = stringResource(R.string.hide_password)
+    val showPasswordText = stringResource(R.string.show_password)
 
     val authViewModel: AuthViewModel = hiltViewModel()
     val authUiState by authViewModel.loginUiState.collectAsState()
@@ -111,19 +116,19 @@ fun LoginScreen() {
                 color = MaterialTheme.colorScheme.primary
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Image(painterResource(R.drawable.sgrms_logo), contentDescription = "SGRMS logo", modifier = Modifier.size(44.dp))
+                    Image(painterResource(R.drawable.sgrms_logo), contentDescription = stringResource(R.string.sgrms_logo), modifier = Modifier.size(44.dp))
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = "Welcome back",
+                text = stringResource(R.string.welcome_back),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Sign in to SGRMS, the school grade record system.",
+                text = stringResource(R.string.sign_in_to_sgrms_the_school),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -137,12 +142,12 @@ fun LoginScreen() {
                     emailError = false
                     authViewModel.clearError()
                 },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                 singleLine = true,
                 isError = emailError,
                 supportingText = if (emailError) {
-                    { Text(if (email.isBlank()) "Email is required" else "Enter a valid email address") }
+                    { Text(if (email.isBlank()) emailIsRequiredText else enterAValidEmailAddressText) }
                 } else {
                     null
                 },
@@ -159,13 +164,13 @@ fun LoginScreen() {
                     passwordError = false
                     authViewModel.clearError()
                 },
-                label = { Text("Password") },
+                label = { Text(stringResource(R.string.password)) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            contentDescription = if (passwordVisible) hidePasswordText else showPasswordText
                         )
                     }
                 },
@@ -173,7 +178,7 @@ fun LoginScreen() {
                 singleLine = true,
                 isError = passwordError,
                 supportingText = if (passwordError) {
-                    { Text("Password is required") }
+                    { Text(stringResource(R.string.password_is_required)) }
                 } else {
                     null
                 },
@@ -188,7 +193,7 @@ fun LoginScreen() {
                 onClick = { showForgotPasswordDialog = true },
                 modifier = Modifier.align(Alignment.End)
             ) {
-                Text("Forgot password?", fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.forgot_password), fontWeight = FontWeight.SemiBold)
             }
 
             if (authUiState.errorMessage.isNotBlank()) {
@@ -223,14 +228,14 @@ fun LoginScreen() {
                 if (authUiState.isLoading) {
                     CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(22.dp))
                 } else {
-                    Text("Sign in", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.sign_in), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
                 }
             }
 
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "© 2026 SGRMS · School Grade Record Management System",
+                text = stringResource(R.string.t_2026_sgrms_school_grade_record_management),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.align(Alignment.CenterHorizontally)

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.report
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -53,6 +55,9 @@ fun ReportDetailScreen(
     onSaveReportClick: () -> Unit = {},
     onUpdateReportClick: () -> Unit = {}
 ) {
+    val additionalRemarks2Text = stringResource(R.string.additional_remarks_2)
+    val needsUpdateText = stringResource(R.string.needs_update)
+    val upToDateText = stringResource(R.string.up_to_date)
     val context = LocalContext.current
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
@@ -94,7 +99,7 @@ fun ReportDetailScreen(
 
         ReportGradeDisplayItem(
             grade = grade,
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
         )
     }.sortedBy { item ->
@@ -108,7 +113,7 @@ fun ReportDetailScreen(
 
         ReportPdfGradeItem(
             grade = grade,
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
         )
     }.sortedBy { item ->
@@ -136,9 +141,9 @@ fun ReportDetailScreen(
     } || completedGrades.isEmpty()
 
     val reportStatusText = if (isReportOutdated) {
-        "Needs Update"
+        needsUpdateText
     } else {
-        "Up to Date"
+        upToDateText
     }
 
     val reportStatusColor = if (isReportOutdated) {
@@ -157,7 +162,7 @@ fun ReportDetailScreen(
     val generatedRemarks = ReportCalculator.buildRemarks(allGrades) { subjectNames[it] }
 
     val reportRemarks = if (additionalRemarks.isNotBlank()) {
-        "$generatedRemarks\n\nAdditional remarks: $additionalRemarks"
+        additionalRemarks2Text.format(generatedRemarks, additionalRemarks)
     } else {
         generatedRemarks
     }
@@ -186,15 +191,15 @@ fun ReportDetailScreen(
     }
 
     SgrmsDetailScreen(
-        title = "Report",
+        title = stringResource(R.string.report),
         onBack = onBackClick,
         isLoading = isLoading && student == null,
         errorMessage = errorMessage.ifBlank { localErrorMessage },
         bottomBar = if (student == null) null else {
             {
-            SgrmsSecondaryButton(text = "Remarks", icon = Icons.Default.EditNote, onClick = onUpdateReportClick, modifier = Modifier.weight(1f))
+            SgrmsSecondaryButton(text = stringResource(R.string.remarks), icon = Icons.Default.EditNote, onClick = onUpdateReportClick, modifier = Modifier.weight(1f))
             SgrmsPrimaryButton(
-                text = "Save PDF",
+                text = stringResource(R.string.save_pdf),
                 icon = Icons.Default.PictureAsPdf,
                 enabled = completedGrades.isNotEmpty(),
                 onClick = {
@@ -212,16 +217,16 @@ fun ReportDetailScreen(
         }
     ) {
         if (student == null) {
-            SgrmsEmptyState(title = "Report not found", message = "This student or report could not be loaded. It may have been deleted.", icon = Icons.Default.Person)
+            SgrmsEmptyState(title = stringResource(R.string.report_not_found), message = stringResource(R.string.this_student_or_report_could_not), icon = Icons.Default.Person)
             return@SgrmsDetailScreen
         }
 
         SgrmsDetailHero(
-            title = student?.studentName ?: "Unknown student",
+            title = student?.studentName ?: stringResource(R.string.unknown_student_2),
             subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),
             leading = {
                 SgrmsAvatar(
-                    name = student?.studentName ?: "Student",
+                    name = student?.studentName ?: stringResource(R.string.student),
                     size = 72.dp,
                     imageUrl = student?.profileImageUrl.orEmpty(),
                     legacyImageBase64 = student?.profileImageBase64.orEmpty()
@@ -234,7 +239,7 @@ fun ReportDetailScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SgrmsStatCard(
                 value = overallGrade,
-                label = "Overall grade",
+                label = stringResource(R.string.overall_grade),
                 icon = Icons.Default.Grade,
                 tint = MaterialTheme.colorScheme.primary,
                 container = MaterialTheme.colorScheme.primaryContainer,
@@ -242,7 +247,7 @@ fun ReportDetailScreen(
             )
             SgrmsStatCard(
                 value = "%.1f%%".format(averageMarks),
-                label = "Average",
+                label = stringResource(R.string.average),
                 icon = Icons.Default.Assessment,
                 tint = com.wilanwell.sgrms.ui.theme.SgrmsColors.Success,
                 container = com.wilanwell.sgrms.ui.theme.SgrmsColors.SuccessContainer,
@@ -250,9 +255,9 @@ fun ReportDetailScreen(
             )
         }
 
-        SgrmsInfoSection("Subjects") {
+        SgrmsInfoSection(stringResource(R.string.subjects)) {
             if (reportGradeList.isEmpty()) {
-                Text("No grade records yet.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
+                Text(stringResource(R.string.no_grade_records_yet), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
             } else {
                 reportGradeList.forEachIndexed { index, item ->
                     if (index > 0) SgrmsRowDivider()
@@ -267,7 +272,7 @@ fun ReportDetailScreen(
             }
         }
 
-        SgrmsInfoSection("Remarks") {
+        SgrmsInfoSection(stringResource(R.string.remarks)) {
             Text(
                 reportRemarks,
                 style = MaterialTheme.typography.bodyMedium,

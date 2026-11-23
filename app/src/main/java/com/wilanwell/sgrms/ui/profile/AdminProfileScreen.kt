@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,8 @@ fun AdminProfileScreen(
     onChangePasswordClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
+    val adminTeachersStudents2Text = stringResource(R.string.admin_teachers_students_2)
+    val classesSubjectsTeachersStudentsText = stringResource(R.string.classes_subjects_teachers_students)
     val viewModel: AdminProfileViewModel = hiltViewModel()
     OnReturnToScreen { viewModel.refresh() }
     val uiState by viewModel.profileUiState.collectAsState()
@@ -51,14 +55,14 @@ fun AdminProfileScreen(
     val isLoading = uiState.isLoading
     val errorMessage = uiState.errorMessage
 
-    val fullName = user?.fullName?.ifBlank { null } ?: "Admin Account"
+    val fullName = user?.fullName?.ifBlank { null } ?: stringResource(R.string.admin_account)
     val username = user?.username?.ifBlank { null } ?: user?.email.orEmpty()
     val email = user?.email.orEmpty()
     val phoneNumber = user?.phoneNumber.orEmpty()
     val address = user?.address.orEmpty()
     val profileNote = user?.profileNote.orEmpty()
     val role = user?.role?.ifBlank { null } ?: UserRole.ADMIN.value
-    val status = user?.status?.ifBlank { null } ?: "Active"
+    val status = user?.status?.ifBlank { null } ?: stringResource(R.string.active)
 
     val userCount = summary.totalAccounts
     val teacherCount = summary.teachers
@@ -70,7 +74,7 @@ fun AdminProfileScreen(
     val studentAccountCount = summary.studentAccounts
 
     SgrmsDetailScreen(
-        title = "Profile",
+        title = stringResource(R.string.profile),
         onBack = onBackClick,
         isLoading = isLoading && user == null,
         errorMessage = errorMessage
@@ -86,32 +90,32 @@ fun AdminProfileScreen(
             SgrmsStatusChip(status, toneForStatus(status))
         }
 
-        SgrmsInfoSection("Account") {
-            SgrmsInfoRow(icon = Icons.Default.Badge, label = "Username", value = username)
+        SgrmsInfoSection(stringResource(R.string.account)) {
+            SgrmsInfoRow(icon = Icons.Default.Badge, label = stringResource(R.string.username), value = username)
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = phoneNumber)
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = phoneNumber)
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Home, label = "Address", value = address)
+            SgrmsInfoRow(icon = Icons.Default.Home, label = stringResource(R.string.address), value = address)
             if (profileNote.isNotBlank()) {
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.Notes, label = "Note", value = profileNote)
+                SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.Notes, label = stringResource(R.string.note), value = profileNote)
             }
         }
 
-        SgrmsInfoSection("System") {
-            SgrmsInfoRow(icon = Icons.Default.ManageAccounts, label = "Accounts", value = "$userCount · $adminCount admin, $teacherAccountCount teachers, $studentAccountCount students")
+        SgrmsInfoSection(stringResource(R.string.system)) {
+            SgrmsInfoRow(icon = Icons.Default.ManageAccounts, label = stringResource(R.string.accounts), value = adminTeachersStudents2Text.format(userCount, adminCount, teacherAccountCount, studentAccountCount))
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.School, label = "School", value = "$classCount classes · $subjectCount subjects · $teacherCount teachers · $studentCount students")
+            SgrmsInfoRow(icon = Icons.Default.School, label = stringResource(R.string.school), value = classesSubjectsTeachersStudentsText.format(classCount, subjectCount, teacherCount, studentCount))
         }
 
         SgrmsGroupedCard {
-            SgrmsSettingsRow("Edit profile", Icons.Default.Edit, onEditProfileClick)
+            SgrmsSettingsRow(stringResource(R.string.edit_profile), Icons.Default.Edit, onEditProfileClick)
             SgrmsRowDivider()
-            SgrmsSettingsRow("Change password", Icons.Default.Lock, onChangePasswordClick)
+            SgrmsSettingsRow(stringResource(R.string.change_password), Icons.Default.Lock, onChangePasswordClick)
         }
 
         SgrmsGroupedCard {
-            SgrmsSettingsRow("Log out", Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
+            SgrmsSettingsRow(stringResource(R.string.log_out), Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
         }
     }
 }

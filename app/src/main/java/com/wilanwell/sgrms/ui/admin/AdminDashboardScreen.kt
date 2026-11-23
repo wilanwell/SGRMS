@@ -1,5 +1,8 @@
 package com.wilanwell.sgrms.ui.admin
 
+import androidx.annotation.StringRes
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -60,11 +63,12 @@ import com.wilanwell.sgrms.ui.theme.SgrmsSpacing
 import com.wilanwell.sgrms.viewmodel.AdminDashboardViewModel
 import java.util.Calendar
 
-/** "Good morning / afternoon / evening" from the phone's clock. */
-fun greetingFor(hourOfDay: Int): String = when (hourOfDay) {
-    in 5..11 -> "Good morning"
-    in 12..17 -> "Good afternoon"
-    else -> "Good evening"
+/** "Good morning / afternoon / evening" for the phone's clock, as a string resource. */
+@StringRes
+fun greetingFor(hourOfDay: Int): Int = when (hourOfDay) {
+    in 5..11 -> R.string.good_morning
+    in 12..17 -> R.string.good_afternoon
+    else -> R.string.good_evening
 }
 
 @Composable
@@ -87,7 +91,7 @@ fun AdminDashboardScreen(
     OnReturnToScreen { viewModel.load() }
     val summary = uiState.summary
     val shown: (Int) -> String = { if (uiState.loaded) it.toString() else "–" }
-    val name = adminName.ifBlank { "Admin" }
+    val name = adminName.ifBlank { stringResource(R.string.admin) }
 
     Column(
         modifier = Modifier
@@ -96,7 +100,7 @@ fun AdminDashboardScreen(
     ) {
         SgrmsPageHeader(
             title = name,
-            subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
+            subtitle = stringResource(greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))),
             trailing = {
                 IconButton(onClick = onProfileClick) {
                     SgrmsAvatar(name = name, size = 44.dp, imageUrl = adminImageUrl, legacyImageBase64 = adminImageBase64)
@@ -135,7 +139,7 @@ fun AdminDashboardScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
                         value = shown(summary.students),
-                        label = "Students",
+                        label = stringResource(R.string.students),
                         icon = Icons.Default.Group,
                         tint = MaterialTheme.colorScheme.primary,
                         container = MaterialTheme.colorScheme.primaryContainer,
@@ -144,7 +148,7 @@ fun AdminDashboardScreen(
                     )
                     SgrmsStatCard(
                         value = shown(summary.teachers),
-                        label = "Teachers",
+                        label = stringResource(R.string.teachers),
                         icon = Icons.Default.SupervisorAccount,
                         tint = SgrmsColors.Success,
                         container = SgrmsColors.SuccessContainer,
@@ -155,7 +159,7 @@ fun AdminDashboardScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
                         value = shown(summary.subjects),
-                        label = "Subjects",
+                        label = stringResource(R.string.subjects),
                         icon = Icons.AutoMirrored.Filled.MenuBook,
                         tint = SgrmsColors.Orange,
                         container = SgrmsColors.OrangeContainer,
@@ -164,7 +168,7 @@ fun AdminDashboardScreen(
                     )
                     SgrmsStatCard(
                         value = shown(summary.classes),
-                        label = "Classes",
+                        label = stringResource(R.string.classes),
                         icon = Icons.Default.School,
                         tint = SgrmsColors.Pink,
                         container = SgrmsColors.PinkContainer,
@@ -174,20 +178,20 @@ fun AdminDashboardScreen(
                 }
             }
 
-            SgrmsSectionTitle("Quick actions")
+            SgrmsSectionTitle(stringResource(R.string.quick_actions))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickAction(text = "Add teacher", icon = Icons.Default.PersonAdd, onClick = onAddTeacherClick, modifier = Modifier.weight(1f))
-                QuickAction(text = "Add student", icon = Icons.Default.PersonAdd, onClick = onAddStudentAccountClick, modifier = Modifier.weight(1f))
+                QuickAction(text = stringResource(R.string.add_teacher_2), icon = Icons.Default.PersonAdd, onClick = onAddTeacherClick, modifier = Modifier.weight(1f))
+                QuickAction(text = stringResource(R.string.add_student), icon = Icons.Default.PersonAdd, onClick = onAddStudentAccountClick, modifier = Modifier.weight(1f))
             }
 
             SgrmsGroupedCard {
-                NavRow(title = "User management", subtitle = "All login accounts and roles", icon = Icons.Default.ManageAccounts, onClick = onUserManagementClick)
+                NavRow(title = stringResource(R.string.user_management), subtitle = stringResource(R.string.all_login_accounts_and_roles), icon = Icons.Default.ManageAccounts, onClick = onUserManagementClick)
                 SgrmsRowDivider()
-                NavRow(title = "Reports", subtitle = "Student results and PDF reports", icon = Icons.Default.Summarize, onClick = onReportClick)
+                NavRow(title = stringResource(R.string.reports), subtitle = stringResource(R.string.student_results_and_pdf_reports), icon = Icons.Default.Summarize, onClick = onReportClick)
             }
 
             if (uiState.recentAccounts.isNotEmpty()) {
-                SgrmsSectionTitle("Recent accounts")
+                SgrmsSectionTitle(stringResource(R.string.recent_accounts))
                 SgrmsGroupedCard {
                     uiState.recentAccounts.forEachIndexed { index, user ->
                         if (index > 0) SgrmsRowDivider()
@@ -198,7 +202,7 @@ fun AdminDashboardScreen(
                             leading = { SgrmsAvatar(name = user.fullName.ifBlank { user.email }, size = 40.dp) },
                             trailing = {
                                 SgrmsStatusChip(
-                                    text = user.role.ifBlank { "User" },
+                                    text = user.role.ifBlank { stringResource(R.string.user) },
                                     tone = if (role == UserRole.TEACHER) ChipTone.Success else ChipTone.Primary
                                 )
                             }
@@ -220,6 +224,8 @@ private fun AccountsHeroCard(
     classes: Int,
     loaded: Boolean
 ) {
+    val classes3Text = stringResource(R.string.classes_3)
+    val t1ClassText = stringResource(R.string.t_1_class)
     Surface(
         shape = RoundedCornerShape(SgrmsRadius.Hero),
         color = MaterialTheme.colorScheme.primary,
@@ -228,11 +234,11 @@ private fun AccountsHeroCard(
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Total accounts", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
+                    Text(stringResource(R.string.total_accounts), style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
                     Text(if (loaded) total.toString() else "–", style = MaterialTheme.typography.displayMedium, color = Color.White)
                 }
                 if (loaded) Text(
-                    text = if (classes == 1) "1 class" else "$classes classes",
+                    text = if (classes == 1) t1ClassText else classes3Text.format(classes),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -251,9 +257,9 @@ private fun AccountsHeroCard(
             }
 
             if (loaded) Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                Text("$admins Admin", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
-                Text("$teachers Teachers", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
-                Text("$students Students", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.admin_2, admins), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.teachers_2, teachers), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
+                Text(stringResource(R.string.students_2, students), style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
             }
         }
     }

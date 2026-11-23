@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.report
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -58,6 +60,9 @@ fun ReportScreen(
     onDownloadPdfClick: (String) -> Unit = {},
     onUpdateReportClick: (String) -> Unit = {}
 ) {
+    val currentText = stringResource(R.string.current)
+    val needsUpdateText = stringResource(R.string.needs_update)
+    val reportsAppearOnceStudentsHaveCompletedText = stringResource(R.string.reports_appear_once_students_have_completed)
     val context = LocalContext.current
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -107,7 +112,7 @@ fun ReportScreen(
 
     val classList = listOf("All Classes") + students
         .map { student ->
-            student.className.ifBlank { "Not assigned" }
+            student.className.ifBlank { stringResource(R.string.not_assigned) }
         }
         .filter { className ->
             className.isNotBlank()
@@ -118,7 +123,7 @@ fun ReportScreen(
     val statusList = listOf(
         "All",
         "Generated",
-        "Needs Update"
+        needsUpdateText
     )
 
     val dateList = listOf(
@@ -152,7 +157,7 @@ fun ReportScreen(
 
                 ReportPdfGradeItem(
                     grade = grade,
-                    subjectName = subject?.subjectName ?: "Unknown Subject",
+                    subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
                     subjectCode = subject?.subjectCode ?: "-"
                 )
             }.sortedBy { item ->
@@ -191,11 +196,11 @@ fun ReportScreen(
                 report = report,
                 student = student,
                 gradeItems = gradeItems,
-                studentName = student.studentName.ifBlank { "Unknown Student" },
+                studentName = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
                 studentCode = student.studentCode.ifBlank { "-" },
-                className = student.className.ifBlank { "Not assigned" },
+                className = student.className.ifBlank { stringResource(R.string.not_assigned) },
                 status = if (hasPendingGrades || completedGrades.isEmpty()) {
-                    "Needs Update"
+                    needsUpdateText
                 } else {
                     "Generated"
                 }
@@ -249,9 +254,9 @@ fun ReportScreen(
 
     if (showDeleteDialog && selectedReportToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Hide this report?",
-            message = "The report is hidden from this list until you refresh. Grade records are not deleted.",
-            confirmText = "Hide",
+            title = stringResource(R.string.hide_this_report),
+            message = stringResource(R.string.the_report_is_hidden_from_this),
+            confirmText = stringResource(R.string.hide),
             onConfirmClick = {
                 selectedReportToDelete?.let { hiddenReportStudentIds.add(it.student.studentId) }
                 showDeleteDialog = false
@@ -265,25 +270,25 @@ fun ReportScreen(
     }
 
     SgrmsListScreen(
-        title = "Reports",
-        subtitle = "${filteredReports.size} of $totalReports students",
+        title = stringResource(R.string.reports),
+        subtitle = stringResource(R.string.of_students, filteredReports.size, totalReports),
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search student, code or class",
+        searchPlaceholder = stringResource(R.string.search_student_code_or_class),
         isLoading = isLoading && students.isEmpty(),
         errorMessage = errorMessage,
         isEmpty = filteredReports.isEmpty(),
-        empty = EmptyContent("No reports yet", "Reports appear once students have completed grades.", Icons.Default.Summarize),
+        empty = EmptyContent(stringResource(R.string.no_reports_yet), reportsAppearOnceStudentsHaveCompletedText, Icons.Default.Summarize),
         chipGroups = listOf(
             ChipGroup(statusList, selectedStatus) { selectedStatus = it },
             ChipGroup(classList, selectedClass) { selectedClass = it }
         ),
         headerActions = {
             SgrmsOverflowMenu(
-                contentDescription = "Sort and refresh",
+                contentDescription = stringResource(R.string.sort_and_refresh),
                 actions = dateList.map { option ->
-                    RowAction(if (option == selectedDate) "$option (current)" else option, Icons.AutoMirrored.Filled.Sort) { selectedDate = option }
-                } + RowAction("Refresh list", Icons.Default.Refresh) {
+                    RowAction(if (option == selectedDate) currentText.format(option) else option, Icons.AutoMirrored.Filled.Sort) { selectedDate = option }
+                } + RowAction(stringResource(R.string.refresh_list), Icons.Default.Refresh) {
                     hiddenReportStudentIds.clear()
                     studentViewModel.loadStudents()
                     gradeViewModel.loadGrades()
@@ -295,7 +300,7 @@ fun ReportScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 SgrmsStatCard(
                     value = generatedReports.size.toString(),
-                    label = "Reports ready",
+                    label = stringResource(R.string.reports_ready),
                     icon = Icons.Default.Summarize,
                     tint = MaterialTheme.colorScheme.primary,
                     container = MaterialTheme.colorScheme.primaryContainer,
@@ -303,7 +308,7 @@ fun ReportScreen(
                 )
                 SgrmsStatCard(
                     value = "%.1f%%".format(averageClassMark),
-                    label = "Average mark",
+                    label = stringResource(R.string.average_mark),
                     icon = Icons.Default.Assessment,
                     tint = com.wilanwell.sgrms.ui.theme.SgrmsColors.Success,
                     container = com.wilanwell.sgrms.ui.theme.SgrmsColors.SuccessContainer,
@@ -326,10 +331,10 @@ fun ReportScreen(
                         SgrmsStatusChip(item.status, ChipTone.Warning)
                     }
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${item.studentName}",
+                        contentDescription = stringResource(R.string.actions_for, item.studentName),
                         actions = listOf(
-                            RowAction("View report", Icons.Default.Visibility) { onViewReportDetailClick(item.report.reportId) },
-                            RowAction("Download PDF", Icons.Default.PictureAsPdf) {
+                            RowAction(stringResource(R.string.view_report), Icons.Default.Visibility) { onViewReportDetailClick(item.report.reportId) },
+                            RowAction(stringResource(R.string.download_pdf), Icons.Default.PictureAsPdf) {
                                 ReportPdfGenerator.saveReportAsPdf(
                                     context = context,
                                     report = item.report,
@@ -338,8 +343,8 @@ fun ReportScreen(
                                 )
                                 onDownloadPdfClick(item.report.reportId)
                             },
-                            RowAction("Update remarks", Icons.Default.EditNote) { onUpdateReportClick(item.report.reportId) },
-                            RowAction("Hide from list", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.update_remarks), Icons.Default.EditNote) { onUpdateReportClick(item.report.reportId) },
+                            RowAction(stringResource(R.string.hide_from_list), Icons.Default.Delete, destructive = true) {
                                 selectedReportToDelete = item
                                 showDeleteDialog = true
                             }

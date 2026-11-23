@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.student
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -145,7 +147,7 @@ fun EditStudentScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Edit Student",
+            title = stringResource(R.string.edit_student),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -165,20 +167,20 @@ fun EditStudentScreen(
             if (selectedStudent == null && !uiState.isLoading) {
                 SgrmsEmptyStateCard(
                     icon = Icons.Default.Person,
-                    title = "Student not found",
-                    message = "The selected student record could not be loaded."
+                    title = stringResource(R.string.student_not_found),
+                    message = stringResource(R.string.the_selected_student_record_could_not)
                 )
             } else {
                 SgrmsFormCard(
-                    title = "Student Information",
-                    subtitle = "Update class, gender, status, and contact information",
+                    title = stringResource(R.string.student_information),
+                    subtitle = stringResource(R.string.update_class_gender_status_and_contact),
                     icon = Icons.Default.Person
                 ) {
                     SgrmsTextField(
                         value = studentName,
                         onValueChange = {},
-                        label = "Student Name",
-                        placeholder = "Student name",
+                        label = stringResource(R.string.student_name),
+                        placeholder = stringResource(R.string.student_name_2),
                         readOnly = true
                     )
 
@@ -187,8 +189,8 @@ fun EditStudentScreen(
                     SgrmsTextField(
                         value = studentCode,
                         onValueChange = {},
-                        label = "Student Code",
-                        placeholder = "Student code",
+                        label = stringResource(R.string.student_code),
+                        placeholder = stringResource(R.string.student_code_2),
                         readOnly = true
                     )
 
@@ -201,11 +203,11 @@ fun EditStudentScreen(
                             emailError = false
                             clearMessages()
                         },
-                        label = "Email",
-                        placeholder = "Example: student@sgrms.com",
+                        label = stringResource(R.string.email),
+                        placeholder = stringResource(R.string.example_student_sgrms_com),
                         icon = Icons.Default.Email,
                         isError = emailError,
-                        errorMessage = "Email is required"
+                        errorMessage = stringResource(R.string.email_is_required)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -217,19 +219,19 @@ fun EditStudentScreen(
                             phoneNumberError = false
                             clearMessages()
                         },
-                        label = "Phone Number",
-                        placeholder = "Example: 0123456789",
+                        label = stringResource(R.string.phone_number),
+                        placeholder = stringResource(R.string.example_0123456789),
                         icon = Icons.Default.Phone,
                         isError = phoneNumberError,
-                        errorMessage = "Phone number is required"
+                        errorMessage = stringResource(R.string.phone_number_is_required)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SgrmsDropdownField(
                         value = selectedClass,
-                        label = "Class",
-                        placeholder = "Select class",
+                        label = stringResource(R.string.class_label),
+                        placeholder = stringResource(R.string.select_class),
                         expanded = classExpanded,
                         onExpandedChange = {
                             classExpanded = it
@@ -244,13 +246,13 @@ fun EditStudentScreen(
                             }
                         },
                         isError = classError,
-                        errorMessage = "Class is required"
+                        errorMessage = stringResource(R.string.class_is_required)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SgrmsSegmentedField(
-                        label = "Gender",
+                        label = stringResource(R.string.gender),
                         options = genderList,
                         selected = selectedGender,
                         onSelect = { it ->
@@ -259,13 +261,13 @@ fun EditStudentScreen(
                             clearMessages()
                         },
                         isError = genderError,
-                        errorMessage = "Gender is required"
+                        errorMessage = stringResource(R.string.gender_is_required)
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     SgrmsSegmentedField(
-                        label = "Status",
+                        label = stringResource(R.string.status),
                         options = statusList,
                         selected = selectedStatus,
                         onSelect = { it ->
@@ -274,7 +276,7 @@ fun EditStudentScreen(
                             clearMessages()
                         },
                         isError = statusError,
-                        errorMessage = "Status is required"
+                        errorMessage = stringResource(R.string.status_is_required)
                     )
 
                     if (uiState.errorMessage.isNotBlank() || classLoadError.isNotBlank()) {
@@ -299,7 +301,7 @@ fun EditStudentScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                    cancelText = "Cancel",
+                                    cancelText = stringResource(R.string.cancel),
                                     confirmText = if (uiState.isLoading) {
                                         "Saving..."
                                     } else {

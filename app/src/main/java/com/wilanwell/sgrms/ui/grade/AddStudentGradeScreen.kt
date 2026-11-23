@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -84,7 +86,7 @@ fun AddStudentGradeScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopBar(
-                title = "Add Student Grade",
+                title = stringResource(R.string.add_student_grade),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false
@@ -125,7 +127,7 @@ fun AddStudentGradeScreen(
                     item {
                         SgrmsEmptyStateCard(
                             icon = Icons.Default.Person,
-                            title = "Unable to load",
+                            title = stringResource(R.string.unable_to_load),
                             message = errorMessage
                         )
                     }
@@ -135,8 +137,8 @@ fun AddStudentGradeScreen(
                     item {
                         SgrmsEmptyStateCard(
                             icon = Icons.Default.MenuBook,
-                            title = "No subjects found",
-                            message = "There are no subjects available for this student."
+                            title = stringResource(R.string.no_subjects_found),
+                            message = stringResource(R.string.there_are_no_subjects_available_for)
                         )
                     }
                 }
@@ -155,14 +157,14 @@ fun AddStudentGradeScreen(
                                 modifier = Modifier.padding(18.dp)
                             ) {
                                 Text(
-                                    text = student?.studentName ?: "Unknown Student",
+                                    text = student?.studentName ?: stringResource(R.string.unknown_student),
                                     color = Color.White,
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold
                                 )
 
                                 Text(
-                                    text = student?.className ?: "Unknown Class",
+                                    text = student?.className ?: stringResource(R.string.unknown_class),
                                     color = Color.White.copy(alpha = 0.88f),
                                     fontSize = 14.sp
                                 )
@@ -172,13 +174,13 @@ fun AddStudentGradeScreen(
 
                     item {
                         Text(
-                            text = "Subjects",
+                            text = stringResource(R.string.subjects),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
 
                         Text(
-                            text = "Enter marks for the subjects below.",
+                            text = stringResource(R.string.enter_marks_for_the_subjects_below),
                             fontSize = 14.sp,
                             color = ColorOnSurfaceVariant
                         )
@@ -218,7 +220,7 @@ fun AddStudentGradeScreen(
                             )
                         ) {
                             Text(
-                                text = "Done",
+                                text = stringResource(R.string.done),
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -238,6 +240,8 @@ private fun AddStudentGradeSubjectCard(
     onRemarksChange: (String) -> Unit,
     onSaveClick: () -> Unit
 ) {
+    val addGradeText = stringResource(R.string.add_grade)
+    val updateGradeText = stringResource(R.string.update_grade)
     val marks = item.marksText.toDoubleOrNull()
     val gradeLetter = if (marks != null) {
         GradeCalculator.gradeLetter(marks)
@@ -273,7 +277,7 @@ private fun AddStudentGradeSubjectCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.MenuBook,
-                        contentDescription = "Subject",
+                        contentDescription = stringResource(R.string.subject),
                         tint = ColorPrimary,
                         modifier = Modifier.size(27.dp)
                     )
@@ -285,7 +289,7 @@ private fun AddStudentGradeSubjectCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = item.subjectName.ifBlank { "Unknown Subject" },
+                        text = item.subjectName.ifBlank { stringResource(R.string.unknown_subject) },
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -317,7 +321,7 @@ private fun AddStudentGradeSubjectCard(
                     onMarksChange(filtered)
                 },
                 label = {
-                    Text("Marks")
+                    Text(stringResource(R.string.marks))
                 },
                 placeholder = {
                     Text("0 - 100")
@@ -325,7 +329,7 @@ private fun AddStudentGradeSubjectCard(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Assessment,
-                        contentDescription = "Marks"
+                        contentDescription = stringResource(R.string.marks)
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -344,10 +348,10 @@ private fun AddStudentGradeSubjectCard(
                 value = item.remarks,
                 onValueChange = onRemarksChange,
                 label = {
-                    Text("Remarks")
+                    Text(stringResource(R.string.remarks))
                 },
                 placeholder = {
-                    Text("Optional remarks")
+                    Text(stringResource(R.string.optional_remarks))
                 },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
@@ -393,9 +397,9 @@ private fun AddStudentGradeSubjectCard(
                 } else {
                     Text(
                         text = if (item.existingGradeId.isBlank()) {
-                            "Add Grade"
+                            addGradeText
                         } else {
-                            "Update Grade"
+                            updateGradeText
                         },
                         color = Color.White,
                         fontSize = 15.sp,

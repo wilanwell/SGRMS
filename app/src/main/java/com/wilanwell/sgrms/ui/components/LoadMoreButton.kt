@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -33,7 +35,7 @@ fun LoadMoreButton(
             )
         } else {
             OutlinedButton(onClick = onClick) {
-                Text(text = "Load more")
+                Text(text = stringResource(R.string.load_more))
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.report
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -48,6 +50,7 @@ fun StudentReportSummaryScreen(
     onBackClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
+    val reportDateText = stringResource(R.string.report_date)
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -81,7 +84,7 @@ fun StudentReportSummaryScreen(
 
         StudentReportSubjectItem(
             grade = grade,
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
         )
     }.sortedByDescending { item ->
@@ -156,13 +159,13 @@ fun StudentReportSummaryScreen(
     val isLoading = studentUiState.isLoading || gradeUiState.isLoading
 
     SgrmsDetailScreen(
-        title = "My report",
+        title = stringResource(R.string.my_report),
         onBack = null,
         isLoading = isLoading && student == null,
         errorMessage = gradeUiState.errorMessage.ifBlank { studentUiState.errorMessage },
         bottomBar = {
             SgrmsPrimaryButton(
-                text = "Download PDF",
+                text = stringResource(R.string.download_pdf),
                 icon = Icons.Default.PictureAsPdf,
                 enabled = completedSubjectItems.isNotEmpty(),
                 onClick = { downloadPdf() },
@@ -171,11 +174,11 @@ fun StudentReportSummaryScreen(
         }
     ) {
         SgrmsDetailHero(
-            title = student?.studentName ?: "Student",
-            subtitle = listOfNotNull(student?.className, "Report date $reportDate").filter { it.isNotBlank() }.joinToString(" · "),
+            title = student?.studentName ?: stringResource(R.string.student),
+            subtitle = listOfNotNull(student?.className, reportDateText.format(reportDate)).filter { it.isNotBlank() }.joinToString(" · "),
             leading = {
                 SgrmsAvatar(
-                    name = student?.studentName ?: "Student",
+                    name = student?.studentName ?: stringResource(R.string.student),
                     size = 72.dp,
                     imageUrl = student?.profileImageUrl.orEmpty(),
                     legacyImageBase64 = student?.profileImageBase64.orEmpty()
@@ -188,7 +191,7 @@ fun StudentReportSummaryScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SgrmsStatCard(
                 value = overallGrade,
-                label = "Overall grade",
+                label = stringResource(R.string.overall_grade),
                 icon = Icons.Default.Grade,
                 tint = MaterialTheme.colorScheme.primary,
                 container = MaterialTheme.colorScheme.primaryContainer,
@@ -196,7 +199,7 @@ fun StudentReportSummaryScreen(
             )
             SgrmsStatCard(
                 value = "%.1f%%".format(averageMarks),
-                label = "$totalSubjects subjects",
+                label = stringResource(R.string.subjects_2, totalSubjects),
                 icon = Icons.Default.Assessment,
                 tint = com.wilanwell.sgrms.ui.theme.SgrmsColors.Success,
                 container = com.wilanwell.sgrms.ui.theme.SgrmsColors.SuccessContainer,
@@ -204,9 +207,9 @@ fun StudentReportSummaryScreen(
             )
         }
 
-        SgrmsInfoSection("Subjects") {
+        SgrmsInfoSection(stringResource(R.string.subjects)) {
             if (subjectItems.isEmpty()) {
-                Text("Your grades will appear here after your teacher adds marks.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
+                Text(stringResource(R.string.your_grades_will_appear_here_after), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
             } else {
                 subjectItems.forEachIndexed { index, item ->
                     if (index > 0) SgrmsRowDivider()
@@ -221,7 +224,7 @@ fun StudentReportSummaryScreen(
             }
         }
 
-        SgrmsInfoSection("Teacher's remarks") {
+        SgrmsInfoSection(stringResource(R.string.teacher_s_remarks)) {
             Text(reportRemarks, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 14.dp))
         }
     }

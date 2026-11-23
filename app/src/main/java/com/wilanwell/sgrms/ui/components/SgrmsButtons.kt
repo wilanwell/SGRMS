@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -174,7 +176,7 @@ fun SgrmsViewButton(
     ) {
         Icon(
             imageVector = Icons.Default.Visibility,
-            contentDescription = "View",
+            contentDescription = stringResource(R.string.view),
             tint = ColorPrimary
         )
     }
@@ -194,7 +196,7 @@ fun SgrmsEditButton(
     ) {
         Icon(
             imageVector = Icons.Default.Edit,
-            contentDescription = "Edit",
+            contentDescription = stringResource(R.string.edit),
             tint = ColorPrimary
         )
     }
@@ -214,7 +216,7 @@ fun SgrmsDeleteButton(
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = "Delete",
+            contentDescription = stringResource(R.string.delete),
             tint = SgrmsColors.Error
         )
     }

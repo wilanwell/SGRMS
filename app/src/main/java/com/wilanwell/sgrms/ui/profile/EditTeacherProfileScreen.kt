@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -62,6 +64,9 @@ fun EditTeacherProfileScreen(
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
+    val departmentIsRequiredText = stringResource(R.string.department_is_required)
+    val enterAValidPhoneNumberText = stringResource(R.string.enter_a_valid_phone_number)
+    val positionIsRequiredText = stringResource(R.string.position_is_required)
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -110,15 +115,15 @@ fun EditTeacherProfileScreen(
         clearErrors()
 
         if (!isValidPhone(phoneNumber)) {
-            phoneNumberError = "Enter a valid phone number"
+            phoneNumberError = enterAValidPhoneNumberText
         }
 
         if (department.isBlank()) {
-            departmentError = "Department is required"
+            departmentError = departmentIsRequiredText
         }
 
         if (position.isBlank()) {
-            positionError = "Position is required"
+            positionError = positionIsRequiredText
         }
 
         return phoneNumberError.isBlank() &&
@@ -169,7 +174,7 @@ fun EditTeacherProfileScreen(
             .navigationBarsPadding()
     ) {
         TopBar(
-            title = "Edit Teacher Profile",
+            title = stringResource(R.string.edit_teacher_profile),
             showBack = true,
             onBackClick = onBackClick
         )
@@ -199,13 +204,13 @@ fun EditTeacherProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Teacher Information",
+                        text = stringResource(R.string.teacher_information),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Update contact, professional details, and profile picture",
+                        text = stringResource(R.string.update_contact_professional_details_and_profile),
                         fontSize = 14.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -218,7 +223,7 @@ fun EditTeacherProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "Loading teacher profile...",
+                            text = stringResource(R.string.loading_teacher_profile),
                             fontSize = 14.sp,
                             color = ColorOnSurfaceVariant
                         )
@@ -249,7 +254,7 @@ fun EditTeacherProfileScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "Remove Picture",
+                                    text = stringResource(R.string.remove_picture),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -272,7 +277,7 @@ fun EditTeacherProfileScreen(
                         SgrmsTextField(
                             value = teacher?.teacherName ?: "",
                             onValueChange = {},
-                            label = "Teacher Name",
+                            label = stringResource(R.string.teacher_name),
                             leadingIcon = Icons.Default.Person,
                             enabled = false
                         )
@@ -282,7 +287,7 @@ fun EditTeacherProfileScreen(
                         SgrmsTextField(
                             value = teacher?.staffId ?: "",
                             onValueChange = {},
-                            label = "Staff ID",
+                            label = stringResource(R.string.staff_id),
                             leadingIcon = Icons.Default.Badge,
                             enabled = false
                         )
@@ -292,7 +297,7 @@ fun EditTeacherProfileScreen(
                         SgrmsTextField(
                             value = teacher?.email ?: "",
                             onValueChange = {},
-                            label = "Email",
+                            label = stringResource(R.string.email),
                             leadingIcon = Icons.Default.Badge,
                             enabled = false
                         )
@@ -300,7 +305,7 @@ fun EditTeacherProfileScreen(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         Text(
-                            text = "Contact Details",
+                            text = stringResource(R.string.contact_details),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth()
@@ -315,7 +320,7 @@ fun EditTeacherProfileScreen(
                                 phoneNumberError = ""
                                 generalError = ""
                             },
-                            label = "Phone Number",
+                            label = stringResource(R.string.phone_number),
                             leadingIcon = Icons.Default.Phone,
                             isError = phoneNumberError.isNotBlank(),
                             errorMessage = phoneNumberError,
@@ -330,7 +335,7 @@ fun EditTeacherProfileScreen(
                                 address = it
                                 clearErrors()
                             },
-                            label = "Address",
+                            label = stringResource(R.string.address),
                             leadingIcon = Icons.Default.Home,
                             singleLine = false,
                             minLines = 2,
@@ -340,7 +345,7 @@ fun EditTeacherProfileScreen(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         Text(
-                            text = "Professional Details",
+                            text = stringResource(R.string.professional_details),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth()
@@ -355,7 +360,7 @@ fun EditTeacherProfileScreen(
                                 departmentError = ""
                                 generalError = ""
                             },
-                            label = "Department",
+                            label = stringResource(R.string.department),
                             leadingIcon = Icons.Default.School,
                             isError = departmentError.isNotBlank(),
                             errorMessage = departmentError,
@@ -371,7 +376,7 @@ fun EditTeacherProfileScreen(
                                 positionError = ""
                                 generalError = ""
                             },
-                            label = "Position",
+                            label = stringResource(R.string.position),
                             leadingIcon = Icons.Default.Work,
                             isError = positionError.isNotBlank(),
                             errorMessage = positionError,
@@ -386,7 +391,7 @@ fun EditTeacherProfileScreen(
                                 officeLocation = it
                                 clearErrors()
                             },
-                            label = "Office Location",
+                            label = stringResource(R.string.office_location),
                             leadingIcon = Icons.Default.LocationOn,
                             enabled = !isSaving
                         )
@@ -399,7 +404,7 @@ fun EditTeacherProfileScreen(
                                 qualification = it
                                 clearErrors()
                             },
-                            label = "Qualification",
+                            label = stringResource(R.string.qualification),
                             leadingIcon = Icons.Default.Work,
                             enabled = !isSaving
                         )
@@ -412,7 +417,7 @@ fun EditTeacherProfileScreen(
                                 specialization = it
                                 clearErrors()
                             },
-                            label = "Specialization",
+                            label = stringResource(R.string.specialization),
                             leadingIcon = Icons.Default.MenuBook,
                             enabled = !isSaving
                         )
@@ -425,7 +430,7 @@ fun EditTeacherProfileScreen(
                                 profileNote = it
                                 clearErrors()
                             },
-                            label = "Profile Note",
+                            label = stringResource(R.string.profile_note),
                             leadingIcon = Icons.Default.Note,
                             singleLine = false,
                             minLines = 3,
@@ -467,7 +472,7 @@ fun EditTeacherProfileScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Save Changes",
+                                    text = stringResource(R.string.save_changes),
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -489,7 +494,7 @@ fun EditTeacherProfileScreen(
                             )
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )

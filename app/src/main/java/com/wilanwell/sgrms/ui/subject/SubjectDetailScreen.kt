@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -52,6 +54,8 @@ fun SubjectDetailScreen(
     onEditClick: () -> Unit = {},
     onViewStudentsClick: () -> Unit = {}
 ) {
+    val addedToSubjectText = stringResource(R.string.added_to_subject)
+    val noStudentsYetUseAddStudentText = stringResource(R.string.no_students_yet_use_add_student)
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
@@ -115,7 +119,7 @@ fun SubjectDetailScreen(
                         subjectId = subjectId,
                         marks = 0.0,
                         gradeLetter = "",
-                        remarks = "Added to subject",
+                        remarks = addedToSubjectText,
                         status = "Pending",
                         createdByTeacherId = subject.teacherId,
                         createdAt = System.currentTimeMillis()
@@ -133,26 +137,26 @@ fun SubjectDetailScreen(
     val gradeByStudent = subjectGrades.associateBy { it.studentId }
 
     SgrmsDetailScreen(
-        title = "Subject",
+        title = stringResource(R.string.subject),
         onBack = onBackClick,
         isLoading = subjectUiState.isLoading && subject == null,
         errorMessage = subjectUiState.errorMessage.ifBlank { studentGradeErrorMessage },
         bottomBar = if (subject != null) {
             {
-                SgrmsSecondaryButton(text = "Edit", icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
-                SgrmsPrimaryButton(text = "Add student", icon = Icons.Default.PersonAdd, onClick = { showAddStudentDialog = true }, modifier = Modifier.weight(1f))
+                SgrmsSecondaryButton(text = stringResource(R.string.edit), icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
+                SgrmsPrimaryButton(text = stringResource(R.string.add_student), icon = Icons.Default.PersonAdd, onClick = { showAddStudentDialog = true }, modifier = Modifier.weight(1f))
             }
         } else {
             null
         }
     ) {
         if (subject == null) {
-            SgrmsEmptyState(title = "Subject not found", message = "The selected subject could not be loaded.", icon = Icons.AutoMirrored.Filled.MenuBook)
+            SgrmsEmptyState(title = stringResource(R.string.subject_not_found), message = stringResource(R.string.the_selected_subject_could_not_be), icon = Icons.AutoMirrored.Filled.MenuBook)
             return@SgrmsDetailScreen
         }
 
         SgrmsDetailHero(
-            title = subject.subjectName.ifBlank { "Unnamed subject" },
+            title = subject.subjectName.ifBlank { stringResource(R.string.unnamed_subject) },
             subtitle = subject.subjectCode,
             leading = {
                 SgrmsIconTile(
@@ -164,25 +168,25 @@ fun SubjectDetailScreen(
             }
         ) {
             if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
-            SgrmsStatusChip("${studentsTakingSubject.size} students", ChipTone.Primary)
+            SgrmsStatusChip(stringResource(R.string.students_3, studentsTakingSubject.size), ChipTone.Primary)
         }
 
-        SgrmsInfoSection("Details") {
-            SgrmsInfoRow(icon = Icons.Default.Person, label = "Teacher", value = subject.teacherName.ifBlank { "Not assigned" })
+        SgrmsInfoSection(stringResource(R.string.details)) {
+            SgrmsInfoRow(icon = Icons.Default.Person, label = stringResource(R.string.teacher), value = subject.teacherName.ifBlank { stringResource(R.string.not_assigned) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Category, label = "Category", value = subject.category.ifBlank { "-" })
+            SgrmsInfoRow(icon = Icons.Default.Category, label = stringResource(R.string.category), value = subject.category.ifBlank { "-" })
         }
 
         SgrmsInfoSection(
-            title = "Students taking this subject",
+            title = stringResource(R.string.students_taking_this_subject),
             trailing = {
-                androidx.compose.material3.TextButton(onClick = onViewStudentsClick) { Text("All students") }
+                androidx.compose.material3.TextButton(onClick = onViewStudentsClick) { Text(stringResource(R.string.all_students)) }
             }
         ) {
             when {
                 isStudentGradeLoading -> Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
                 studentsTakingSubject.isEmpty() -> Text(
-                    "No students yet. Use Add student to enrol one.",
+                    noStudentsYetUseAddStudentText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)
@@ -200,7 +204,7 @@ fun SubjectDetailScreen(
                                 val letter = grade.gradeLetter.ifBlank { com.wilanwell.sgrms.utils.GradeCalculator.gradeLetter(grade.marks) }
                                 SgrmsStatusChip("$letter · ${"%.0f".format(grade.marks)}", toneForGrade(letter))
                             } else {
-                                SgrmsStatusChip("Pending", ChipTone.Warning)
+                                SgrmsStatusChip(stringResource(R.string.pending), ChipTone.Warning)
                             }
                         }
                     )

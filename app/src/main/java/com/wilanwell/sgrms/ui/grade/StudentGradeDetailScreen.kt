@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -46,6 +48,9 @@ fun StudentGradeDetailScreen(
     onAddGradeClick: () -> Unit = {},
     onGenerateReportClick: () -> Unit = {}
 ) {
+    val noGradeRecordsYetUseEnterText = stringResource(R.string.no_grade_records_yet_use_enter)
+    val noGradesText = stringResource(R.string.no_grades)
+    val overallText = stringResource(R.string.overall)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
@@ -73,8 +78,8 @@ fun StudentGradeDetailScreen(
 
     val subjects = subjectUiState.subjects
 
-    val studentName = student?.studentName ?: "Unknown Student"
-    val className = student?.className ?: "Unknown Class"
+    val studentName = student?.studentName ?: stringResource(R.string.unknown_student)
+    val className = student?.className ?: stringResource(R.string.unknown_class)
 
     val gradeDisplayList = allGrades.map { grade ->
         val subject = subjects.find { subject ->
@@ -83,7 +88,7 @@ fun StudentGradeDetailScreen(
 
         StudentGradeSubjectDisplayItem(
             grade = grade,
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
         )
     }.sortedBy { item ->
@@ -121,19 +126,19 @@ fun StudentGradeDetailScreen(
     }
 
     SgrmsDetailScreen(
-        title = "Grades",
+        title = stringResource(R.string.grades),
         onBack = onBackClick,
         isLoading = isLoading && student == null,
         errorMessage = errorMessage,
         bottomBar = if (student == null) null else {
             {
-            SgrmsSecondaryButton(text = "Report", icon = Icons.Default.Summarize, onClick = onGenerateReportClick, modifier = Modifier.weight(1f))
-            SgrmsPrimaryButton(text = "Enter marks", icon = Icons.Default.EditNote, onClick = onAddGradeClick, modifier = Modifier.weight(1f))
+            SgrmsSecondaryButton(text = stringResource(R.string.report), icon = Icons.Default.Summarize, onClick = onGenerateReportClick, modifier = Modifier.weight(1f))
+            SgrmsPrimaryButton(text = stringResource(R.string.enter_marks), icon = Icons.Default.EditNote, onClick = onAddGradeClick, modifier = Modifier.weight(1f))
             }
         }
     ) {
         if (student == null) {
-            SgrmsEmptyState(title = "Student not found", message = "This student could not be loaded. It may have been deleted.", icon = Icons.Default.Person)
+            SgrmsEmptyState(title = stringResource(R.string.student_not_found), message = stringResource(R.string.this_student_could_not_be_loaded), icon = Icons.Default.Person)
             return@SgrmsDetailScreen
         }
 
@@ -149,14 +154,14 @@ fun StudentGradeDetailScreen(
                 )
             }
         ) {
-            SgrmsStatusChip(if (completedGrades.isEmpty()) "No grades" else "Overall $overallGrade", if (completedGrades.isEmpty()) ChipTone.Neutral else toneForGrade(overallGrade))
+            SgrmsStatusChip(if (completedGrades.isEmpty()) noGradesText else overallText.format(overallGrade), if (completedGrades.isEmpty()) ChipTone.Neutral else toneForGrade(overallGrade))
             SgrmsStatusChip("Avg ${"%.1f".format(averageMarks)}%", ChipTone.Primary)
         }
 
-        SgrmsInfoSection(title = "Subjects ($subjectCount graded of ${allGrades.size})") {
+        SgrmsInfoSection(title = stringResource(R.string.subjects_graded_of, subjectCount, allGrades.size)) {
             if (gradeDisplayList.isEmpty()) {
                 Text(
-                    "No grade records yet. Use Enter marks to add them.",
+                    noGradeRecordsYetUseEnterText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)

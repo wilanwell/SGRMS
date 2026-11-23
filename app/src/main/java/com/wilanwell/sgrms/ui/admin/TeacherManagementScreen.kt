@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
@@ -46,6 +48,7 @@ fun TeacherManagementScreen(
     onViewTeacherClick: (String) -> Unit = {},
     onEditTeacherClick: (String) -> Unit = {}
 ) {
+    val addATeacherAccountOrChangeText = stringResource(R.string.add_a_teacher_account_or_change)
     val context = LocalContext.current
 
     val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
@@ -67,13 +70,13 @@ fun TeacherManagementScreen(
 
     val departmentList = listOf("All Departments") + teachers
         .map { teacher ->
-            teacher.department.ifBlank { "Not specified" }
+            teacher.department.ifBlank { stringResource(R.string.not_specified) }
         }
         .distinct()
         .sorted()
 
     val filteredTeachers = teachers.filter { teacher ->
-        val teacherDepartment = teacher.department.ifBlank { "Not specified" }
+        val teacherDepartment = teacher.department.ifBlank { stringResource(R.string.not_specified) }
 
         val matchesSearch =
             teacher.teacherName.contains(searchText, ignoreCase = true) ||
@@ -90,8 +93,8 @@ fun TeacherManagementScreen(
 
     if (showDeleteDialog && selectedTeacherToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete Teacher",
-            message = "Are you sure you want to delete this teacher account? This will remove the teacher profile from Firestore.",
+            title = stringResource(R.string.delete_teacher),
+            message = stringResource(R.string.are_you_sure_you_want_to_3),
             onConfirmClick = {
                 selectedTeacherToDelete?.let { teacher ->
                     teacherViewModel.deleteTeacher(
@@ -110,22 +113,22 @@ fun TeacherManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Teachers",
-        subtitle = "${filteredTeachers.size} of ${teachers.size} teachers",
+        title = stringResource(R.string.teachers),
+        subtitle = stringResource(R.string.of_teachers, filteredTeachers.size, teachers.size),
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search name, staff ID or email",
+        searchPlaceholder = stringResource(R.string.search_name_staff_id_or_email),
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         isEmpty = filteredTeachers.isEmpty(),
-        empty = EmptyContent("No teachers found", "Add a teacher account or change the filter.", Icons.Default.SupervisorAccount),
+        empty = EmptyContent(stringResource(R.string.no_teachers_found), addATeacherAccountOrChangeText, Icons.Default.SupervisorAccount),
         chipGroups = listOf(ChipGroup(departmentList, selectedDepartment) { selectedDepartment = it }),
-        fab = ListFab("Add teacher", Icons.Default.PersonAdd, onAddTeacherClick),
+        fab = ListFab(stringResource(R.string.add_teacher_2), Icons.Default.PersonAdd, onAddTeacherClick),
         headerActions = {
             SgrmsOverflowMenu(
-                contentDescription = "Export",
+                contentDescription = stringResource(R.string.export),
                 actions = listOf(
-                    RowAction("Export CSV", Icons.Default.FileDownload) {
+                    RowAction(stringResource(R.string.export_csv), Icons.Default.FileDownload) {
                         exportTeacherListToCsv(context = context, teachers = filteredTeachers)
                     }
                 )
@@ -135,7 +138,7 @@ fun TeacherManagementScreen(
         items(items = filteredTeachers, key = { it.teacherId }) { teacher ->
             Box(ListItemPadding) {
                 SgrmsListItemCard(
-                    title = teacher.teacherName.ifBlank { "Unnamed teacher" },
+                    title = teacher.teacherName.ifBlank { stringResource(R.string.unnamed_teacher) },
                     subtitle = listOf(teacher.staffId, teacher.department, teacher.position)
                         .filter { it.isNotBlank() }
                         .joinToString(" · "),
@@ -150,11 +153,11 @@ fun TeacherManagementScreen(
                     onClick = { onViewTeacherClick(teacher.teacherId) }
                 ) {
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${teacher.teacherName}",
+                        contentDescription = stringResource(R.string.actions_for, teacher.teacherName),
                         actions = listOf(
-                            RowAction("View", Icons.Default.Visibility) { onViewTeacherClick(teacher.teacherId) },
-                            RowAction("Edit", Icons.Default.Edit) { onEditTeacherClick(teacher.teacherId) },
-                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.view), Icons.Default.Visibility) { onViewTeacherClick(teacher.teacherId) },
+                            RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditTeacherClick(teacher.teacherId) },
+                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedTeacherToDelete = teacher
                                 showDeleteDialog = true
                             }
@@ -173,15 +176,16 @@ fun exportTeacherListToCsv(
     val fileName = "teacher_list.csv"
     val file = File(context.cacheDir, fileName)
 
+    val notSpecified = context.getString(R.string.not_specified)
     val csvContent = buildString {
-        appendLine("Teacher Name,Staff ID,Email,Department,Position")
+        appendLine(context.getString(R.string.csv_teacher_header))
 
         teachers.forEach { teacher ->
             val row = listOf(
-                teacher.teacherName.ifBlank { "Unknown Teacher" },
-                teacher.staffId.ifBlank { "Not specified" },
-                teacher.email.ifBlank { "Not specified" },
-                teacher.department.ifBlank { "Not specified" },
+                teacher.teacherName.ifBlank { context.getString(R.string.unknown_teacher) },
+                teacher.staffId.ifBlank { notSpecified },
+                teacher.email.ifBlank { notSpecified },
+                teacher.department.ifBlank { notSpecified },
                 teacher.position.ifBlank { "Teacher" }
             )
 
@@ -204,7 +208,7 @@ fun exportTeacherListToCsv(
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/csv"
         putExtra(Intent.EXTRA_STREAM, uri)
-        putExtra(Intent.EXTRA_SUBJECT, "Teacher List")
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.teacher_list))
         putExtra(Intent.EXTRA_TITLE, "teacher_list.csv")
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
@@ -212,7 +216,7 @@ fun exportTeacherListToCsv(
     context.startActivity(
         Intent.createChooser(
             shareIntent,
-            "Export Teacher List"
+            context.getString(R.string.export_teacher_list)
         )
     )
 }

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -42,6 +44,9 @@ fun ClassManagementScreen(
     onViewClassClick: (String) -> Unit = {},
     onAddStudentClick: () -> Unit = {}
 ) {
+    val createAClassThenAddStudentsText = stringResource(R.string.create_a_class_then_add_students)
+    val students3Text = stringResource(R.string.students_3)
+    val t1StudentText = stringResource(R.string.t_1_student)
     val classViewModel: ClassFirebaseViewModel = hiltViewModel()
 
     val uiState by classViewModel.uiState.collectAsState()
@@ -127,8 +132,8 @@ fun ClassManagementScreen(
 
     if (showDeleteDialog && selectedClassToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete Class",
-            message = "Are you sure you want to delete this class? This action cannot be undone.",
+            title = stringResource(R.string.delete_class),
+            message = stringResource(R.string.are_you_sure_you_want_to_2),
             onConfirmClick = {
                 selectedClassToDelete?.let { schoolClass ->
                     classViewModel.deleteClass(
@@ -173,25 +178,25 @@ fun ClassManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Classes",
-        subtitle = "${classes.size} classes · ${students.size} students",
+        title = stringResource(R.string.classes),
+        subtitle = stringResource(R.string.classes_students, classes.size, students.size),
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search class, year or class teacher",
+        searchPlaceholder = stringResource(R.string.search_class_year_or_class_teacher),
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         isEmpty = filteredClasses.isEmpty(),
-        empty = EmptyContent("No classes yet", "Create a class, then add students to it.", Icons.Default.School),
-        fab = ListFab("Add class", Icons.Default.Add) { showAddDialog = true }
+        empty = EmptyContent(stringResource(R.string.no_classes_yet), createAClassThenAddStudentsText, Icons.Default.School),
+        fab = ListFab(stringResource(R.string.add_class_2), Icons.Default.Add) { showAddDialog = true }
     ) {
         items(items = filteredClasses, key = { it.classId }) { schoolClass ->
             val count = studentCountByClass[schoolClass.classId] ?: 0
             Box(ListItemPadding) {
                 SgrmsListItemCard(
-                    title = schoolClass.className.ifBlank { "Unnamed class" },
+                    title = schoolClass.className.ifBlank { stringResource(R.string.unnamed_class) },
                     subtitle = listOf(
                         schoolClass.academicYear,
-                        "Teacher: " + schoolClass.classTeacherName.ifBlank { "Not assigned" }
+                        "Teacher: " + schoolClass.classTeacherName.ifBlank { stringResource(R.string.not_assigned) }
                     ).filter { it.isNotBlank() }.joinToString(" · "),
                     leading = {
                         SgrmsIconTile(
@@ -203,17 +208,17 @@ fun ClassManagementScreen(
                     },
                     onClick = { onViewClassClick(schoolClass.classId) }
                 ) {
-                    SgrmsStatusChip(if (count == 1) "1 student" else "$count students", ChipTone.Primary)
+                    SgrmsStatusChip(if (count == 1) t1StudentText else students3Text.format(count), ChipTone.Primary)
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${schoolClass.className}",
+                        contentDescription = stringResource(R.string.actions_for, schoolClass.className),
                         actions = listOf(
-                            RowAction("View", Icons.Default.Visibility) { onViewClassClick(schoolClass.classId) },
-                            RowAction("Students", Icons.Default.Group) { selectedClassToView = schoolClass },
-                            RowAction("Edit", Icons.Default.Edit) {
+                            RowAction(stringResource(R.string.view), Icons.Default.Visibility) { onViewClassClick(schoolClass.classId) },
+                            RowAction(stringResource(R.string.students), Icons.Default.Group) { selectedClassToView = schoolClass },
+                            RowAction(stringResource(R.string.edit), Icons.Default.Edit) {
                                 selectedClassToEdit = schoolClass
                                 showEditDialog = true
                             },
-                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedClassToDelete = schoolClass
                                 showDeleteDialog = true
                             }

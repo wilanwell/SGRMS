@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.subject
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,6 +51,8 @@ fun AddSubjectScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noStaffIdText = stringResource(R.string.no_staff_id)
+    val text5Text = stringResource(R.string.text_5)
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
 
     val teacherViewModel: TeacherFirebaseViewModel = hiltViewModel()
@@ -89,8 +93,8 @@ fun AddSubjectScreen(
         listOf("No teacher available")
     } else {
         teachers.map { teacher ->
-            val staffIdText = teacher.staffId.ifBlank { "No Staff ID" }
-            "${teacher.teacherName} ($staffIdText)"
+            val staffIdText = teacher.staffId.ifBlank { stringResource(R.string.no_staff_id) }
+            text5Text.format(teacher.teacherName, staffIdText)
         }
     }
 
@@ -127,7 +131,7 @@ fun AddSubjectScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Add New Subject",
+            title = stringResource(R.string.add_new_subject),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -145,8 +149,8 @@ fun AddSubjectScreen(
                 )
         ) {
             SgrmsFormCard(
-                title = "Subject Information",
-                subtitle = "Enter the subject details",
+                title = stringResource(R.string.subject_information),
+                subtitle = stringResource(R.string.enter_the_subject_details),
                 icon = Icons.Default.MenuBook
             ) {
                 SgrmsTextField(
@@ -156,11 +160,11 @@ fun AddSubjectScreen(
                         subjectCodeError = false
                         clearMessages()
                     },
-                    label = "Subject Code",
-                    placeholder = "Example: MATH101",
+                    label = stringResource(R.string.subject_code),
+                    placeholder = stringResource(R.string.example_math101),
                     icon = Icons.Default.Badge,
                     isError = subjectCodeError,
-                    errorMessage = "Subject code is required"
+                    errorMessage = stringResource(R.string.subject_code_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -172,19 +176,19 @@ fun AddSubjectScreen(
                         subjectNameError = false
                         clearMessages()
                     },
-                    label = "Subject Name",
-                    placeholder = "Example: Mathematics",
+                    label = stringResource(R.string.subject_name),
+                    placeholder = stringResource(R.string.example_mathematics),
                     icon = Icons.Default.MenuBook,
                     isError = subjectNameError,
-                    errorMessage = "Subject name is required"
+                    errorMessage = stringResource(R.string.subject_name_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsDropdownField(
-                    value = selectedTeacherDisplay.ifBlank { "Select teacher" },
-                    label = "Teacher Name",
-                    placeholder = "Select teacher",
+                    value = selectedTeacherDisplay.ifBlank { stringResource(R.string.select_teacher) },
+                    label = stringResource(R.string.teacher_name),
+                    placeholder = stringResource(R.string.select_teacher),
                     expanded = teacherExpanded,
                     onExpandedChange = {
                         teacherExpanded = it
@@ -193,7 +197,7 @@ fun AddSubjectScreen(
                     onItemSelected = { selectedText ->
                         if (selectedText != "No teacher available") {
                             val selectedTeacher = teachers.find { teacher ->
-                                val staffIdText = teacher.staffId.ifBlank { "No Staff ID" }
+                                val staffIdText = teacher.staffId.ifBlank { noStaffIdText }
                                 "${teacher.teacherName} ($staffIdText)" == selectedText
                             }
 
@@ -209,14 +213,14 @@ fun AddSubjectScreen(
                         teacherExpanded = false
                     },
                     isError = teacherError,
-                    errorMessage = "Teacher is required"
+                    errorMessage = stringResource(R.string.teacher_is_required)
                 )
 
                 if (selectedTeacherId.isNotBlank()) {
                     Spacer(modifier = Modifier.height(10.dp))
 
                     Text(
-                        text = "Teacher ID will be saved automatically.",
+                        text = stringResource(R.string.teacher_id_will_be_saved_automatically),
                         fontSize = 13.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -225,9 +229,9 @@ fun AddSubjectScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsDropdownField(
-                    value = selectedCategory.ifBlank { "Select category" },
-                    label = "Category",
-                    placeholder = "Select category",
+                    value = selectedCategory.ifBlank { stringResource(R.string.select_category) },
+                    label = stringResource(R.string.category),
+                    placeholder = stringResource(R.string.select_category),
                     expanded = categoryExpanded,
                     onExpandedChange = {
                         categoryExpanded = it
@@ -240,7 +244,7 @@ fun AddSubjectScreen(
                         clearMessages()
                     },
                     isError = categoryError,
-                    errorMessage = "Category is required"
+                    errorMessage = stringResource(R.string.category_is_required)
                 )
 
                 if (errorMessage.isNotBlank()) {
@@ -266,7 +270,7 @@ fun AddSubjectScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                cancelText = "Cancel",
+                                cancelText = stringResource(R.string.cancel),
                                 confirmText = if (isLoading) {
                                     "Saving..."
                                 } else {

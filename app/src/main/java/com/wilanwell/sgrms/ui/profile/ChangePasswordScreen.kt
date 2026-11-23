@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,6 +62,14 @@ fun ChangePasswordScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val currentPasswordIsIncorrectText = stringResource(R.string.current_password_is_incorrect)
+    val currentPasswordIsRequiredText = stringResource(R.string.current_password_is_required)
+    val newPasswordIsRequiredText = stringResource(R.string.new_password_is_required)
+    val newPasswordMustBeDifferentText = stringResource(R.string.new_password_must_be_different)
+    val passwordMustBeAtLeast6Text = stringResource(R.string.password_must_be_at_least_6)
+    val passwordUpdatedSuccessfullyText = stringResource(R.string.password_updated_successfully)
+    val passwordsDoNotMatchText = stringResource(R.string.passwords_do_not_match)
+    val pleaseConfirmYourNewPasswordText = stringResource(R.string.please_confirm_your_new_password)
     val viewModel: ChangePasswordViewModel = hiltViewModel()
     val result by viewModel.result.collectAsState()
 
@@ -94,21 +104,21 @@ fun ChangePasswordScreen(
 
 
         if (currentPassword.isBlank()) {
-            currentPasswordError = "Current password is required"
+            currentPasswordError = currentPasswordIsRequiredText
         }
 
         if (newPassword.isBlank()) {
-            newPasswordError = "New password is required"
+            newPasswordError = newPasswordIsRequiredText
         } else if (newPassword.length < 6) {
-            newPasswordError = "Password must be at least 6 characters"
+            newPasswordError = passwordMustBeAtLeast6Text
         } else if (newPassword == currentPassword) {
-            newPasswordError = "New password must be different"
+            newPasswordError = newPasswordMustBeDifferentText
         }
 
         if (confirmPassword.isBlank()) {
-            confirmPasswordError = "Please confirm your new password"
+            confirmPasswordError = pleaseConfirmYourNewPasswordText
         } else if (confirmPassword != newPassword) {
-            confirmPasswordError = "Passwords do not match"
+            confirmPasswordError = passwordsDoNotMatchText
         }
 
         return currentPasswordError.isBlank() &&
@@ -128,7 +138,7 @@ fun ChangePasswordScreen(
         when (val state = result) {
             ChangePasswordResult.Success -> {
                 showConfirmDialog = false
-                successMessage = "Password updated successfully"
+                successMessage = passwordUpdatedSuccessfullyText
                 currentPassword = ""
                 newPassword = ""
                 confirmPassword = ""
@@ -138,7 +148,7 @@ fun ChangePasswordScreen(
 
             ChangePasswordResult.WrongCurrentPassword -> {
                 showConfirmDialog = false
-                currentPasswordError = "Current password is incorrect"
+                currentPasswordError = currentPasswordIsIncorrectText
                 viewModel.reset()
             }
 
@@ -161,13 +171,13 @@ fun ChangePasswordScreen(
             },
             title = {
                 Text(
-                    text = "Confirm Password Change",
+                    text = stringResource(R.string.confirm_password_change),
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
                 Text(
-                    text = "Are you sure you want to change your password?"
+                    text = stringResource(R.string.are_you_sure_you_want_to_4)
                 )
             },
             confirmButton = {
@@ -188,7 +198,7 @@ fun ChangePasswordScreen(
                         )
                     } else {
                         Text(
-                            text = "Confirm",
+                            text = stringResource(R.string.confirm),
                             color = Color.White
                         )
                     }
@@ -202,7 +212,7 @@ fun ChangePasswordScreen(
                     enabled = !isLoading
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel),
                         color = ColorPrimary
                     )
                 }
@@ -217,7 +227,7 @@ fun ChangePasswordScreen(
             .navigationBarsPadding()
     ) {
         TopBar(
-            title = "Change Password",
+            title = stringResource(R.string.change_password_2),
             showBack = true,
             onBackClick = onBackClick
         )
@@ -242,7 +252,7 @@ fun ChangePasswordScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            contentDescription = "Password Icon",
+                            contentDescription = stringResource(R.string.password_icon),
                             tint = ColorPrimary
                         )
 
@@ -250,13 +260,13 @@ fun ChangePasswordScreen(
 
                         Column {
                             Text(
-                                text = "Update Password",
+                                text = stringResource(R.string.update_password),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold
                             )
 
                             Text(
-                                text = "Enter your current and new password",
+                                text = stringResource(R.string.enter_your_current_and_new_password),
                                 fontSize = 14.sp,
                                 color = ColorOnSurfaceVariant
                             )
@@ -272,7 +282,7 @@ fun ChangePasswordScreen(
                             currentPasswordError = ""
                             clearMessages()
                         },
-                        label = "Current Password",
+                        label = stringResource(R.string.current_password),
                         visible = currentVisible,
                         onVisibilityClick = {
                             currentVisible = !currentVisible
@@ -291,7 +301,7 @@ fun ChangePasswordScreen(
                             newPasswordError = ""
                             clearMessages()
                         },
-                        label = "New Password",
+                        label = stringResource(R.string.new_password),
                         visible = newVisible,
                         onVisibilityClick = {
                             newVisible = !newVisible
@@ -310,7 +320,7 @@ fun ChangePasswordScreen(
                             confirmPasswordError = ""
                             clearMessages()
                         },
-                        label = "Confirm Password",
+                        label = stringResource(R.string.confirm_password),
                         visible = confirmVisible,
                         onVisibilityClick = {
                             confirmVisible = !confirmVisible
@@ -356,7 +366,7 @@ fun ChangePasswordScreen(
                                 .height(50.dp)
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 color = ColorPrimary,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -386,7 +396,7 @@ fun ChangePasswordScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Save",
+                                    text = stringResource(R.string.save),
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -437,7 +447,7 @@ fun PasswordInputField(
                     } else {
                         Icons.Default.VisibilityOff
                     },
-                    contentDescription = "Password Visibility"
+                    contentDescription = stringResource(R.string.password_visibility)
                 )
             }
         },

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,7 +93,7 @@ fun QuickGradeStudentCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Student",
+                        contentDescription = stringResource(R.string.student),
                         tint = Color.White
                     )
                 }
@@ -102,7 +104,7 @@ fun QuickGradeStudentCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = student.studentName.ifBlank { "Unknown Student" },
+                        text = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -132,7 +134,7 @@ fun QuickGradeStudentCard(
                 value = marks,
                 onValueChange = onMarksChange,
                 label = {
-                    Text("Marks")
+                    Text(stringResource(R.string.marks))
                 },
                 placeholder = {
                     Text("0 - 100")
@@ -140,7 +142,7 @@ fun QuickGradeStudentCard(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Badge,
-                        contentDescription = "Marks"
+                        contentDescription = stringResource(R.string.marks)
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),

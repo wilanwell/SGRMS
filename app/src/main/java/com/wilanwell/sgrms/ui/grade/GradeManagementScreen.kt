@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
@@ -46,6 +48,8 @@ fun GradeManagementScreen(
     onStudentDetailClick: (String) -> Unit = {},
     onEditGradeClick: (String) -> Unit = {}
 ) {
+    val addGradesForAClassOrText = stringResource(R.string.add_grades_for_a_class_or)
+    val allStatusText = stringResource(R.string.all_status)
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
@@ -103,29 +107,29 @@ fun GradeManagementScreen(
 
         GradeDisplayItem(
             grade = grade,
-            studentName = student?.studentName ?: "Unknown Student",
-            className = student?.className ?: "Unknown Class",
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            studentName = student?.studentName ?: stringResource(R.string.unknown_student),
+            className = student?.className ?: stringResource(R.string.unknown_class),
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-"
         )
     }
 
     val classList = listOf("All Classes") + students
         .map { student ->
-            student.className.ifBlank { "Unknown Class" }
+            student.className.ifBlank { stringResource(R.string.unknown_class) }
         }
         .distinct()
         .sorted()
 
     val subjectList = listOf("All Subjects") + subjects
         .map { subject ->
-            subject.subjectName.ifBlank { "Unknown Subject" }
+            subject.subjectName.ifBlank { stringResource(R.string.unknown_subject) }
         }
         .distinct()
         .sorted()
 
     val statusList = listOf(
-        "All Status",
+        allStatusText,
         "Complete",
         "Pending"
     )
@@ -151,8 +155,8 @@ fun GradeManagementScreen(
 
     if (showDeleteDialog && selectedGradeToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete grade?",
-            message = "This grade record will be removed. This cannot be undone.",
+            title = stringResource(R.string.delete_grade),
+            message = stringResource(R.string.this_grade_record_will_be_removed),
             onConfirmClick = {
                 selectedGradeToDelete?.let { gradeViewModel.deleteGrade(gradeId = it.gradeId) }
                 showDeleteDialog = false
@@ -166,27 +170,27 @@ fun GradeManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Grades",
+        title = stringResource(R.string.grades),
         subtitle = "${filteredRecords.size} shown · ${grades.size}${if (gradeUiState.hasMore) "+" else ""} loaded",
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search student, subject or class",
+        searchPlaceholder = stringResource(R.string.search_student_subject_or_class),
         isLoading = isLoading && grades.isEmpty(),
         errorMessage = errorMessage,
         isEmpty = filteredRecords.isEmpty(),
-        empty = EmptyContent("No grade records", "Add grades for a class, or change the filters.", Icons.Default.Assessment),
+        empty = EmptyContent(stringResource(R.string.no_grade_records), addGradesForAClassOrText, Icons.Default.Assessment),
         chipGroups = listOf(
             ChipGroup(subjectList, selectedSubject) { selectedSubject = it },
             ChipGroup(statusList, selectedStatus) { selectedStatus = it },
             ChipGroup(classList, selectedClass) { selectedClass = it }
         ),
-        fab = ListFab("Add grades", Icons.Default.EditNote, onAddGradeClick)
+        fab = ListFab(stringResource(R.string.add_grades), Icons.Default.EditNote, onAddGradeClick)
     ) {
         items(items = filteredRecords, key = { it.grade.gradeId }) { item ->
             Box(ListItemPadding) {
                 SgrmsListItemCard(
                     title = item.studentName,
-                    subtitle = "${item.subjectName} · ${item.className}",
+                    subtitle = stringResource(R.string.text, item.subjectName, item.className),
                     leading = { SgrmsAvatar(name = item.studentName, size = 44.dp) },
                     onClick = { onStudentDetailClick(item.grade.studentId) }
                 ) {
@@ -195,14 +199,14 @@ fun GradeManagementScreen(
                         val letter = item.grade.gradeLetter.ifBlank { com.wilanwell.sgrms.utils.GradeCalculator.gradeLetter(item.grade.marks) }
                         SgrmsStatusChip("$letter · ${"%.0f".format(item.grade.marks)}", toneForGrade(letter))
                     } else {
-                        SgrmsStatusChip(item.grade.status.ifBlank { "Pending" }, ChipTone.Warning)
+                        SgrmsStatusChip(item.grade.status.ifBlank { stringResource(R.string.pending) }, ChipTone.Warning)
                     }
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${item.studentName}",
+                        contentDescription = stringResource(R.string.actions_for, item.studentName),
                         actions = listOf(
-                            RowAction("View student", Icons.Default.Visibility) { onStudentDetailClick(item.grade.studentId) },
-                            RowAction("Edit grade", Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) },
-                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.view_student), Icons.Default.Visibility) { onStudentDetailClick(item.grade.studentId) },
+                            RowAction(stringResource(R.string.edit_grade_2), Icons.Default.Edit) { onEditGradeClick(item.grade.gradeId) },
+                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedGradeToDelete = item.grade
                                 showDeleteDialog = true
                             }

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
@@ -33,6 +35,8 @@ fun SgrmsPasswordField(
     isError: Boolean = false,
     errorMessage: String? = null
 ) {
+    val hidePasswordText = stringResource(R.string.hide_password)
+    val showPasswordText = stringResource(R.string.show_password)
     var visible by rememberSaveable { mutableStateOf(false) }
 
     OutlinedTextField(
@@ -49,7 +53,7 @@ fun SgrmsPasswordField(
             IconButton(onClick = { visible = !visible }) {
                 Icon(
                     imageVector = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                    contentDescription = if (visible) "Hide password" else "Show password"
+                    contentDescription = if (visible) hidePasswordText else showPasswordText
                 )
             }
         },

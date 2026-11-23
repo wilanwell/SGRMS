@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -104,7 +106,7 @@ fun SgrmsPageHeader(
     ) {
         if (onBack != null) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onSurface)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onSurface)
             }
             Spacer(Modifier.width(4.dp))
         }
@@ -362,7 +364,7 @@ data class RowAction(
 @Composable
 fun SgrmsOverflowMenu(
     actions: List<RowAction>,
-    contentDescription: String = "More actions"
+    contentDescription: String = stringResource(R.string.more_actions)
 ) {
     var expanded by remember { mutableStateOf(false) }
 

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
@@ -51,27 +53,27 @@ fun TeacherDetailScreen(
     val teacher = uiState.selectedTeacher
 
     SgrmsDetailScreen(
-        title = "Teacher",
+        title = stringResource(R.string.teacher),
         onBack = onBackClick,
         isLoading = uiState.isLoading && teacher == null,
         errorMessage = if (teacher != null) uiState.errorMessage else "",
         bottomBar = if (teacher != null) {
-            { SgrmsPrimaryButton(text = "Edit teacher", icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f)) }
+            { SgrmsPrimaryButton(text = stringResource(R.string.edit_teacher_2), icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f)) }
         } else {
             null
         }
     ) {
         if (teacher == null) {
             SgrmsEmptyState(
-                title = "Teacher not found",
-                message = uiState.errorMessage.ifBlank { "The selected teacher record could not be loaded." },
+                title = stringResource(R.string.teacher_not_found),
+                message = uiState.errorMessage.ifBlank { stringResource(R.string.the_selected_teacher_record_could_not) },
                 icon = Icons.Default.SupervisorAccount
             )
             return@SgrmsDetailScreen
         }
 
         SgrmsDetailHero(
-            title = teacher.teacherName.ifBlank { "Unknown teacher" },
+            title = teacher.teacherName.ifBlank { stringResource(R.string.unknown_teacher) },
             subtitle = listOf(teacher.staffId, teacher.department).filter { it.isNotBlank() }.joinToString(" · "),
             leading = {
                 SgrmsAvatar(
@@ -82,33 +84,33 @@ fun TeacherDetailScreen(
                 )
             }
         ) {
-            SgrmsStatusChip(teacher.position.ifBlank { "Teacher" }, ChipTone.Success)
+            SgrmsStatusChip(teacher.position.ifBlank { stringResource(R.string.teacher) }, ChipTone.Success)
         }
 
-        SgrmsInfoSection("Contact") {
-            SgrmsInfoRow(icon = Icons.Default.Email, label = "Email", value = teacher.email.ifBlank { "Not specified" })
+        SgrmsInfoSection(stringResource(R.string.contact)) {
+            SgrmsInfoRow(icon = Icons.Default.Email, label = stringResource(R.string.email), value = teacher.email.ifBlank { stringResource(R.string.not_specified) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = teacher.phoneNumber.ifBlank { "Not specified" })
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = teacher.phoneNumber.ifBlank { stringResource(R.string.not_specified) })
         }
 
-        SgrmsInfoSection("Work") {
-            SgrmsInfoRow(icon = Icons.Default.Badge, label = "Staff ID", value = teacher.staffId.ifBlank { "Not specified" })
+        SgrmsInfoSection(stringResource(R.string.work)) {
+            SgrmsInfoRow(icon = Icons.Default.Badge, label = stringResource(R.string.staff_id), value = teacher.staffId.ifBlank { stringResource(R.string.not_specified) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Business, label = "Department", value = teacher.department.ifBlank { "Not specified" })
+            SgrmsInfoRow(icon = Icons.Default.Business, label = stringResource(R.string.department), value = teacher.department.ifBlank { stringResource(R.string.not_specified) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.WorkOutline, label = "Position", value = teacher.position.ifBlank { "Teacher" })
+            SgrmsInfoRow(icon = Icons.Default.WorkOutline, label = stringResource(R.string.position), value = teacher.position.ifBlank { stringResource(R.string.teacher) })
             if (teacher.qualification.isNotBlank()) {
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.Default.School, label = "Qualification", value = teacher.qualification)
+                SgrmsInfoRow(icon = Icons.Default.School, label = stringResource(R.string.qualification), value = teacher.qualification)
             }
             if (teacher.officeLocation.isNotBlank()) {
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.Default.Place, label = "Office", value = teacher.officeLocation)
+                SgrmsInfoRow(icon = Icons.Default.Place, label = stringResource(R.string.office), value = teacher.officeLocation)
             }
         }
 
-        SgrmsInfoSection("Account") {
-            SgrmsInfoRow(icon = Icons.Default.Key, label = "Login user ID", value = teacher.userId.ifBlank { "Not linked" })
+        SgrmsInfoSection(stringResource(R.string.account)) {
+            SgrmsInfoRow(icon = Icons.Default.Key, label = stringResource(R.string.login_user_id), value = teacher.userId.ifBlank { stringResource(R.string.not_linked) })
         }
     }
 }

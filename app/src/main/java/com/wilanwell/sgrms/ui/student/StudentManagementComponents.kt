@@ -1,5 +1,6 @@
 package com.wilanwell.sgrms.ui.student
 
+import com.wilanwell.sgrms.R
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
@@ -13,17 +14,18 @@ fun exportStudentListToCsv(
     val fileName = "student_list.csv"
     val file = File(context.cacheDir, fileName)
 
+    val notSpecified = context.getString(R.string.not_specified)
     val csvContent = buildString {
-        appendLine("Student Name,Student Code,Email,Phone Number,Class,Gender,Status")
+        appendLine(context.getString(R.string.csv_student_header))
 
         students.forEach { student ->
             val row = listOf(
                 student.studentName.ifBlank { "Unknown Student" },
                 student.studentCode.ifBlank { "-" },
-                student.email.ifBlank { "Not specified" },
-                student.phoneNumber.ifBlank { "Not specified" },
+                student.email.ifBlank { notSpecified },
+                student.phoneNumber.ifBlank { notSpecified },
                 student.className.ifBlank { "Not assigned" },
-                student.gender.ifBlank { "Not specified" },
+                student.gender.ifBlank { notSpecified },
                 student.status.ifBlank { "Active" }
             )
 
@@ -46,7 +48,7 @@ fun exportStudentListToCsv(
     val shareIntent = Intent(Intent.ACTION_SEND).apply {
         type = "text/csv"
         putExtra(Intent.EXTRA_STREAM, uri)
-        putExtra(Intent.EXTRA_SUBJECT, "Student List")
+        putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.student_list))
         putExtra(Intent.EXTRA_TITLE, "student_list.csv")
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
@@ -54,7 +56,7 @@ fun exportStudentListToCsv(
     context.startActivity(
         Intent.createChooser(
             shareIntent,
-            "Export Student List"
+            context.getString(R.string.export_student_list)
         )
     )
 }

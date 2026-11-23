@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.student
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.SgrmsPasswordField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -139,7 +141,7 @@ fun AddStudentScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Add Student",
+            title = stringResource(R.string.add_student_2),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -157,8 +159,8 @@ fun AddStudentScreen(
                 )
         ) {
             SgrmsFormCard(
-                title = "Student Information",
-                subtitle = "Enter new student details",
+                title = stringResource(R.string.student_information),
+                subtitle = stringResource(R.string.enter_new_student_details),
                 icon = Icons.Default.PersonAdd
             ) {
                 SgrmsTextField(
@@ -168,10 +170,10 @@ fun AddStudentScreen(
                         studentNameError = false
                         clearMessages()
                     },
-                    label = "Student Name",
-                    placeholder = "Enter student name",
+                    label = stringResource(R.string.student_name),
+                    placeholder = stringResource(R.string.enter_student_name),
                     isError = studentNameError,
-                    errorMessage = "Student name is required"
+                    errorMessage = stringResource(R.string.student_name_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -183,10 +185,10 @@ fun AddStudentScreen(
                         studentCodeError = false
                         clearMessages()
                     },
-                    label = "Student Code",
-                    placeholder = "Example: S001",
+                    label = stringResource(R.string.student_code),
+                    placeholder = stringResource(R.string.example_s001),
                     isError = studentCodeError,
-                    errorMessage = "Student code is required"
+                    errorMessage = stringResource(R.string.student_code_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -198,11 +200,11 @@ fun AddStudentScreen(
                         emailError = false
                         clearMessages()
                     },
-                    label = "Email",
-                    placeholder = "Example: student@sgrms.com",
+                    label = stringResource(R.string.email),
+                    placeholder = stringResource(R.string.example_student_sgrms_com),
                     icon = Icons.Default.Email,
                     isError = emailError,
-                    errorMessage = "Email is required"
+                    errorMessage = stringResource(R.string.email_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -214,19 +216,19 @@ fun AddStudentScreen(
                         phoneNumberError = false
                         clearMessages()
                     },
-                    label = "Phone Number",
-                    placeholder = "Example: 0123456789",
+                    label = stringResource(R.string.phone_number),
+                    placeholder = stringResource(R.string.example_0123456789),
                     icon = Icons.Default.Phone,
                     isError = phoneNumberError,
-                    errorMessage = "Phone number is required"
+                    errorMessage = stringResource(R.string.phone_number_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsDropdownField(
                     value = selectedClass,
-                    label = "Class",
-                    placeholder = "Select class",
+                    label = stringResource(R.string.class_label),
+                    placeholder = stringResource(R.string.select_class),
                     expanded = classExpanded,
                     onExpandedChange = {
                         classExpanded = it
@@ -243,13 +245,13 @@ fun AddStudentScreen(
                         classExpanded = false
                     },
                     isError = classError,
-                    errorMessage = "Class is required"
+                    errorMessage = stringResource(R.string.class_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsSegmentedField(
-                    label = "Gender",
+                    label = stringResource(R.string.gender),
                     options = genderList,
                     selected = selectedGender,
                     onSelect = { it ->
@@ -258,13 +260,13 @@ fun AddStudentScreen(
                         clearMessages()
                     },
                     isError = genderError,
-                    errorMessage = "Gender is required"
+                    errorMessage = stringResource(R.string.gender_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsSegmentedField(
-                    label = "Status",
+                    label = stringResource(R.string.status),
                     options = statusList,
                     selected = selectedStatus,
                     onSelect = { it ->
@@ -282,10 +284,10 @@ fun AddStudentScreen(
                         passwordError = false
                         clearMessages()
                     },
-                    label = "Login Password",
-                    placeholder = "Enter student login password",
+                    label = stringResource(R.string.login_password),
+                    placeholder = stringResource(R.string.enter_student_login_password),
                     isError = passwordError,
-                    errorMessage = "Password is required"
+                    errorMessage = stringResource(R.string.password_is_required)
                 )
 
                 if (uiState.errorMessage.isNotBlank() || classLoadError.isNotBlank()) {
@@ -311,7 +313,7 @@ fun AddStudentScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                cancelText = "Cancel",
+                                cancelText = stringResource(R.string.cancel),
                                 confirmText = if (uiState.isLoading) {
                                     "Saving..."
                                 } else {

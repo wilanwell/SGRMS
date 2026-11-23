@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -66,12 +68,12 @@ fun TeacherProfileScreen(
     val assignedSubjectNames = assignments.subjects.joinToString { it.subjectName }
 
     SgrmsDetailScreen(
-        title = "Profile",
+        title = stringResource(R.string.profile),
         onBack = onBackClick,
         isLoading = isLoading && teacher == null,
         errorMessage = errorMessage
     ) {
-        val name = teacher?.teacherName?.ifBlank { null } ?: "Teacher"
+        val name = teacher?.teacherName?.ifBlank { null } ?: stringResource(R.string.teacher)
         SgrmsDetailHero(
             title = name,
             subtitle = teacher?.email,
@@ -79,48 +81,48 @@ fun TeacherProfileScreen(
                 SgrmsAvatar(name = name, size = 88.dp, imageUrl = teacher?.profileImageUrl.orEmpty(), legacyImageBase64 = teacher?.profileImageBase64.orEmpty())
             }
         ) {
-            SgrmsStatusChip(teacher?.position?.ifBlank { null } ?: "Teacher", ChipTone.Success)
+            SgrmsStatusChip(teacher?.position?.ifBlank { null } ?: stringResource(R.string.teacher), ChipTone.Success)
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             SgrmsStatCard(
-                value = studentCount.toString(), label = "Students", icon = Icons.Default.Group,
+                value = studentCount.toString(), label = stringResource(R.string.students), icon = Icons.Default.Group,
                 tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.weight(1f)
             )
             SgrmsStatCard(
-                value = subjectCount.toString(), label = "Subjects", icon = Icons.AutoMirrored.Filled.MenuBook,
+                value = subjectCount.toString(), label = stringResource(R.string.subjects), icon = Icons.AutoMirrored.Filled.MenuBook,
                 tint = com.wilanwell.sgrms.ui.theme.SgrmsColors.Orange, container = com.wilanwell.sgrms.ui.theme.SgrmsColors.OrangeContainer,
                 modifier = Modifier.weight(1f)
             )
         }
 
-        SgrmsInfoSection("Teaching") {
-            SgrmsInfoRow(icon = Icons.Default.School, label = "Classes ($classCount)", value = assignedClassNames.ifBlank { "No class assigned" })
+        SgrmsInfoSection(stringResource(R.string.teaching)) {
+            SgrmsInfoRow(icon = Icons.Default.School, label = stringResource(R.string.classes_2, classCount), value = assignedClassNames.ifBlank { stringResource(R.string.no_class_assigned) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.MenuBook, label = "Subjects", value = assignedSubjectNames.ifBlank { "No subject assigned" })
+            SgrmsInfoRow(icon = Icons.AutoMirrored.Filled.MenuBook, label = stringResource(R.string.subjects), value = assignedSubjectNames.ifBlank { stringResource(R.string.no_subject_assigned) })
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Summarize, label = "Reports", value = reportCount.toString())
+            SgrmsInfoRow(icon = Icons.Default.Summarize, label = stringResource(R.string.reports), value = reportCount.toString())
         }
 
-        SgrmsInfoSection("Work") {
-            SgrmsInfoRow(icon = Icons.Default.Badge, label = "Staff ID", value = teacher?.staffId.orEmpty())
+        SgrmsInfoSection(stringResource(R.string.work)) {
+            SgrmsInfoRow(icon = Icons.Default.Badge, label = stringResource(R.string.staff_id), value = teacher?.staffId.orEmpty())
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Business, label = "Department", value = teacher?.department.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Business, label = stringResource(R.string.department), value = teacher?.department.orEmpty())
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = teacher?.phoneNumber.orEmpty())
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = teacher?.phoneNumber.orEmpty())
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Place, label = "Office", value = teacher?.officeLocation.orEmpty())
-        }
-
-        SgrmsGroupedCard {
-            SgrmsSettingsRow("Edit profile", Icons.Default.Edit, onEditProfileClick)
-            SgrmsRowDivider()
-            SgrmsSettingsRow("Change password", Icons.Default.Lock, onChangePasswordClick)
+            SgrmsInfoRow(icon = Icons.Default.Place, label = stringResource(R.string.office), value = teacher?.officeLocation.orEmpty())
         }
 
         SgrmsGroupedCard {
-            SgrmsSettingsRow("Log out", Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
+            SgrmsSettingsRow(stringResource(R.string.edit_profile), Icons.Default.Edit, onEditProfileClick)
+            SgrmsRowDivider()
+            SgrmsSettingsRow(stringResource(R.string.change_password), Icons.Default.Lock, onChangePasswordClick)
+        }
+
+        SgrmsGroupedCard {
+            SgrmsSettingsRow(stringResource(R.string.log_out), Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
         }
     }
 }

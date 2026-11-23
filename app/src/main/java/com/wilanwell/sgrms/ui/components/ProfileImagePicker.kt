@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -188,7 +190,7 @@ fun ProfileImagePicker(
                 ) {
                     Icon(
                         imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Change Profile Picture",
+                        contentDescription = stringResource(R.string.change_profile_picture),
                         tint = Color.White,
                         modifier = Modifier.size(18.dp)
                     )
@@ -204,7 +206,7 @@ fun ProfileImagePicker(
             },
             title = {
                 Text(
-                    text = "Change Profile Photo",
+                    text = stringResource(R.string.change_profile_photo),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = ColorOnSurface
@@ -215,8 +217,8 @@ fun ProfileImagePicker(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     ProfileImageOptionCard(
-                        title = "Take Photo",
-                        description = "Use your camera",
+                        title = stringResource(R.string.take_photo),
+                        description = stringResource(R.string.use_your_camera),
                         onClick = {
                             showOptionDialog = false
                             openCamera()
@@ -224,8 +226,8 @@ fun ProfileImagePicker(
                     )
 
                     ProfileImageOptionCard(
-                        title = "Choose from Gallery",
-                        description = "Select photo from your phone",
+                        title = stringResource(R.string.choose_from_gallery),
+                        description = stringResource(R.string.select_photo_from_your_phone),
                         onClick = {
                             showOptionDialog = false
                             openGallery()
@@ -241,7 +243,7 @@ fun ProfileImagePicker(
                     }
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel),
                         color = ColorPrimary,
                         fontWeight = FontWeight.Bold
                     )
@@ -384,7 +386,7 @@ private fun ProfilePhoto(
     when {
         bitmap != null -> Image(
             bitmap = bitmap.asImageBitmap(),
-            contentDescription = "Profile Picture",
+            contentDescription = stringResource(R.string.profile_picture),
             modifier = Modifier
                 .size(size.dp)
                 .clip(CircleShape),
@@ -393,7 +395,7 @@ private fun ProfilePhoto(
 
         imageUrl.isNotBlank() && !ProfileImageRepository.isFirestoreReference(imageUrl) -> AsyncImage(
             model = imageUrl,
-            contentDescription = "Profile Picture",
+            contentDescription = stringResource(R.string.profile_picture),
             modifier = Modifier
                 .size(size.dp)
                 .clip(CircleShape),
@@ -402,7 +404,7 @@ private fun ProfilePhoto(
 
         else -> Icon(
             imageVector = Icons.Default.Person,
-            contentDescription = "Default Profile Picture",
+            contentDescription = stringResource(R.string.default_profile_picture),
             tint = Color.White,
             modifier = Modifier.size((size * 0.52).dp)
         )

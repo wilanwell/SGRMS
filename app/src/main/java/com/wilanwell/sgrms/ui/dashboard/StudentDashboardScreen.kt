@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.dashboard
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +64,7 @@ fun StudentDashboardScreen(
     onReportClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {}
 ) {
+    val notificationsUnreadText = stringResource(R.string.notifications_unread)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
@@ -85,7 +88,7 @@ fun StudentDashboardScreen(
     OnReturnToScreen { loadAll() }
 
     val student = studentUiState.selectedStudent
-    val firstName = student?.studentName?.trim()?.substringBefore(' ')?.ifBlank { null } ?: "Student"
+    val firstName = student?.studentName?.trim()?.substringBefore(' ')?.ifBlank { null } ?: stringResource(R.string.student)
     val summary = studentGradeSummary(gradeUiState.grades, subjectUiState.subjects)
     val unread = notificationUiState.notifications.filter { !it.isRead }
     val latestUnread = unread.maxByOrNull { it.createdAt }
@@ -97,17 +100,17 @@ fun StudentDashboardScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         SgrmsPageHeader(
-            title = "Hi, $firstName",
+            title = stringResource(R.string.hi, firstName),
             subtitle = listOfNotNull(
                 student?.className?.ifBlank { null },
                 student?.studentCode?.ifBlank { null }
-            ).joinToString(" · ").ifBlank { "Student" },
+            ).joinToString(" · ").ifBlank { stringResource(R.string.student) },
             trailing = {
                 Box {
                     IconButton(onClick = onNotificationsClick) {
                         Icon(
                             Icons.Default.Notifications,
-                            contentDescription = if (unread.isEmpty()) "Notifications" else "Notifications, ${unread.size} unread",
+                            contentDescription = if (unread.isEmpty()) "Notifications" else notificationsUnreadText.format(unread.size),
                             tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -124,7 +127,7 @@ fun StudentDashboardScreen(
                 }
                 IconButton(onClick = onProfileClick) {
                     com.wilanwell.sgrms.ui.components.SgrmsAvatar(
-                        name = student?.studentName ?: "Student",
+                        name = student?.studentName ?: stringResource(R.string.student),
                         size = 40.dp,
                         imageUrl = student?.profileImageUrl.orEmpty(),
                         legacyImageBase64 = student?.profileImageBase64.orEmpty()
@@ -162,7 +165,7 @@ fun StudentDashboardScreen(
                     ) {
                         SgrmsIconTile(icon = Icons.Default.Notifications, tint = SgrmsColors.Orange, container = androidx.compose.ui.graphics.Color(0xFFFFEDD5))
                         Column(Modifier.weight(1f)) {
-                            Text(latestUnread.title.ifBlank { "New notification" }, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text(latestUnread.title.ifBlank { stringResource(R.string.new_notification) }, style = MaterialTheme.typography.titleSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(
                                 latestUnread.message,
                                 style = MaterialTheme.typography.bodySmall,
@@ -175,8 +178,8 @@ fun StudentDashboardScreen(
                 }
             }
 
-            SgrmsSectionTitle("My subjects") {
-                TextButton(onClick = onReportClick) { Text("Full report", fontWeight = FontWeight.SemiBold) }
+            SgrmsSectionTitle(stringResource(R.string.my_subjects)) {
+                TextButton(onClick = onReportClick) { Text(stringResource(R.string.full_report), fontWeight = FontWeight.SemiBold) }
             }
 
             when {
@@ -185,8 +188,8 @@ fun StudentDashboardScreen(
                 }
 
                 summary.items.isEmpty() -> SgrmsEmptyState(
-                    title = "No grades yet",
-                    message = "Your grades will appear here after your teacher adds marks.",
+                    title = stringResource(R.string.no_grades_yet),
+                    message = stringResource(R.string.your_grades_will_appear_here_after),
                     icon = Icons.Default.Assessment
                 )
 
@@ -236,6 +239,7 @@ private fun OverallCard(
     gradedCount: Int,
     totalCount: Int
 ) {
+    val noGradesYetText = stringResource(R.string.no_grades_yet)
     Surface(
         shape = RoundedCornerShape(SgrmsRadius.Hero),
         color = MaterialTheme.colorScheme.surface,
@@ -264,14 +268,14 @@ private fun OverallCard(
                 }
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("Overall average", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.overall_average), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    if (gradedCount > 0) GradeCalculator.performanceStatus(averageMarks, hasGrades = true) else "No grades yet",
+                    if (gradedCount > 0) GradeCalculator.performanceStatus(averageMarks, hasGrades = true) else noGradesYetText,
                     style = MaterialTheme.typography.titleLarge
                 )
                 if (totalCount > 0) {
                     SgrmsStatusChip(
-                        text = "$gradedCount of $totalCount subjects graded",
+                        text = stringResource(R.string.of_subjects_graded, gradedCount, totalCount),
                         tone = if (gradedCount == totalCount) com.wilanwell.sgrms.ui.components.ChipTone.Success else com.wilanwell.sgrms.ui.components.ChipTone.Warning
                     )
                 }

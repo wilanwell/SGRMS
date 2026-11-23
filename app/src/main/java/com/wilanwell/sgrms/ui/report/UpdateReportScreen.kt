@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.report
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -50,6 +52,7 @@ fun UpdateReportScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val theSelectedReportCouldNotBeText = stringResource(R.string.the_selected_report_could_not_be)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
@@ -140,7 +143,7 @@ fun UpdateReportScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Update Report",
+            title = stringResource(R.string.update_report),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -174,36 +177,36 @@ fun UpdateReportScreen(
                 reportId.isBlank() || student == null -> {
                     SgrmsEmptyStateCard(
                         icon = Icons.Default.Summarize,
-                        title = "Report not found",
+                        title = stringResource(R.string.report_not_found),
                         message = if (errorMessage.isNotBlank()) {
                             errorMessage
                         } else {
-                            "The selected report could not be loaded."
+                            theSelectedReportCouldNotBeText
                         }
                     )
                 }
 
                 else -> {
                     SgrmsFormCard(
-                        title = "Report Information",
-                        subtitle = "Update additional report remarks",
+                        title = stringResource(R.string.report_information),
+                        subtitle = stringResource(R.string.update_additional_report_remarks),
                         icon = Icons.Default.Edit
                     ) {
                         SgrmsTextField(
-                            value = student.studentName.ifBlank { "Unknown Student" },
+                            value = student.studentName.ifBlank { stringResource(R.string.unknown_student) },
                             onValueChange = {},
-                            label = "Student Name",
-                            placeholder = "Student name",
+                            label = stringResource(R.string.student_name),
+                            placeholder = stringResource(R.string.student_name_2),
                             readOnly = true
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         SgrmsTextField(
-                            value = student.className.ifBlank { "Not assigned" },
+                            value = student.className.ifBlank { stringResource(R.string.not_assigned) },
                             onValueChange = {},
-                            label = "Class",
-                            placeholder = "Class",
+                            label = stringResource(R.string.class_label),
+                            placeholder = stringResource(R.string.class_label),
                             readOnly = true
                         )
 
@@ -212,8 +215,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = completedGrades.size.toString(),
                             onValueChange = {},
-                            label = "Completed Subjects",
-                            placeholder = "Completed subjects",
+                            label = stringResource(R.string.completed_subjects),
+                            placeholder = stringResource(R.string.completed_subjects_2),
                             readOnly = true
                         )
 
@@ -222,8 +225,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = "%.2f".format(totalMarks),
                             onValueChange = {},
-                            label = "Total Marks",
-                            placeholder = "Total marks",
+                            label = stringResource(R.string.total_marks),
+                            placeholder = stringResource(R.string.total_marks_2),
                             readOnly = true
                         )
 
@@ -232,8 +235,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = "%.2f%%".format(averageMarks),
                             onValueChange = {},
-                            label = "Average Marks",
-                            placeholder = "Average marks",
+                            label = stringResource(R.string.average_marks),
+                            placeholder = stringResource(R.string.average_marks_2),
                             readOnly = true
                         )
 
@@ -242,8 +245,8 @@ fun UpdateReportScreen(
                         SgrmsTextField(
                             value = overallGrade,
                             onValueChange = {},
-                            label = "Overall Grade",
-                            placeholder = "Overall grade",
+                            label = stringResource(R.string.overall_grade_2),
+                            placeholder = stringResource(R.string.overall_grade),
                             readOnly = true
                         )
 
@@ -255,12 +258,12 @@ fun UpdateReportScreen(
                                 remarks = it
                                 clearMessages()
                             },
-                            label = "Additional Remarks",
-                            placeholder = "Enter additional report remarks",
+                            label = stringResource(R.string.additional_remarks),
+                            placeholder = stringResource(R.string.enter_additional_report_remarks),
                             singleLine = false,
                             modifier = Modifier.height(130.dp),
                             isError = remarksError,
-                            errorMessage = "Remarks are required"
+                            errorMessage = stringResource(R.string.remarks_are_required)
                         )
 
                         if (errorMessage.isNotBlank()) {
@@ -295,7 +298,7 @@ fun UpdateReportScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                        cancelText = "Cancel",
+                                        cancelText = stringResource(R.string.cancel),
                                         confirmText = if (isSaving) {
                                             "Saving..."
                                         } else {

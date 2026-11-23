@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -53,6 +55,9 @@ fun UserManagementScreen(
     onAddStudentAccountClick: () -> Unit = {},
     onEditUserClick: (String) -> Unit = {}
 ) {
+    val allRolesText = stringResource(R.string.all_roles)
+    val systemAdminText = stringResource(R.string.system_admin)
+    val tryAnotherSearchOrRoleText = stringResource(R.string.try_another_search_or_role)
     val viewModel: UserManagementViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
 
@@ -75,7 +80,7 @@ fun UserManagementScreen(
     }
 
     val roleList = listOf(
-        "All Roles",
+        allRolesText,
         "Admin",
         "Teacher",
         "Student"
@@ -85,7 +90,7 @@ fun UserManagementScreen(
         val linkedId = when (user.role) {
             "Teacher" -> user.teacherId
             "Student" -> user.studentId
-            "Admin" -> "System Admin"
+            "Admin" -> systemAdminText
             else -> "-"
         }
 
@@ -107,8 +112,8 @@ fun UserManagementScreen(
 
     if (showDeleteDialog && selectedUserToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete User",
-            message = "This account will stop working at once. Its profile, grades, notifications and reports will be permanently removed. This cannot be undone.",
+            title = stringResource(R.string.delete_user),
+            message = stringResource(R.string.this_account_will_stop_working_at),
             onConfirmClick = {
                 val userToDelete = selectedUserToDelete
 
@@ -139,32 +144,32 @@ fun UserManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Users",
-        subtitle = "$adminCount admin · $teacherCount teachers · $studentCount students",
+        title = stringResource(R.string.users),
+        subtitle = stringResource(R.string.admin_teachers_students, adminCount, teacherCount, studentCount),
         onBack = onBackClick,
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search name, email or role",
+        searchPlaceholder = stringResource(R.string.search_name_email_or_role),
         isLoading = isLoading,
         errorMessage = errorMessage,
         isEmpty = filteredUsers.isEmpty(),
-        empty = EmptyContent("No users found", "Try another search or role.", Icons.Default.ManageAccounts),
+        empty = EmptyContent(stringResource(R.string.no_users_found), tryAnotherSearchOrRoleText, Icons.Default.ManageAccounts),
         chipGroups = listOf(ChipGroup(roleList, selectedRole) { selectedRole = it }),
         headerActions = {
             SgrmsOverflowMenu(
-                contentDescription = "Add account",
+                contentDescription = stringResource(R.string.add_account),
                 actions = listOf(
-                    RowAction("Add teacher", Icons.Default.PersonAdd, onClick = onAddTeacherClick),
-                    RowAction("Add student", Icons.Default.PersonAdd, onClick = onAddStudentAccountClick)
+                    RowAction(stringResource(R.string.add_teacher_2), Icons.Default.PersonAdd, onClick = onAddTeacherClick),
+                    RowAction(stringResource(R.string.add_student), Icons.Default.PersonAdd, onClick = onAddStudentAccountClick)
                 )
             )
         }
     ) {
         items(items = filteredUsers, key = { it.userId }) { user ->
             val linkedIdentity = when (user.role) {
-                "Student" -> user.studentId.ifBlank { "Not linked" }
-                "Teacher" -> user.teacherId.ifBlank { "Not linked" }
-                "Admin" -> "System Admin"
+                "Student" -> user.studentId.ifBlank { stringResource(R.string.not_linked) }
+                "Teacher" -> user.teacherId.ifBlank { stringResource(R.string.not_linked) }
+                "Admin" -> systemAdminText
                 else -> "-"
             }
             val tone = when (user.role) {
@@ -191,20 +196,20 @@ fun UserManagementScreen(
                         showViewDialog = true
                     }
                 ) {
-                    SgrmsStatusChip(user.role.ifBlank { "User" }, tone)
+                    SgrmsStatusChip(user.role.ifBlank { stringResource(R.string.user) }, tone)
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${user.fullName}",
+                        contentDescription = stringResource(R.string.actions_for, user.fullName),
                         actions = buildList {
-                            add(RowAction("View", Icons.Default.Visibility) {
+                            add(RowAction(stringResource(R.string.view), Icons.Default.Visibility) {
                                 selectedUserToView = user
                                 selectedLinkedIdentityToView = linkedIdentity
                                 showViewDialog = true
                             })
                             if (user.role == "Teacher" && user.teacherId.isNotBlank()) {
-                                add(RowAction("Edit", Icons.Default.Edit) { onEditUserClick(user.teacherId) })
+                                add(RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditUserClick(user.teacherId) })
                             }
                             if (user.role != "Admin") {
-                                add(RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                                add(RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                     selectedUserToDelete = user
                                     showDeleteDialog = true
                                 })
@@ -223,11 +228,13 @@ fun UserDetailDialog(
     linkedIdentity: String,
     onDismiss: () -> Unit
 ) {
+    val notSpecifiedText = stringResource(R.string.not_specified)
+    val unknownUserText = stringResource(R.string.unknown_user)
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "User Details",
+                text = stringResource(R.string.user_details),
                 fontWeight = FontWeight.Bold
             )
         },
@@ -235,9 +242,9 @@ fun UserDetailDialog(
             Column {
                 SgrmsInfoRow(
                     icon = Icons.Default.Person,
-                    label = "Full Name",
+                    label = stringResource(R.string.full_name),
                     value = user.fullName.ifBlank {
-                        "Unknown User"
+                        unknownUserText
                     }
                 )
 
@@ -245,7 +252,7 @@ fun UserDetailDialog(
 
                 SgrmsInfoRow(
                     icon = Icons.Default.Badge,
-                    label = "User ID",
+                    label = stringResource(R.string.user_id),
                     value = user.userId.ifBlank {
                         "-"
                     }
@@ -255,9 +262,9 @@ fun UserDetailDialog(
 
                 SgrmsInfoRow(
                     icon = Icons.Default.Email,
-                    label = "Email",
+                    label = stringResource(R.string.email),
                     value = user.email.ifBlank {
-                        "Not specified"
+                        notSpecifiedText
                     }
                 )
 
@@ -265,7 +272,7 @@ fun UserDetailDialog(
 
                 SgrmsInfoRow(
                     icon = Icons.Default.ManageAccounts,
-                    label = "Role",
+                    label = stringResource(R.string.role),
                     value = user.role.ifBlank {
                         "-"
                     }
@@ -275,7 +282,7 @@ fun UserDetailDialog(
 
                 SgrmsInfoRow(
                     icon = Icons.Default.Badge,
-                    label = "Linked ID",
+                    label = stringResource(R.string.linked_id),
                     value = linkedIdentity
                 )
             }
@@ -285,7 +292,7 @@ fun UserDetailDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.close),
                     color = ColorPrimary
                 )
             }

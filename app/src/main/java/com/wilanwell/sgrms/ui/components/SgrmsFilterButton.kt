@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -45,7 +47,7 @@ fun SgrmsFilterButton(
             if (showFilterIcon) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
-                    contentDescription = "Filter",
+                    contentDescription = stringResource(R.string.filter),
                     tint = ColorPrimary,
                     modifier = Modifier.size(18.dp)
                 )
@@ -63,7 +65,7 @@ fun SgrmsFilterButton(
 
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Open Filter",
+                contentDescription = stringResource(R.string.open_filter),
                 tint = ColorPrimary,
                 modifier = Modifier.size(18.dp)
             )

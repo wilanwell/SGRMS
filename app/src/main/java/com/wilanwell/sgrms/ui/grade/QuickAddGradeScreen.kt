@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.utils.isComplete
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -69,6 +71,7 @@ fun QuickAddGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val noMarksChangedEnterOrChangeText = stringResource(R.string.no_marks_changed_enter_or_change)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val subjectViewModel: SubjectFirebaseViewModel = hiltViewModel()
@@ -116,7 +119,7 @@ fun QuickAddGradeScreen(
 
     val classList = students
         .map { student ->
-            student.className.ifBlank { "Not assigned" }
+            student.className.ifBlank { stringResource(R.string.not_assigned) }
         }
         .distinct()
         .sorted()
@@ -145,7 +148,7 @@ fun QuickAddGradeScreen(
 
     val classStudents = students
         .filter { student ->
-            student.className.ifBlank { "Not assigned" } == selectedClassName
+            student.className.ifBlank { stringResource(R.string.not_assigned) } == selectedClassName
         }
         .sortedBy { student ->
             student.studentName
@@ -177,7 +180,7 @@ fun QuickAddGradeScreen(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             TopBar(
-                title = "Quick Add Grade",
+                title = stringResource(R.string.quick_add_grade),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false
@@ -214,7 +217,7 @@ fun QuickAddGradeScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Assessment,
-                                contentDescription = "Quick Grade",
+                                contentDescription = stringResource(R.string.quick_grade),
                                 tint = ColorPrimary,
                                 modifier = Modifier.size(30.dp)
                             )
@@ -223,13 +226,13 @@ fun QuickAddGradeScreen(
 
                             Column {
                                 Text(
-                                    text = "Bulk Grade Entry",
+                                    text = stringResource(R.string.bulk_grade_entry),
                                     fontSize = 22.sp,
                                     fontWeight = FontWeight.Bold
                                 )
 
                                 Text(
-                                    text = "Select class and subject, then enter marks for students",
+                                    text = stringResource(R.string.select_class_and_subject_then_enter),
                                     fontSize = 14.sp,
                                     color = ColorOnSurfaceVariant
                                 )
@@ -239,9 +242,9 @@ fun QuickAddGradeScreen(
                         Spacer(modifier = Modifier.height(18.dp))
 
                         SgrmsDropdownField(
-                            value = selectedClassName.ifBlank { "Select class" },
-                            label = "Class",
-                            placeholder = "Select class",
+                            value = selectedClassName.ifBlank { stringResource(R.string.select_class) },
+                            label = stringResource(R.string.class_label),
+                            placeholder = stringResource(R.string.select_class),
                             expanded = classExpanded,
                             onExpandedChange = {
                                 classExpanded = it
@@ -261,7 +264,7 @@ fun QuickAddGradeScreen(
 
                         if (classError) {
                             Text(
-                                text = "Class is required",
+                                text = stringResource(R.string.class_is_required),
                                 color = SgrmsColors.Error,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -271,9 +274,9 @@ fun QuickAddGradeScreen(
                         Spacer(modifier = Modifier.height(14.dp))
 
                         SgrmsDropdownField(
-                            value = selectedSubjectName.ifBlank { "Select subject" },
-                            label = "Subject",
-                            placeholder = "Select subject",
+                            value = selectedSubjectName.ifBlank { stringResource(R.string.select_subject) },
+                            label = stringResource(R.string.subject),
+                            placeholder = stringResource(R.string.select_subject),
                             expanded = subjectExpanded,
                             onExpandedChange = {
                                 subjectExpanded = it
@@ -299,7 +302,7 @@ fun QuickAddGradeScreen(
 
                         if (subjectError) {
                             Text(
-                                text = "Subject is required",
+                                text = stringResource(R.string.subject_is_required),
                                 color = SgrmsColors.Error,
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp)
@@ -310,7 +313,7 @@ fun QuickAddGradeScreen(
 
                         SgrmsInfoRow(
                             icon = Icons.Default.Person,
-                            label = "Students Found",
+                            label = stringResource(R.string.students_found),
                             value = if (selectedClassName.isBlank() || selectedClassName == "No class available") {
                                 "-"
                             } else {
@@ -334,7 +337,7 @@ fun QuickAddGradeScreen(
 
             item {
                 Text(
-                    text = "Student Marks",
+                    text = stringResource(R.string.student_marks),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -360,8 +363,8 @@ fun QuickAddGradeScreen(
                     item {
                         SgrmsEmptyStateCard(
                             icon = Icons.Default.School,
-                            title = "Select class and subject",
-                            message = "Choose a class and subject before entering marks."
+                            title = stringResource(R.string.select_class_and_subject),
+                            message = stringResource(R.string.choose_a_class_and_subject_before)
                         )
                     }
                 }
@@ -370,8 +373,8 @@ fun QuickAddGradeScreen(
                     item {
                         SgrmsEmptyStateCard(
                             icon = Icons.Default.Person,
-                            title = "No students in this class",
-                            message = "Add students to this class first before entering grades."
+                            title = stringResource(R.string.no_students_in_this_class),
+                            message = stringResource(R.string.add_students_to_this_class_first)
                         )
                     }
                 }
@@ -452,7 +455,7 @@ fun QuickAddGradeScreen(
                                     }
 
                                     if (gradeEntries.isEmpty()) {
-                                        marksErrorMessage = "No marks changed. Enter or change at least one mark."
+                                        marksErrorMessage = noMarksChangedEnterOrChangeText
                                     } else {
                                         gradeViewModel.saveBulkGrades(
                                             gradeEntries = gradeEntries,
@@ -479,14 +482,14 @@ fun QuickAddGradeScreen(
                             } else {
                                 Icon(
                                     imageVector = Icons.Default.Save,
-                                    contentDescription = "Save Grades",
+                                    contentDescription = stringResource(R.string.save_grades),
                                     tint = Color.White
                                 )
 
                                 Spacer(modifier = Modifier.size(8.dp))
 
                                 Text(
-                                    text = "Save All Grades",
+                                    text = stringResource(R.string.save_all_grades),
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -502,7 +505,7 @@ fun QuickAddGradeScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 color = ColorPrimary,
                                 fontWeight = FontWeight.Bold
                             )

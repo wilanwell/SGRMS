@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.components
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
@@ -63,7 +65,7 @@ fun SgrmsDropdownField(
         ) {
             if (items.isEmpty()) {
                 DropdownMenuItem(
-                    text = { Text("No item available") },
+                    text = { Text(stringResource(R.string.no_item_available)) },
                     onClick = { onExpandedChange(false) }
                 )
             } else {

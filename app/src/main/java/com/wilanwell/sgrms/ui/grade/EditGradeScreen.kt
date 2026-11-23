@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.grade
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +50,10 @@ fun EditGradeScreen(
     onBackClick: () -> Unit = {},
     onSaveClick: () -> Unit = {}
 ) {
+    val invalidGradeIdText = stringResource(R.string.invalid_grade_id)
+    val saveChangesText = stringResource(R.string.save_changes)
+    val text4Text = stringResource(R.string.text_4)
+    val text5Text = stringResource(R.string.text_5)
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -101,8 +107,8 @@ fun EditGradeScreen(
         listOf("No student available")
     } else {
         studentList.map { student ->
-            val className = student.className.ifBlank { "Not assigned" }
-            "${student.studentName} (${student.studentCode}) - $className"
+            val className = student.className.ifBlank { stringResource(R.string.not_assigned) }
+            text4Text.format(student.studentName, student.studentCode, className)
         }
     }
 
@@ -110,7 +116,7 @@ fun EditGradeScreen(
         listOf("No subject available")
     } else {
         subjectList.map { subject ->
-            "${subject.subjectName} (${subject.subjectCode})"
+            text5Text.format(subject.subjectName, subject.subjectCode)
         }
     }
 
@@ -138,13 +144,13 @@ fun EditGradeScreen(
 
             selectedStudentDisplay = if (student != null) {
                 val className = student.className.ifBlank { "Not assigned" }
-                "${student.studentName} (${student.studentCode}) - $className"
+                text4Text.format(student.studentName, student.studentCode, className)
             } else {
                 ""
             }
 
             selectedSubjectDisplay = if (subject != null) {
-                "${subject.subjectName} (${subject.subjectCode})"
+                text5Text.format(subject.subjectName, subject.subjectCode)
             } else {
                 ""
             }
@@ -180,7 +186,7 @@ fun EditGradeScreen(
             .imePadding()
     ) {
         TopBar(
-            title = "Edit Grade",
+            title = stringResource(R.string.edit_grade),
             showBack = true,
             onBackClick = onBackClick,
             showIcon = false
@@ -198,14 +204,14 @@ fun EditGradeScreen(
                 )
         ) {
             SgrmsFormCard(
-                title = "Grade Information",
-                subtitle = "Update student subject mark and grade",
+                title = stringResource(R.string.grade_information),
+                subtitle = stringResource(R.string.update_student_subject_mark_and_grade),
                 icon = Icons.Default.Edit
             ) {
                 SgrmsDropdownField(
-                    value = selectedStudentDisplay.ifBlank { "Select student" },
-                    label = "Student",
-                    placeholder = "Select student",
+                    value = selectedStudentDisplay.ifBlank { stringResource(R.string.select_student) },
+                    label = stringResource(R.string.student),
+                    placeholder = stringResource(R.string.select_student),
                     expanded = studentExpanded,
                     onExpandedChange = {
                         studentExpanded = it
@@ -229,15 +235,15 @@ fun EditGradeScreen(
                         studentExpanded = false
                     },
                     isError = studentError,
-                    errorMessage = "Student is required"
+                    errorMessage = stringResource(R.string.student_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsDropdownField(
-                    value = selectedSubjectDisplay.ifBlank { "Select subject" },
-                    label = "Subject",
-                    placeholder = "Select subject",
+                    value = selectedSubjectDisplay.ifBlank { stringResource(R.string.select_subject) },
+                    label = stringResource(R.string.subject),
+                    placeholder = stringResource(R.string.select_subject),
                     expanded = subjectExpanded,
                     onExpandedChange = {
                         subjectExpanded = it
@@ -260,7 +266,7 @@ fun EditGradeScreen(
                         subjectExpanded = false
                     },
                     isError = subjectError,
-                    errorMessage = "Subject is required"
+                    errorMessage = stringResource(R.string.subject_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -282,10 +288,10 @@ fun EditGradeScreen(
                             }
                         }
                     },
-                    label = "Marks",
-                    placeholder = "Enter marks",
+                    label = stringResource(R.string.marks),
+                    placeholder = stringResource(R.string.enter_marks),
                     isError = marksError,
-                    errorMessage = "Marks must be between 0 and 100",
+                    errorMessage = stringResource(R.string.marks_must_be_between_0_and),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal
                     )
@@ -298,24 +304,24 @@ fun EditGradeScreen(
                     onValueChange = {
                         gradeLetter = it
                     },
-                    label = "Grade Letter",
-                    placeholder = "Auto generated grade",
+                    label = stringResource(R.string.grade_letter),
+                    placeholder = stringResource(R.string.auto_generated_grade),
                     readOnly = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SgrmsSegmentedField(
-                    label = "Status",
+                    label = stringResource(R.string.status),
                     options = statusList,
-                    selected = selectedStatus.ifBlank { "Select status" },
+                    selected = selectedStatus.ifBlank { stringResource(R.string.select_status) },
                     onSelect = { it ->
                         selectedStatus = it
                         statusError = false
 clearMessages()
                     },
                     isError = statusError,
-                    errorMessage = "Status is required"
+                    errorMessage = stringResource(R.string.status_is_required)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -326,8 +332,8 @@ clearMessages()
                         remarks = it
                         clearMessages()
                     },
-                    label = "Remarks",
-                    placeholder = "Optional notes",
+                    label = stringResource(R.string.remarks),
+                    placeholder = stringResource(R.string.optional_notes),
                     singleLine = false,
                     modifier = Modifier.height(110.dp)
                 )
@@ -351,11 +357,11 @@ clearMessages()
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                                cancelText = "Cancel",
+                                cancelText = stringResource(R.string.cancel),
                                 confirmText = if (isLoading) {
                                     "Saving..."
                                 } else {
-                                    "Save Changes"
+                                    saveChangesText
                                 },
                                 onCancelClick = onBackClick,
                                 onConfirmClick = {
@@ -397,7 +403,7 @@ clearMessages()
                                             onSuccess = onSaveClick
                                         )
                                     } else if (gradeId.isBlank()) {
-                                        localErrorMessage = "Invalid grade ID"
+                                        localErrorMessage = invalidGradeIdText
                                     }
                                 }
                             )

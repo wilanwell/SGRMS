@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.student
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,6 +84,11 @@ fun StudentManagementScreen(
     onStudentDetailClick: (String) -> Unit = {},
     onEditStudentClick: (String) -> Unit = {}
 ) {
+    val allGenderText = stringResource(R.string.all_gender)
+    val allStatusText = stringResource(R.string.all_status)
+    val andTheirGradesNotificationsAndReportText = stringResource(R.string.and_their_grades_notifications_and_report)
+    val sortByCurrentText = stringResource(R.string.sort_by_current)
+    val sortByText = stringResource(R.string.sort_by)
     val context = LocalContext.current
 
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
@@ -122,13 +129,13 @@ fun StudentManagementScreen(
     val classList = listOf("All Classes") + classIdByName.keys.sorted()
 
     val genderList = listOf(
-        "All Gender",
+        allGenderText,
         "Male",
         "Female"
     )
 
     val statusList = listOf(
-        "All Status",
+        allStatusText,
         "Active",
         "Inactive"
     )
@@ -142,9 +149,9 @@ fun StudentManagementScreen(
     )
 
     val filteredStudents = students.filter { student ->
-        val studentClass = student.className.ifBlank { "Not assigned" }
-        val studentGender = student.gender.ifBlank { "Not specified" }
-        val studentStatus = student.status.ifBlank { "Active" }
+        val studentClass = student.className.ifBlank { stringResource(R.string.not_assigned) }
+        val studentGender = student.gender.ifBlank { stringResource(R.string.not_specified) }
+        val studentStatus = student.status.ifBlank { stringResource(R.string.active) }
 
         val matchesSearch =
             student.studentName.contains(searchText, ignoreCase = true) ||
@@ -191,8 +198,8 @@ fun StudentManagementScreen(
 
     if (showDeleteDialog && selectedStudentToDelete != null) {
         SgrmsDeleteDialog(
-            title = "Delete student?",
-            message = "${selectedStudentToDelete?.studentName} and their grades, notifications and report will be removed. This cannot be undone.",
+            title = stringResource(R.string.delete_student),
+            message = andTheirGradesNotificationsAndReportText.format(selectedStudentToDelete?.studentName),
             onConfirmClick = {
                 selectedStudentToDelete?.let { studentViewModel.deleteStudent(studentId = it.studentId) }
                 showDeleteDialog = false
@@ -206,17 +213,17 @@ fun StudentManagementScreen(
     }
 
     SgrmsListScreen(
-        title = "Students",
+        title = stringResource(R.string.students),
         subtitle = "${filteredStudents.size} shown · ${students.size}${if (uiState.hasMore) "+" else ""} loaded",
         searchText = searchText,
         onSearchChange = { searchText = it },
-        searchPlaceholder = "Search name, code, email or phone",
+        searchPlaceholder = stringResource(R.string.search_name_code_email_or_phone),
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         isEmpty = filteredStudents.isEmpty(),
         empty = EmptyContent(
-            title = "No students found",
-            message = "Try another search or filter.",
+            title = stringResource(R.string.no_students_found),
+            message = stringResource(R.string.try_another_search_or_filter),
             icon = Icons.Default.Group
         ),
         chipGroups = listOf(
@@ -224,16 +231,16 @@ fun StudentManagementScreen(
             ChipGroup(statusList, selectedStatus) { selectedStatus = it },
             ChipGroup(genderList, selectedGender) { selectedGender = it }
         ),
-        fab = if (canAddStudent) ListFab("Add student", Icons.Default.PersonAdd, onAddStudentClick) else null,
+        fab = if (canAddStudent) ListFab(stringResource(R.string.add_student), Icons.Default.PersonAdd, onAddStudentClick) else null,
         headerActions = {
             SgrmsOverflowMenu(
-                contentDescription = "Sort and export",
+                contentDescription = stringResource(R.string.sort_and_export),
                 actions = sortList.map { option ->
                     RowAction(
-                        label = if (option == selectedSort) "Sort by $option (current)" else "Sort by $option",
+                        label = if (option == selectedSort) sortByCurrentText.format(option) else sortByText.format(option),
                         icon = Icons.AutoMirrored.Filled.Sort
                     ) { selectedSort = option }
-                } + RowAction("Export CSV", Icons.Default.FileDownload) {
+                } + RowAction(stringResource(R.string.export_csv), Icons.Default.FileDownload) {
                     exportStudentListToCsv(context = context, students = filteredStudents)
                 }
             )
@@ -242,10 +249,10 @@ fun StudentManagementScreen(
         items(items = filteredStudents, key = { it.studentId }) { student ->
             Box(ListItemPadding) {
                 SgrmsListItemCard(
-                    title = student.studentName.ifBlank { "Unnamed student" },
+                    title = student.studentName.ifBlank { stringResource(R.string.unnamed_student) },
                     subtitle = listOf(
                         student.studentCode,
-                        student.className.ifBlank { "No class" },
+                        student.className.ifBlank { stringResource(R.string.no_class) },
                         student.gender
                     ).filter { it.isNotBlank() }.joinToString(" · "),
                     leading = {
@@ -258,14 +265,14 @@ fun StudentManagementScreen(
                     },
                     onClick = { onStudentDetailClick(student.studentId) }
                 ) {
-                    val status = student.status.ifBlank { "Active" }
+                    val status = student.status.ifBlank { stringResource(R.string.active) }
                     SgrmsStatusChip(text = status, tone = toneForStatus(status))
                     SgrmsOverflowMenu(
-                        contentDescription = "Actions for ${student.studentName}",
+                        contentDescription = stringResource(R.string.actions_for, student.studentName),
                         actions = listOf(
-                            RowAction("View", Icons.Default.Visibility) { onStudentDetailClick(student.studentId) },
-                            RowAction("Edit", Icons.Default.Edit) { onEditStudentClick(student.studentId) },
-                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                            RowAction(stringResource(R.string.view), Icons.Default.Visibility) { onStudentDetailClick(student.studentId) },
+                            RowAction(stringResource(R.string.edit), Icons.Default.Edit) { onEditStudentClick(student.studentId) },
+                            RowAction(stringResource(R.string.delete), Icons.Default.Delete, destructive = true) {
                                 selectedStudentToDelete = student
                                 showDeleteDialog = true
                             }

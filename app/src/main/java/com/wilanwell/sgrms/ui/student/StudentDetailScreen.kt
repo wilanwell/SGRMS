@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.student
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -47,6 +49,9 @@ fun StudentDetailScreen(
     onDeleteClick: () -> Unit = {},
     onViewGradeClick: () -> Unit = {}
 ) {
+    val noGradesRecordedYetText = stringResource(R.string.no_grades_recorded_yet)
+    val noGradesText = stringResource(R.string.no_grades)
+    val overallText = stringResource(R.string.overall)
     val studentViewModel: StudentFirebaseViewModel = hiltViewModel()
 
     val gradeViewModel: GradeFirebaseViewModel = hiltViewModel()
@@ -75,7 +80,7 @@ fun StudentDetailScreen(
         }
 
         StudentDetailSubjectItem(
-            subjectName = subject?.subjectName ?: "Unknown Subject",
+            subjectName = subject?.subjectName ?: stringResource(R.string.unknown_subject),
             subjectCode = subject?.subjectCode ?: "-",
             marks = grade.marks,
             grade = grade.gradeLetter
@@ -84,13 +89,13 @@ fun StudentDetailScreen(
         subject.subjectName
     }
 
-    val studentName = student?.studentName ?: "Unknown Student"
+    val studentName = student?.studentName ?: stringResource(R.string.unknown_student)
     val studentCode = student?.studentCode ?: "-"
     val email = student?.email ?: "-"
     val phoneNumber = student?.phoneNumber ?: "-"
     val gender = student?.gender ?: "-"
     val className = student?.className ?: "-"
-    val status = student?.status?.ifBlank { "Active" } ?: "Active"
+    val status = student?.status?.ifBlank { stringResource(R.string.active) } ?: stringResource(R.string.active)
 
     val totalMarks = subjectResults.sumOf { subject ->
         subject.marks
@@ -120,14 +125,14 @@ fun StudentDetailScreen(
     }
 
     SgrmsDetailScreen(
-        title = "Student",
+        title = stringResource(R.string.student),
         onBack = onBackClick,
         isLoading = isLoading && student == null,
         errorMessage = if (student != null) errorMessage else "",
         bottomBar = if (student != null) {
             {
-                SgrmsSecondaryButton(text = "Edit", icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
-                SgrmsPrimaryButton(text = "Grades", icon = Icons.Default.Assessment, onClick = onViewGradeClick, modifier = Modifier.weight(1f))
+                SgrmsSecondaryButton(text = stringResource(R.string.edit), icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
+                SgrmsPrimaryButton(text = stringResource(R.string.grades), icon = Icons.Default.Assessment, onClick = onViewGradeClick, modifier = Modifier.weight(1f))
             }
         } else {
             null
@@ -135,8 +140,8 @@ fun StudentDetailScreen(
     ) {
         if (student == null) {
             SgrmsEmptyState(
-                title = "Student not found",
-                message = errorMessage.ifBlank { "The selected student record could not be loaded." },
+                title = stringResource(R.string.student_not_found),
+                message = errorMessage.ifBlank { stringResource(R.string.the_selected_student_record_could_not) },
                 icon = Icons.Default.Person
             )
             return@SgrmsDetailScreen
@@ -144,7 +149,7 @@ fun StudentDetailScreen(
 
         SgrmsDetailHero(
             title = studentName,
-            subtitle = "$studentCode · $className",
+            subtitle = stringResource(R.string.text, studentCode, className),
             leading = {
                 SgrmsAvatar(
                     name = studentName,
@@ -156,31 +161,31 @@ fun StudentDetailScreen(
         ) {
             SgrmsStatusChip(status, toneForStatus(status))
             SgrmsStatusChip(
-                if (subjectResults.isEmpty()) "No grades" else "Overall $overallGrade",
+                if (subjectResults.isEmpty()) noGradesText else overallText.format(overallGrade),
                 if (subjectResults.isEmpty()) ChipTone.Neutral else toneForGrade(overallGrade)
             )
         }
 
-        SgrmsInfoSection("Contact") {
-            SgrmsInfoRow(icon = Icons.Default.Email, label = "Email", value = email)
+        SgrmsInfoSection(stringResource(R.string.contact)) {
+            SgrmsInfoRow(icon = Icons.Default.Email, label = stringResource(R.string.email), value = email)
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = phoneNumber)
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = stringResource(R.string.phone), value = phoneNumber)
             SgrmsRowDivider()
-            SgrmsInfoRow(icon = Icons.Default.Person, label = "Gender", value = gender)
+            SgrmsInfoRow(icon = Icons.Default.Person, label = stringResource(R.string.gender), value = gender)
         }
 
         if (student.guardianName.isNotBlank() || student.guardianPhone.isNotBlank() || student.address.isNotBlank() || student.dateOfBirth.isNotBlank()) {
-            SgrmsInfoSection("Personal") {
-                SgrmsInfoRow(icon = Icons.Default.Cake, label = "Date of birth", value = student.dateOfBirth)
+            SgrmsInfoSection(stringResource(R.string.personal)) {
+                SgrmsInfoRow(icon = Icons.Default.Cake, label = stringResource(R.string.date_of_birth_2), value = student.dateOfBirth)
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.Default.FamilyRestroom, label = "Guardian", value = listOf(student.guardianName, student.guardianPhone).filter { it.isNotBlank() }.joinToString(" · "))
+                SgrmsInfoRow(icon = Icons.Default.FamilyRestroom, label = stringResource(R.string.guardian), value = listOf(student.guardianName, student.guardianPhone).filter { it.isNotBlank() }.joinToString(" · "))
                 SgrmsRowDivider()
-                SgrmsInfoRow(icon = Icons.Default.Home, label = "Address", value = student.address)
+                SgrmsInfoRow(icon = Icons.Default.Home, label = stringResource(R.string.address), value = student.address)
             }
         }
 
         SgrmsInfoSection(
-            title = "Subjects",
+            title = stringResource(R.string.subjects),
             trailing = {
                 if (subjectResults.isNotEmpty()) {
                     Text("Avg ${"%.1f".format(averageMarks)}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -189,7 +194,7 @@ fun StudentDetailScreen(
         ) {
             if (subjectResults.isEmpty()) {
                 Text(
-                    "No grades recorded yet.",
+                    noGradesRecordedYetText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 16.dp)

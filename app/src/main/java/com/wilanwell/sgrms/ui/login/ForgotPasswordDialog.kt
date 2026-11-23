@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.login
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,21 +65,19 @@ fun ForgotPasswordDialog(
     AlertDialog(
         onDismissRequest = { if (!isSending) close() },
         title = {
-            Text(text = "Reset Password", fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.reset_password), fontWeight = FontWeight.Bold)
         },
         text = {
             when (val current = state) {
                 is PasswordResetState.Sent -> Text(
-                    text = "If an account exists for ${current.email}, a password reset link " +
-                        "has been sent to it. Check your inbox and spam folder, then log in " +
-                        "with your new password.",
+                    text = stringResource(R.string.password_reset_link_sent, current.email),
                     fontSize = 14.sp,
                     color = SgrmsColors.Success
                 )
 
                 else -> Column {
                     Text(
-                        text = "Enter the email you use to log in. We will send you a link to set a new password.",
+                        text = stringResource(R.string.enter_the_email_you_use_to),
                         fontSize = 14.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -96,7 +96,7 @@ fun ForgotPasswordDialog(
                             email = it
                             if (state !is PasswordResetState.Idle) viewModel.reset()
                         },
-                        label = { Text("Email") },
+                        label = { Text(stringResource(R.string.email)) },
                         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
                         singleLine = true,
                         enabled = !isSending,
@@ -121,7 +121,7 @@ fun ForgotPasswordDialog(
         confirmButton = {
             if (state is PasswordResetState.Sent) {
                 TextButton(onClick = { close() }) {
-                    Text(text = "OK", color = ColorPrimary, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.ok), color = ColorPrimary, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Button(
@@ -137,7 +137,7 @@ fun ForgotPasswordDialog(
                             modifier = Modifier.size(18.dp)
                         )
                     } else {
-                        Text(text = "Send Link")
+                        Text(text = stringResource(R.string.send_link))
                     }
                 }
             }
@@ -145,7 +145,7 @@ fun ForgotPasswordDialog(
         dismissButton = {
             if (state !is PasswordResetState.Sent) {
                 TextButton(onClick = { close() }, enabled = !isSending) {
-                    Text(text = "Cancel", color = ColorOnSurfaceVariant)
+                    Text(text = stringResource(R.string.cancel), color = ColorOnSurfaceVariant)
                 }
             }
         }

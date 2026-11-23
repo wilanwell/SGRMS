@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -69,12 +71,12 @@ fun AddStudentToClassDialog(
         title = {
             Column {
                 Text(
-                    text = "Add Student",
+                    text = stringResource(R.string.add_student_2),
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    text = "Choose an unassigned student to add into $className",
+                    text = stringResource(R.string.choose_an_unassigned_student_to_add, className),
                     fontSize = 13.sp,
                     color = ColorOnSurfaceVariant
                 )
@@ -87,8 +89,8 @@ fun AddStudentToClassDialog(
                     onValueChange = {
                         searchText = it
                     },
-                    label = "Search Student",
-                    placeholder = "Search by name or code"
+                    label = stringResource(R.string.search_student),
+                    placeholder = stringResource(R.string.search_by_name_or_code)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -96,8 +98,8 @@ fun AddStudentToClassDialog(
                 if (filteredStudents.isEmpty()) {
                     SgrmsEmptyStateCard(
                         icon = Icons.Default.Group,
-                        title = "No available student",
-                        message = "No unassigned students are available."
+                        title = stringResource(R.string.no_available_student),
+                        message = stringResource(R.string.no_unassigned_students_are_available)
                     )
                 } else {
                     LazyColumn(
@@ -126,7 +128,7 @@ fun AddStudentToClassDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Close",
+                    text = stringResource(R.string.close),
                     color = ColorPrimary
                 )
             }
@@ -166,7 +168,7 @@ fun AddStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
+                    contentDescription = stringResource(R.string.student),
                     tint = Color.White
                 )
             }
@@ -183,7 +185,7 @@ fun AddStudentSelectionCard(
                 )
 
                 Text(
-                    text = "Code: ${student.studentCode}",
+                    text = stringResource(R.string.code, student.studentCode),
                     fontSize = 13.sp,
                     color = ColorOnSurfaceVariant
                 )
@@ -204,7 +206,7 @@ fun AddStudentSelectionCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Student",
+                    contentDescription = stringResource(R.string.add_student_2),
                     tint = Color.White,
                     modifier = Modifier.size(18.dp)
                 )
@@ -223,13 +225,13 @@ fun RemoveStudentFromClassDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Remove Student",
+                text = stringResource(R.string.remove_student),
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Text(
-                text = "Are you sure you want to remove ${student.studentName} from this class?"
+                text = stringResource(R.string.are_you_sure_you_want_to, student.studentName)
             )
         },
         confirmButton = {
@@ -240,7 +242,7 @@ fun RemoveStudentFromClassDialog(
                 )
             ) {
                 Text(
-                    text = "Remove",
+                    text = stringResource(R.string.remove),
                     color = Color.White
                 )
             }
@@ -250,7 +252,7 @@ fun RemoveStudentFromClassDialog(
                 onClick = onDismiss
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     color = ColorPrimary
                 )
             }

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.admin
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.SgrmsPasswordField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -83,7 +85,7 @@ fun AddTeacherScreen(
                     .fillMaxWidth()
                     .navigationBarsPadding()
                     .padding(horizontal = 20.dp, vertical = 12.dp),
-                        cancelText = "Cancel",
+                        cancelText = stringResource(R.string.cancel),
                         confirmText = if (uiState.isLoading) {
                             "Saving..."
                         } else {
@@ -120,7 +122,7 @@ fun AddTeacherScreen(
         },
         topBar = {
             TopBar(
-                title = "Add Teacher",
+                title = stringResource(R.string.add_teacher),
                 showBack = true,
                 onBackClick = onBackClick,
                 showIcon = false
@@ -147,13 +149,13 @@ fun AddTeacherScreen(
                     modifier = Modifier.padding(18.dp)
                 ) {
                     Text(
-                        text = "Teacher Information",
+                        text = stringResource(R.string.teacher_information),
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Create a teacher profile and Firebase login account",
+                        text = stringResource(R.string.create_a_teacher_profile_and_firebase),
                         fontSize = 14.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -167,12 +169,12 @@ fun AddTeacherScreen(
                             staffIdError = false
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Staff ID") },
-                        placeholder = { Text("Example: STF001") },
+                        label = { Text(stringResource(R.string.staff_id)) },
+                        placeholder = { Text(stringResource(R.string.example_stf001)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Badge,
-                                contentDescription = "Staff ID"
+                                contentDescription = stringResource(R.string.staff_id)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -181,7 +183,7 @@ fun AddTeacherScreen(
                         isError = staffIdError,
                         supportingText = {
                             if (staffIdError) {
-                                Text("Staff ID is required")
+                                Text(stringResource(R.string.staff_id_is_required))
                             }
                         },
                         colors = sgrmsFieldColors()
@@ -196,12 +198,12 @@ fun AddTeacherScreen(
                             teacherNameError = false
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Teacher Name") },
-                        placeholder = { Text("Enter teacher full name") },
+                        label = { Text(stringResource(R.string.teacher_name)) },
+                        placeholder = { Text(stringResource(R.string.enter_teacher_full_name)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "Teacher Name"
+                                contentDescription = stringResource(R.string.teacher_name)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -210,7 +212,7 @@ fun AddTeacherScreen(
                         isError = teacherNameError,
                         supportingText = {
                             if (teacherNameError) {
-                                Text("Teacher name is required")
+                                Text(stringResource(R.string.teacher_name_is_required))
                             }
                         },
                         colors = sgrmsFieldColors()
@@ -225,12 +227,12 @@ fun AddTeacherScreen(
                             emailError = false
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Email") },
-                        placeholder = { Text("Example: teacher@sgrms.com") },
+                        label = { Text(stringResource(R.string.email)) },
+                        placeholder = { Text(stringResource(R.string.example_teacher_sgrms_com)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Email,
-                                contentDescription = "Email"
+                                contentDescription = stringResource(R.string.email)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -239,7 +241,7 @@ fun AddTeacherScreen(
                         isError = emailError,
                         supportingText = {
                             if (emailError) {
-                                Text("Email is required")
+                                Text(stringResource(R.string.email_is_required))
                             }
                         },
                         colors = sgrmsFieldColors()
@@ -253,12 +255,12 @@ fun AddTeacherScreen(
                             phoneNumber = it
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Phone Number") },
-                        placeholder = { Text("Example: 0123456789") },
+                        label = { Text(stringResource(R.string.phone_number)) },
+                        placeholder = { Text(stringResource(R.string.example_0123456789)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Phone,
-                                contentDescription = "Phone Number"
+                                contentDescription = stringResource(R.string.phone_number)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -275,12 +277,12 @@ fun AddTeacherScreen(
                             department = it
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Department") },
-                        placeholder = { Text("Example: Academic Department") },
+                        label = { Text(stringResource(R.string.department)) },
+                        placeholder = { Text(stringResource(R.string.example_academic_department)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Work,
-                                contentDescription = "Department"
+                                contentDescription = stringResource(R.string.department)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -294,12 +296,12 @@ fun AddTeacherScreen(
                     OutlinedTextField(
                         value = position,
                         onValueChange = {},
-                        label = { Text("Position") },
-                        placeholder = { Text("Example: Teacher") },
+                        label = { Text(stringResource(R.string.position)) },
+                        placeholder = { Text(stringResource(R.string.example_teacher)) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Work,
-                                contentDescription = "Position"
+                                contentDescription = stringResource(R.string.position)
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -318,10 +320,10 @@ fun AddTeacherScreen(
                             passwordError = false
                             teacherViewModel.clearMessage()
                         },
-                        label = "Login Password",
-                        placeholder = "Enter teacher login password",
+                        label = stringResource(R.string.login_password),
+                        placeholder = stringResource(R.string.enter_teacher_login_password),
                         isError = passwordError,
-                        errorMessage = "Password is required"
+                        errorMessage = stringResource(R.string.password_is_required)
                     )
 
                     if (uiState.errorMessage.isNotBlank()) {

@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.profile
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -65,6 +67,9 @@ fun EditStudentProfileScreen(
     onBackClick: () -> Unit = {},
     onSaveSuccess: () -> Unit = {}
 ) {
+    val enterAValidEmergencyContactText = stringResource(R.string.enter_a_valid_emergency_contact)
+    val enterAValidGuardianPhoneNumberText = stringResource(R.string.enter_a_valid_guardian_phone_number)
+    val enterAValidPhoneNumberText = stringResource(R.string.enter_a_valid_phone_number)
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -153,15 +158,15 @@ fun EditStudentProfileScreen(
         clearErrors()
 
         if (!isValidPhone(phoneNumber)) {
-            phoneNumberError = "Enter a valid phone number"
+            phoneNumberError = enterAValidPhoneNumberText
         }
 
         if (!isValidPhone(guardianPhone)) {
-            guardianPhoneError = "Enter a valid guardian phone number"
+            guardianPhoneError = enterAValidGuardianPhoneNumberText
         }
 
         if (!isValidPhone(emergencyContact)) {
-            emergencyContactError = "Enter a valid emergency contact"
+            emergencyContactError = enterAValidEmergencyContactText
         }
 
         return phoneNumberError.isBlank() &&
@@ -239,7 +244,7 @@ fun EditStudentProfileScreen(
             .navigationBarsPadding()
     ) {
         TopBar(
-            title = "Edit Student Profile",
+            title = stringResource(R.string.edit_student_profile),
             showBack = true,
             onBackClick = onBackClick
         )
@@ -273,13 +278,13 @@ fun EditStudentProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Profile Information",
+                        text = stringResource(R.string.profile_information),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Update contact, guardian, and profile picture",
+                        text = stringResource(R.string.update_contact_guardian_and_profile_picture),
                         fontSize = 14.sp,
                         color = ColorOnSurfaceVariant
                     )
@@ -294,7 +299,7 @@ fun EditStudentProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "Loading student profile...",
+                            text = stringResource(R.string.loading_student_profile),
                             fontSize = 14.sp,
                             color = ColorOnSurfaceVariant
                         )
@@ -325,7 +330,7 @@ fun EditStudentProfileScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "Remove Picture",
+                                    text = stringResource(R.string.remove_picture),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -348,7 +353,7 @@ fun EditStudentProfileScreen(
                         SgrmsTextField(
                             value = student?.studentName ?: "",
                             onValueChange = {},
-                            label = "Student Name",
+                            label = stringResource(R.string.student_name),
                             leadingIcon = Icons.Default.Person,
                             enabled = false
                         )
@@ -358,7 +363,7 @@ fun EditStudentProfileScreen(
                         SgrmsTextField(
                             value = student?.studentCode ?: "",
                             onValueChange = {},
-                            label = "Student ID",
+                            label = stringResource(R.string.student_id),
                             leadingIcon = Icons.Default.Badge,
                             enabled = false
                         )
@@ -368,7 +373,7 @@ fun EditStudentProfileScreen(
                         SgrmsTextField(
                             value = student?.className ?: "",
                             onValueChange = {},
-                            label = "Class",
+                            label = stringResource(R.string.class_label),
                             leadingIcon = Icons.Default.Badge,
                             enabled = false
                         )
@@ -376,7 +381,7 @@ fun EditStudentProfileScreen(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         Text(
-                            text = "Personal Details",
+                            text = stringResource(R.string.personal_details),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth()
@@ -389,8 +394,8 @@ fun EditStudentProfileScreen(
                             SgrmsTextField(
                                 value = dateOfBirth,
                                 onValueChange = {},
-                                label = "Date of Birth",
-                                placeholder = "Tap to choose a date",
+                                label = stringResource(R.string.date_of_birth),
+                                placeholder = stringResource(R.string.tap_to_choose_a_date),
                                 leadingIcon = Icons.Default.CalendarMonth,
                                 readOnly = true
                             )
@@ -410,7 +415,7 @@ fun EditStudentProfileScreen(
                                 phoneNumberError = ""
                                 generalError = ""
                             },
-                            label = "Phone Number",
+                            label = stringResource(R.string.phone_number),
                             leadingIcon = Icons.Default.Phone,
                             isError = phoneNumberError.isNotBlank(),
                             errorMessage = phoneNumberError,
@@ -425,7 +430,7 @@ fun EditStudentProfileScreen(
                                 address = it
                                 clearErrors()
                             },
-                            label = "Address",
+                            label = stringResource(R.string.address),
                             leadingIcon = Icons.Default.Home,
                             singleLine = false,
                             minLines = 2,
@@ -435,7 +440,7 @@ fun EditStudentProfileScreen(
                         Spacer(modifier = Modifier.height(22.dp))
 
                         Text(
-                            text = "Guardian Details",
+                            text = stringResource(R.string.guardian_details),
                             fontSize = 17.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.fillMaxWidth()
@@ -449,7 +454,7 @@ fun EditStudentProfileScreen(
                                 guardianName = it
                                 clearErrors()
                             },
-                            label = "Guardian Name",
+                            label = stringResource(R.string.guardian_name),
                             leadingIcon = Icons.Default.Person,
                             enabled = !isSaving
                         )
@@ -463,7 +468,7 @@ fun EditStudentProfileScreen(
                                 guardianPhoneError = ""
                                 generalError = ""
                             },
-                            label = "Guardian Phone",
+                            label = stringResource(R.string.guardian_phone),
                             leadingIcon = Icons.Default.Phone,
                             isError = guardianPhoneError.isNotBlank(),
                             errorMessage = guardianPhoneError,
@@ -479,7 +484,7 @@ fun EditStudentProfileScreen(
                                 emergencyContactError = ""
                                 generalError = ""
                             },
-                            label = "Emergency Contact",
+                            label = stringResource(R.string.emergency_contact),
                             leadingIcon = Icons.Default.Emergency,
                             isError = emergencyContactError.isNotBlank(),
                             errorMessage = emergencyContactError,
@@ -494,7 +499,7 @@ fun EditStudentProfileScreen(
                                 profileNote = it
                                 clearErrors()
                             },
-                            label = "Profile Note",
+                            label = stringResource(R.string.profile_note),
                             leadingIcon = Icons.Default.Note,
                             singleLine = false,
                             minLines = 3,
@@ -537,7 +542,7 @@ fun EditStudentProfileScreen(
                                 )
                             } else {
                                 Text(
-                                    text = "Save Changes",
+                                    text = stringResource(R.string.save_changes),
                                     color = Color.White,
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
@@ -559,7 +564,7 @@ fun EditStudentProfileScreen(
                             )
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(R.string.cancel),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )

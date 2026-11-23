@@ -1,5 +1,7 @@
 package com.wilanwell.sgrms.ui.dashboard
 
+import com.wilanwell.sgrms.R
+import androidx.compose.ui.res.stringResource
 import com.wilanwell.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -62,6 +64,7 @@ fun TeacherDashboardScreen(
     onReportClick: () -> Unit = {},
     onProfileClick: () -> Unit = {}
 ) {
+    val acrossSubjectsGradeRecordsText = stringResource(R.string.across_subjects_grade_records)
     val viewModel: TeacherDashboardViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
     OnReturnToScreen { viewModel.load() }
@@ -75,7 +78,7 @@ fun TeacherDashboardScreen(
     ) {
         SgrmsPageHeader(
             title = uiState.teacherName,
-            subtitle = greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY)),
+            subtitle = stringResource(greetingFor(Calendar.getInstance().get(Calendar.HOUR_OF_DAY))),
             trailing = {
                 IconButton(onClick = onProfileClick) {
                     SgrmsAvatar(name = uiState.teacherName, size = 44.dp, imageUrl = uiState.teacherImageUrl, legacyImageBase64 = uiState.teacherImageBase64)
@@ -101,10 +104,10 @@ fun TeacherDashboardScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("Students you teach", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
+                    Text(stringResource(R.string.students_you_teach), style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
                     Text(shown(summary.students), style = MaterialTheme.typography.displayMedium, color = Color.White)
                     Text(
-                        text = if (uiState.loaded) "across ${summary.subjects} subjects · ${summary.grades} grade records" else "Loading…",
+                        text = if (uiState.loaded) acrossSubjectsGradeRecordsText.format(summary.subjects, summary.grades) else "Loading…",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFE0E7FF)
                     )
@@ -114,44 +117,44 @@ fun TeacherDashboardScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = shown(summary.students), label = "Students", icon = Icons.Default.Group,
+                        value = shown(summary.students), label = stringResource(R.string.students), icon = Icons.Default.Group,
                         tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer,
                         onClick = onStudentClick, modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = shown(summary.subjects), label = "Subjects", icon = Icons.AutoMirrored.Filled.MenuBook,
+                        value = shown(summary.subjects), label = stringResource(R.string.subjects), icon = Icons.AutoMirrored.Filled.MenuBook,
                         tint = SgrmsColors.Orange, container = SgrmsColors.OrangeContainer,
                         onClick = onSubjectClick, modifier = Modifier.weight(1f)
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = shown(summary.grades), label = "Grades", icon = Icons.Default.Assessment,
+                        value = shown(summary.grades), label = stringResource(R.string.grades), icon = Icons.Default.Assessment,
                         tint = SgrmsColors.Success, container = SgrmsColors.SuccessContainer,
                         onClick = onGradeClick, modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = shown(summary.reports), label = "Reports", icon = Icons.Default.Summarize,
+                        value = shown(summary.reports), label = stringResource(R.string.reports), icon = Icons.Default.Summarize,
                         tint = SgrmsColors.Pink, container = SgrmsColors.PinkContainer,
                         onClick = onReportClick, modifier = Modifier.weight(1f)
                     )
                 }
             }
 
-            SgrmsSectionTitle("Quick actions")
+            SgrmsSectionTitle(stringResource(R.string.quick_actions))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                QuickAction("Add grades", Icons.Default.EditNote, onGradeClick, Modifier.weight(1f))
-                QuickAction("Reports", Icons.Default.Summarize, onReportClick, Modifier.weight(1f))
+                QuickAction(stringResource(R.string.add_grades), Icons.Default.EditNote, onGradeClick, Modifier.weight(1f))
+                QuickAction(stringResource(R.string.reports), Icons.Default.Summarize, onReportClick, Modifier.weight(1f))
             }
 
-            SgrmsSectionTitle("Subject averages")
+            SgrmsSectionTitle(stringResource(R.string.subject_averages))
             when {
                 uiState.isLoading && summary.subjectAverages.isEmpty() ->
                     Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
 
                 summary.subjectAverages.isEmpty() -> SgrmsEmptyState(
-                    title = "No averages yet",
-                    message = "Add subjects and grades to see how each subject is doing.",
+                    title = stringResource(R.string.no_averages_yet),
+                    message = stringResource(R.string.add_subjects_and_grades_to_see),
                     icon = Icons.Default.Assessment
                 )
 
@@ -161,7 +164,7 @@ fun TeacherDashboardScreen(
                         Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Row {
                                 Text(
-                                    item.subjectName.ifBlank { "Unnamed subject" },
+                                    item.subjectName.ifBlank { stringResource(R.string.unnamed_subject) },
                                     style = MaterialTheme.typography.titleSmall,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
