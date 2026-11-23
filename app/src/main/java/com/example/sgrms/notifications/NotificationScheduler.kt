@@ -33,9 +33,13 @@ class NotificationScheduler @Inject constructor(
         )
     }
 
+    /**
+     * Stops checking on logout. The per-student "last checked" time is kept on
+     * purpose: grades entered while the student was logged out are then shown
+     * as phone notifications at their next login instead of being skipped.
+     */
     fun stop() {
         WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
-        NotificationCheckStore(context).clear()
     }
 
     private companion object {

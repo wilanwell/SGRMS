@@ -6,6 +6,7 @@ import com.example.sgrms.data.model.GradeModel
 import com.example.sgrms.data.model.NotificationModel
 import com.example.sgrms.data.repository.GradeFirebaseRepository
 import com.example.sgrms.data.repository.NotificationFirebaseRepository
+import com.example.sgrms.data.session.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,10 +39,34 @@ data class GradeBulkEntry(
     val subjectName: String = ""
 )
 
+/**
+ * The grade document a bulk entry saves. A new grade records [teacherId] as
+ * its creator; an update keeps the original creator, creation time and the
+ * teacher's remarks unless the entry brings new remarks.
+ */
+fun bulkGradeRecord(existing: GradeModel?, entry: GradeBulkEntry, teacherId: String, now: Long): GradeModel =
+    existing?.copy(
+        marks = entry.marks,
+        gradeLetter = entry.gradeLetter,
+        status = entry.status,
+        remarks = entry.remarks.ifBlank { existing.remarks },
+        createdByTeacherId = existing.createdByTeacherId.ifBlank { teacherId }
+    ) ?: GradeModel(
+        studentId = entry.studentId,
+        subjectId = entry.subjectId,
+        marks = entry.marks,
+        gradeLetter = entry.gradeLetter,
+        status = entry.status,
+        remarks = entry.remarks,
+        createdByTeacherId = teacherId,
+        createdAt = now
+    )
+
 @HiltViewModel
 class GradeFirebaseViewModel @Inject constructor(
     private val gradeRepository: GradeFirebaseRepository,
-    private val notificationRepository: NotificationFirebaseRepository
+    private val notificationRepository: NotificationFirebaseRepository,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GradeFirebaseUiState())
@@ -286,37 +311,25 @@ class GradeFirebaseViewModel @Inject constructor(
                             subjectId = entry.subjectId
                         )
 
-                        if (existingGrade == null) {
-                            val newGrade = GradeModel(
-                                studentId = entry.studentId,
-                                subjectId = entry.subjectId,
-                                marks = entry.marks,
-                                gradeLetter = entry.gradeLetter,
-                                status = entry.status,
-                                remarks = entry.remarks,
-                                createdByTeacherId = entry.createdByTeacherId,
-                                createdAt = System.currentTimeMillis()
-                            )
+                        val record = bulkGradeRecord(
+                            existing = existingGrade,
+                            entry = entry,
+                            teacherId = entry.createdByTeacherId.ifBlank { sessionManager.currentTeacherId },
+                            now = System.currentTimeMillis()
+                        )
 
-                            gradeRepository.addGrade(newGrade)
+                        // New and changed grades both notify the student.
+                        val saved = if (existingGrade == null) {
+                            gradeRepository.addGrade(record)
                         } else {
-                            val updatedGrade = existingGrade.copy(
-                                marks = entry.marks,
-                                gradeLetter = entry.gradeLetter,
-                                status = entry.status,
-                                remarks = entry.remarks,
-                                createdByTeacherId = entry.createdByTeacherId.ifBlank {
-                                    existingGrade.createdByTeacherId
-                                }
-                            )
-
-                            gradeRepository.updateGrade(updatedGrade)
-
-                            createGradeUpdatedNotification(
-                                grade = updatedGrade,
-                                subjectName = entry.subjectName
-                            )
+                            gradeRepository.updateGrade(record)
+                            record
                         }
+
+                        createGradeUpdatedNotification(
+                            grade = saved,
+                            subjectName = entry.subjectName
+                        )
                     }
                 }
 

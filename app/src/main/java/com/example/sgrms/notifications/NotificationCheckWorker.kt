@@ -93,9 +93,5 @@ internal class NotificationCheckStore(context: Context) {
         prefs.edit().putLong(key(studentId), time).apply()
     }
 
-    fun clear() {
-        prefs.edit().clear().apply()
-    }
-
     private fun key(studentId: String) = "last_checked_$studentId"
 }

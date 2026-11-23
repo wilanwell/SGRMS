@@ -134,7 +134,7 @@ class AddStudentGradeViewModel @Inject constructor(
                     )
                 )
 
-                // The Cloud Function sendNotificationPush pushes this to the phone.
+                // The student's phone picks this up in NotificationCheckWorker (no Cloud Functions on Spark).
                 notificationRepository.addNotification(
                     NotificationModel(
                         studentId = student.studentId,
