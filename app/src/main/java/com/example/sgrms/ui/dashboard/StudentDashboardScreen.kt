@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.dashboard
 
+import com.example.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,7 +72,7 @@ fun StudentDashboardScreen(
     val subjectUiState by subjectViewModel.uiState.collectAsState()
     val notificationUiState by notificationViewModel.uiState.collectAsState()
 
-    LaunchedEffect(studentId) {
+    val loadAll = {
         if (studentId.isNotBlank()) {
             studentViewModel.loadStudentById(studentId)
             gradeViewModel.loadGradesByStudentId(studentId)
@@ -79,6 +80,9 @@ fun StudentDashboardScreen(
             notificationViewModel.loadNotificationsByStudentId(studentId)
         }
     }
+
+    LaunchedEffect(studentId) { loadAll() }
+    OnReturnToScreen { loadAll() }
 
     val student = studentUiState.selectedStudent
     val firstName = student?.studentName?.trim()?.substringBefore(' ')?.ifBlank { null } ?: "Student"
@@ -254,13 +258,15 @@ private fun OverallCard(
                 )
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(overallGrade, style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.primary)
-                    Text("%.1f%%".format(averageMarks), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (gradedCount > 0) {
+                        Text("%.1f%%".format(averageMarks), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text("Overall average", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    GradeCalculator.performanceStatus(averageMarks, hasGrades = gradedCount > 0),
+                    if (gradedCount > 0) GradeCalculator.performanceStatus(averageMarks, hasGrades = true) else "No grades yet",
                     style = MaterialTheme.typography.titleLarge
                 )
                 if (totalCount > 0) {

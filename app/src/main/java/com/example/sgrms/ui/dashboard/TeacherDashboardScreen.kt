@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.dashboard
 
+import com.example.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +64,8 @@ fun TeacherDashboardScreen(
 ) {
     val viewModel: TeacherDashboardViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    OnReturnToScreen { viewModel.load() }
+    val shown: (Int) -> String = { if (uiState.loaded) it.toString() else "–" }
     val summary = uiState.summary
 
     Column(
@@ -99,9 +102,9 @@ fun TeacherDashboardScreen(
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("Students you teach", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
-                    Text(summary.students.toString(), style = MaterialTheme.typography.displayMedium, color = Color.White)
+                    Text(shown(summary.students), style = MaterialTheme.typography.displayMedium, color = Color.White)
                     Text(
-                        text = "across ${summary.subjects} subjects · ${summary.grades} grade records",
+                        text = if (uiState.loaded) "across ${summary.subjects} subjects · ${summary.grades} grade records" else "Loading…",
                         style = MaterialTheme.typography.bodySmall,
                         color = Color(0xFFE0E7FF)
                     )
@@ -111,24 +114,24 @@ fun TeacherDashboardScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = summary.students.toString(), label = "Students", icon = Icons.Default.Group,
+                        value = shown(summary.students), label = "Students", icon = Icons.Default.Group,
                         tint = MaterialTheme.colorScheme.primary, container = MaterialTheme.colorScheme.primaryContainer,
                         onClick = onStudentClick, modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = summary.subjects.toString(), label = "Subjects", icon = Icons.AutoMirrored.Filled.MenuBook,
+                        value = shown(summary.subjects), label = "Subjects", icon = Icons.AutoMirrored.Filled.MenuBook,
                         tint = SgrmsColors.Orange, container = SgrmsColors.OrangeContainer,
                         onClick = onSubjectClick, modifier = Modifier.weight(1f)
                     )
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = summary.grades.toString(), label = "Grades", icon = Icons.Default.Assessment,
+                        value = shown(summary.grades), label = "Grades", icon = Icons.Default.Assessment,
                         tint = SgrmsColors.Success, container = SgrmsColors.SuccessContainer,
                         onClick = onGradeClick, modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = summary.reports.toString(), label = "Reports", icon = Icons.Default.Summarize,
+                        value = shown(summary.reports), label = "Reports", icon = Icons.Default.Summarize,
                         tint = SgrmsColors.Pink, container = SgrmsColors.PinkContainer,
                         onClick = onReportClick, modifier = Modifier.weight(1f)
                     )

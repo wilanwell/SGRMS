@@ -29,6 +29,10 @@ object GradeCalculator {
     /** Shown when there is nothing to grade yet. */
     const val NO_GRADE = "-"
 
+    /** Marks for display: 70.0 -> "70", 72.5 -> "72.5". */
+    fun formatMarks(marks: Double): String =
+        if (marks % 1.0 == 0.0) marks.toLong().toString() else marks.toString()
+
     /** Grade letter for a mark between 0 and 100. */
     fun gradeLetter(marks: Double): String {
         return when {

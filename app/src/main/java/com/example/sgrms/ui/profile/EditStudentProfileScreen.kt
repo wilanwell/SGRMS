@@ -1,5 +1,8 @@
 package com.example.sgrms.ui.profile
 
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -306,26 +309,27 @@ fun EditStudentProfileScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        if (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                        OutlinedButton(
-                            onClick = {
-                                removeProfilePicture()
-                            },
-                            enabled = (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) &&
-                                    !isSaving &&
-                                    !isUploadingImage,
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(SgrmsRadius.Field),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = ColorPrimary
-                            )
-                        ) {
-                            Text(
-                                text = "Remove Picture",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            OutlinedButton(
+                                onClick = {
+                                    removeProfilePicture()
+                                },
+                                enabled = !isSaving &&
+                                        !isUploadingImage,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(SgrmsRadius.Field),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = ColorPrimary
+                                )
+                            ) {
+                                Text(
+                                    text = "Remove Picture",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(18.dp))
@@ -380,36 +384,20 @@ fun EditStudentProfileScreen(
 
                         Spacer(modifier = Modifier.height(14.dp))
 
-                        SgrmsTextField(
-                            value = dateOfBirth.ifBlank {
-                                "Select date of birth"
-                            },
-                            onValueChange = {},
-                            label = "Date of Birth",
-                            leadingIcon = Icons.Default.Badge,
-                            readOnly = true,
-                            enabled = false
-                        )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        OutlinedButton(
-                            onClick = {
-                                openDatePicker()
-                            },
-                            enabled = !isSaving,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(48.dp),
-                            shape = RoundedCornerShape(SgrmsRadius.Field),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = ColorPrimary
+                        // The whole field opens the calendar; no separate button.
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            SgrmsTextField(
+                                value = dateOfBirth,
+                                onValueChange = {},
+                                label = "Date of Birth",
+                                placeholder = "Tap to choose a date",
+                                leadingIcon = Icons.Default.CalendarMonth,
+                                readOnly = true
                             )
-                        ) {
-                            Text(
-                                text = "Choose from Calendar",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .clickable(enabled = !isSaving) { openDatePicker() }
                             )
                         }
 

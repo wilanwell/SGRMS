@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.admin
 
+import com.example.sgrms.ui.components.SgrmsPasswordField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,7 +16,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Work
@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.TopBar
@@ -312,32 +311,17 @@ fun AddTeacherScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    OutlinedTextField(
+                    SgrmsPasswordField(
                         value = password,
                         onValueChange = {
                             password = it
                             passwordError = false
                             teacherViewModel.clearMessage()
                         },
-                        label = { Text("Login Password") },
-                        placeholder = { Text("Enter teacher login password") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Lock,
-                                contentDescription = "Password"
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(SgrmsRadius.Field),
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
+                        label = "Login Password",
+                        placeholder = "Enter teacher login password",
                         isError = passwordError,
-                        supportingText = {
-                            if (passwordError) {
-                                Text("Password is required")
-                            }
-                        },
-                        colors = sgrmsFieldColors()
+                        errorMessage = "Password is required"
                     )
 
                     if (uiState.errorMessage.isNotBlank()) {

@@ -108,7 +108,7 @@ fun UserManagementScreen(
     if (showDeleteDialog && selectedUserToDelete != null) {
         SgrmsDeleteDialog(
             title = "Delete User",
-            message = "Are you sure you want to delete this account? The login account, profile and related records will be permanently removed.",
+            message = "This account will stop working at once. Its profile, grades, notifications and reports will be permanently removed. This cannot be undone.",
             onConfirmClick = {
                 val userToDelete = selectedUserToDelete
 

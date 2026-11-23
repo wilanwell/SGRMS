@@ -26,6 +26,8 @@ data class AdminDashboardUiState(
     val summary: AdminSummary = AdminSummary(),
     val recentAccounts: List<UserModel> = emptyList(),
     val isLoading: Boolean = true,
+    /** True once figures have loaded at least once (until then, show "–", not 0). */
+    val loaded: Boolean = false,
     val errorMessage: String = ""
 )
 
@@ -71,7 +73,8 @@ class AdminDashboardViewModel @Inject constructor(
                 _uiState.value = AdminDashboardUiState(
                     summary = summary,
                     recentAccounts = recent.await(),
-                    isLoading = false
+                    isLoading = false,
+                    loaded = true
                 )
             } catch (e: Exception) {
                 _uiState.update {
@@ -88,6 +91,8 @@ data class TeacherDashboardUiState(
     val teacherImageBase64: String = "",
     val summary: TeacherDashboardSummary = TeacherDashboardSummary(),
     val isLoading: Boolean = true,
+    /** True once figures have loaded at least once (until then, show "–", not 0). */
+    val loaded: Boolean = false,
     val errorMessage: String = ""
 )
 
@@ -128,7 +133,8 @@ class TeacherDashboardViewModel @Inject constructor(
                     teacherImageUrl = teacher?.profileImageUrl.orEmpty(),
                     teacherImageBase64 = teacher?.profileImageBase64.orEmpty(),
                     summary = summary,
-                    isLoading = false
+                    isLoading = false,
+                    loaded = true
                 )
             } catch (e: Exception) {
                 _uiState.update {

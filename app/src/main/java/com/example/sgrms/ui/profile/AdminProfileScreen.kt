@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.profile
 
+import com.example.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
@@ -41,6 +42,7 @@ fun AdminProfileScreen(
     onLogoutClick: () -> Unit = {}
 ) {
     val viewModel: AdminProfileViewModel = hiltViewModel()
+    OnReturnToScreen { viewModel.refresh() }
     val uiState by viewModel.profileUiState.collectAsState()
     val summary by viewModel.summary.collectAsState()
 

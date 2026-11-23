@@ -1,5 +1,10 @@
 package com.example.sgrms.ui.components
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -151,35 +156,76 @@ fun BottomNavigationBar(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             items.forEach { item ->
-                val isSelected = currentRoute == item.route
-                val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .heightIn(min = 52.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
-                        .selectable(
-                            selected = isSelected,
-                            role = Role.Tab,
-                            onClick = { if (!isSelected) onItemClick(item.route) }
-                        )
-                        .padding(vertical = 6.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(item.icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(22.dp))
-                    Text(
-                        text = item.label,
-                        color = contentColor,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                NavItem(item, currentRoute == item.route, onItemClick, Modifier.weight(1f))
             }
         }
+    }
+}
+
+/**
+ * Landscape phones: the same items as a rail on the left, so a bottom bar
+ * does not eat into the little height there is.
+ */
+@Composable
+fun SgrmsNavigationRail(
+    currentRoute: String?,
+    items: List<BottomNavItem>,
+    onItemClick: (String) -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 4.dp,
+        modifier = Modifier.fillMaxHeight()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .selectableGroup()
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items.forEach { item ->
+                NavItem(item, currentRoute == item.route, onItemClick, Modifier.width(76.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NavItem(
+    item: BottomNavItem,
+    isSelected: Boolean,
+    onItemClick: (String) -> Unit,
+    modifier: Modifier
+) {
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+
+    Column(
+        modifier = modifier
+            .heightIn(min = 52.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+            .selectable(
+                selected = isSelected,
+                role = Role.Tab,
+                onClick = { if (!isSelected) onItemClick(item.route) }
+            )
+            .padding(vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(item.icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(22.dp))
+        Text(
+            text = item.label,
+            color = contentColor,
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

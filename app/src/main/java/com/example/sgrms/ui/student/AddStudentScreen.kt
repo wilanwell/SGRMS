@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.student
 
+import com.example.sgrms.ui.components.SgrmsPasswordField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.runtime.Composable
@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.sgrms.ui.components.SgrmsButtonRow
 import com.example.sgrms.ui.components.SgrmsDropdownField
@@ -276,7 +275,7 @@ fun AddStudentScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                SgrmsTextField(
+                SgrmsPasswordField(
                     value = password,
                     onValueChange = {
                         password = it
@@ -285,8 +284,6 @@ fun AddStudentScreen(
                     },
                     label = "Login Password",
                     placeholder = "Enter student login password",
-                    icon = Icons.Default.Lock,
-                    visualTransformation = PasswordVisualTransformation(),
                     isError = passwordError,
                     errorMessage = "Password is required"
                 )

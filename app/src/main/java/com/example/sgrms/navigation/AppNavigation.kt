@@ -1,5 +1,8 @@
 package com.example.sgrms.navigation
 
+import com.example.sgrms.ui.components.SgrmsNavigationRail
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -187,6 +190,34 @@ fun AppNavigation() {
         }
     }
 
+    // Landscape phones: a side rail instead of a bottom bar, so content keeps its height.
+    val useRail = LocalConfiguration.current.screenHeightDp < 480
+
+    val navItems = when (currentRole) {
+        UserRole.ADMIN -> AdminBottomNavItems
+        UserRole.STUDENT -> StudentBottomNavItems
+        else -> TeacherBottomNavItems
+    }
+
+    val onNavItemClick: (String) -> Unit = { route ->
+        val target = when {
+            currentRole == UserRole.STUDENT &&
+                route == Screen.StudentReportSummary.route ->
+                Screen.StudentReportSummary.createRoute(currentStudentId)
+
+            currentRole == UserRole.STUDENT &&
+                route == Screen.StudentNotifications.route ->
+                Screen.StudentNotifications.createRoute(currentStudentId)
+
+            else -> route
+        }
+
+        navController.navigate(target) {
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+
     Scaffold(
         // Keep content clear of the navigation bar / camera cutout at the
         // sides in landscape; top and bottom insets are handled per screen.
@@ -195,43 +226,21 @@ fun AppNavigation() {
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
-            if (showBottomBar) {
-                val bottomItems = when (currentRole) {
-                    UserRole.ADMIN -> AdminBottomNavItems
-                    UserRole.STUDENT -> StudentBottomNavItems
-                    else -> TeacherBottomNavItems
-                }
-
-                BottomNavigationBar(
-                    currentRoute = currentRoute,
-                    items = bottomItems,
-                    onItemClick = { route ->
-                        val target = when {
-                            currentRole == UserRole.STUDENT &&
-                                route == Screen.StudentReportSummary.route ->
-                                Screen.StudentReportSummary.createRoute(currentStudentId)
-
-                            currentRole == UserRole.STUDENT &&
-                                route == Screen.StudentNotifications.route ->
-                                Screen.StudentNotifications.createRoute(currentStudentId)
-
-                            else -> route
-                        }
-
-                        navController.navigate(target) {
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                )
+            if (showBottomBar && !useRail) {
+                BottomNavigationBar(currentRoute = currentRoute, items = navItems, onItemClick = onNavItemClick)
             }
         }
     ) { paddingValues ->
 
+        Row(modifier = Modifier.padding(paddingValues)) {
+        if (showBottomBar && useRail) {
+            SgrmsNavigationRail(currentRoute = currentRoute, items = navItems, onItemClick = onNavItemClick)
+        }
+
         NavHost(
             navController = navController,
             startDestination = Screen.Splash.route,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.weight(1f)
         ) {
             composable(Screen.Splash.route) {
                 Box(
@@ -947,6 +956,7 @@ fun AppNavigation() {
                     }
                 )
             }
+        }
         }
     }
 }

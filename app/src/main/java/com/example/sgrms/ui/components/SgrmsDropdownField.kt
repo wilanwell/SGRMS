@@ -1,23 +1,23 @@
 package com.example.sgrms.ui.components
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.ui.theme.SgrmsRadius
 
+/**
+ * Read-only picker field. Tapping anywhere on the field opens the menu, and
+ * the menu is exactly as wide as the field.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SgrmsDropdownField(
     value: String,
@@ -31,38 +31,35 @@ fun SgrmsDropdownField(
     isError: Boolean = false,
     errorMessage: String? = null
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        modifier = modifier.fillMaxWidth()
+    ) {
         OutlinedTextField(
             value = value,
             onValueChange = {},
             readOnly = true,
+            singleLine = true,
             label = { Text(label) },
             placeholder = { Text(placeholder) },
-            trailingIcon = {
-                IconButton(
-                    onClick = { onExpandedChange(true) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = label
-                    )
-                }
-            },
-            modifier = Modifier.fillMaxWidth(),
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .fillMaxWidth(),
             shape = RoundedCornerShape(SgrmsRadius.Field),
             isError = isError,
-            supportingText = {
-                if (isError && errorMessage != null) {
-                    Text(errorMessage)
-                }
+            supportingText = if (isError && errorMessage != null) {
+                { Text(errorMessage) }
+            } else {
+                null
             },
             colors = sgrmsFieldColors()
         )
 
-        DropdownMenu(
+        ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.fillMaxWidth()
+            onDismissRequest = { onExpandedChange(false) }
         ) {
             if (items.isEmpty()) {
                 DropdownMenuItem(
@@ -76,7 +73,8 @@ fun SgrmsDropdownField(
                         onClick = {
                             onItemSelected(item)
                             onExpandedChange(false)
-                        }
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
                     )
                 }
             }

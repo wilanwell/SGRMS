@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.grade
 
+import com.example.sgrms.utils.isComplete
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,6 +150,22 @@ fun QuickAddGradeScreen(
             student.studentName
         }
 
+    fun existingGradeFor(studentId: String) = gradeUiState.grades.firstOrNull { grade ->
+        grade.studentId == studentId && grade.subjectId == selectedSubjectId
+    }
+
+    // Show the marks already saved for this class and subject, so the teacher
+    // sees them and only changes what is new.
+    LaunchedEffect(selectedClassName, selectedSubjectId, gradeUiState.grades) {
+        if (selectedSubjectId.isBlank()) return@LaunchedEffect
+        classStudents.forEach { student ->
+            val existing = existingGradeFor(student.studentId)
+            if (student.studentId !in marksMap && existing != null && existing.isComplete) {
+                marksMap[student.studentId] = GradeCalculator.formatMarks(existing.marks)
+            }
+        }
+    }
+
     val canShowStudents =
         selectedClassName.isNotBlank() &&
                 selectedClassName != "No class available" &&
@@ -271,6 +288,8 @@ fun QuickAddGradeScreen(
                                     selectedSubjectId = selectedSubject?.subjectId ?: ""
                                     subjectError = false
                                     marksErrorMessage = ""
+                                    // Marks typed for the previous subject must not carry over.
+                                    marksMap.clear()
                                 }
 
                                 subjectExpanded = false
@@ -399,8 +418,11 @@ fun QuickAddGradeScreen(
                                     val gradeEntries = classStudents.mapNotNull { student ->
                                         val marksText = marksMap[student.studentId].orEmpty()
                                         val marks = marksText.toDoubleOrNull()
+                                        val existing = existingGradeFor(student.studentId)
+                                        val unchanged = existing != null && existing.isComplete && existing.marks == marks
 
-                                        if (marks == null) {
+                                        // Empty, or the same mark that is already saved: nothing to save.
+                                        if (marks == null || unchanged) {
                                             null
                                         } else {
                                             GradeBulkEntry(
@@ -417,7 +439,7 @@ fun QuickAddGradeScreen(
                                     }
 
                                     if (gradeEntries.isEmpty()) {
-                                        marksErrorMessage = "Enter at least one valid mark before saving."
+                                        marksErrorMessage = "No marks changed. Enter or change at least one mark."
                                     } else {
                                         gradeViewModel.saveBulkGrades(
                                             gradeEntries = gradeEntries,

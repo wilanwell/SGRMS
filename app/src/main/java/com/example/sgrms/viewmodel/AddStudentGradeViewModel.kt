@@ -138,8 +138,8 @@ class AddStudentGradeViewModel @Inject constructor(
                 notificationRepository.addNotification(
                     NotificationModel(
                         studentId = student.studentId,
-                        title = "Grade Updated",
-                        message = "Your ${item.subjectName} grade has been updated.",
+                        title = if (item.existingGrade == null) "New grade" else "Grade updated",
+                        message = "Your ${item.subjectName} grade is now ${GradeCalculator.formatMarks(marks)} (${saved.gradeLetter}).",
                         type = "GRADE_UPDATED",
                         relatedGradeId = saved.gradeId,
                         relatedSubjectId = item.subjectId,

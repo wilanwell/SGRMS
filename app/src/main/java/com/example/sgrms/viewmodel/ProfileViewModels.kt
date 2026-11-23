@@ -136,6 +136,8 @@ abstract class BaseProfileViewModel<T>(
 
             try {
                 val url = block()
+                // Keep the session user (dashboard header avatar) in step with the new photo.
+                runCatching { sessionManager.refresh() }
                 profileState.update {
                     it.copy(
                         profile = it.profile?.withImageUrl(url),
@@ -164,6 +166,11 @@ class AdminProfileViewModel @Inject constructor(
     val summary: StateFlow<AdminSummary> = _summary.asStateFlow()
 
     init {
+        refresh()
+    }
+
+    /** Loads the profile; also called when coming back from the edit screen. */
+    fun refresh() {
         load("Failed to load admin profile.") {
             userRepository.getUser(sessionManager.currentUserId)
         }
@@ -197,6 +204,7 @@ class AdminProfileViewModel @Inject constructor(
 @HiltViewModel
 class TeacherProfileViewModel @Inject constructor(
     private val teacherRepository: TeacherFirebaseRepository,
+    private val userRepository: UserFirebaseRepository,
     private val dashboardRepository: DashboardRepository,
     profileImageRepository: ProfileImageRepository,
     sessionManager: SessionManager
@@ -206,6 +214,11 @@ class TeacherProfileViewModel @Inject constructor(
     val assignments: StateFlow<TeacherAssignments> = _assignments.asStateFlow()
 
     init {
+        refresh()
+    }
+
+    /** Loads the profile; also called when coming back from the edit screen. */
+    fun refresh() {
         load("Failed to load teacher profile.") {
             val teacher = sessionManager.currentTeacherId
                 .takeIf { it.isNotBlank() }
@@ -238,8 +251,11 @@ class TeacherProfileViewModel @Inject constructor(
         write = { teacherRepository.updateOwnProfile(it.teacherId, update) }
     )
 
-    override suspend fun writeImageUrl(profile: TeacherModel, imageUrl: String) =
+    override suspend fun writeImageUrl(profile: TeacherModel, imageUrl: String) {
         teacherRepository.updateProfileImage(profile.teacherId, imageUrl)
+        // users/{uid} carries the photo too: User management and the session read it.
+        userRepository.updateProfileImage(sessionManager.currentUserId, imageUrl)
+    }
 
     override fun TeacherModel.withImageUrl(imageUrl: String) =
         copy(profileImageUrl = imageUrl, profileImageBase64 = "")
@@ -255,6 +271,7 @@ data class StudentProfileExtras(
 @HiltViewModel
 class StudentProfileViewModel @Inject constructor(
     private val studentRepository: StudentFirebaseRepository,
+    private val userRepository: UserFirebaseRepository,
     private val gradeRepository: GradeFirebaseRepository,
     profileImageRepository: ProfileImageRepository,
     sessionManager: SessionManager
@@ -264,6 +281,11 @@ class StudentProfileViewModel @Inject constructor(
     val extras: StateFlow<StudentProfileExtras> = _extras.asStateFlow()
 
     init {
+        refresh()
+    }
+
+    /** Loads the profile; also called when coming back from the edit screen. */
+    fun refresh() {
         load("Failed to load student profile.") {
             val studentId = sessionManager.currentStudentId
             if (studentId.isBlank()) {
@@ -294,8 +316,11 @@ class StudentProfileViewModel @Inject constructor(
         write = { studentRepository.updateOwnProfile(it.studentId, update) }
     )
 
-    override suspend fun writeImageUrl(profile: StudentModel, imageUrl: String) =
+    override suspend fun writeImageUrl(profile: StudentModel, imageUrl: String) {
         studentRepository.updateProfileImage(profile.studentId, imageUrl)
+        // users/{uid} carries the photo too: User management and the session read it.
+        userRepository.updateProfileImage(sessionManager.currentUserId, imageUrl)
+    }
 
     override fun StudentModel.withImageUrl(imageUrl: String) =
         copy(profileImageUrl = imageUrl, profileImageBase64 = "")

@@ -233,26 +233,27 @@ fun EditTeacherProfileScreen(
                             }
                         )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        if (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(10.dp))
 
-                        OutlinedButton(
-                            onClick = {
-                                removeProfilePicture()
-                            },
-                            enabled = (profileImageUrl.isNotBlank() || legacyImageBase64.isNotBlank()) &&
-                                    !isSaving &&
-                                    !isUploadingImage,
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(SgrmsRadius.Field),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = ColorPrimary
-                            )
-                        ) {
-                            Text(
-                                text = "Remove Picture",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            OutlinedButton(
+                                onClick = {
+                                    removeProfilePicture()
+                                },
+                                enabled = !isSaving &&
+                                        !isUploadingImage,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(SgrmsRadius.Field),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = ColorPrimary
+                                )
+                            ) {
+                                Text(
+                                    text = "Remove Picture",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(18.dp))

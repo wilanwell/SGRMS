@@ -62,4 +62,11 @@ class GradeCalculatorTest {
         val grades = listOf(GradeModel(marks = 60.0), GradeModel(marks = 90.0))
         assertEquals(75.0, GradeCalculator.averageMarks(grades), 0.0001)
     }
+
+    @Test
+    fun formatMarks_dropsATrailingZeroOnly() {
+        assertEquals("70", GradeCalculator.formatMarks(70.0))
+        assertEquals("72.5", GradeCalculator.formatMarks(72.5))
+        assertEquals("100", GradeCalculator.formatMarks(100.0))
+    }
 }

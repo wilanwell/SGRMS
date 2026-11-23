@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.profile
 
+import com.example.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -48,6 +49,7 @@ fun TeacherProfileScreen(
     onLogoutClick: () -> Unit = {}
 ) {
     val viewModel: TeacherProfileViewModel = hiltViewModel()
+    OnReturnToScreen { viewModel.refresh() }
     val uiState by viewModel.profileUiState.collectAsState()
     val assignments by viewModel.assignments.collectAsState()
 

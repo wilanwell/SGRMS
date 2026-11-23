@@ -1,5 +1,6 @@
 package com.example.sgrms.ui.admin
 
+import com.example.sgrms.ui.components.OnReturnToScreen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -83,7 +84,9 @@ fun AdminDashboardScreen(
 ) {
     val viewModel: AdminDashboardViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+    OnReturnToScreen { viewModel.load() }
     val summary = uiState.summary
+    val shown: (Int) -> String = { if (uiState.loaded) it.toString() else "–" }
     val name = adminName.ifBlank { "Admin" }
 
     Column(
@@ -109,7 +112,7 @@ fun AdminDashboardScreen(
                 .padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            if (uiState.isLoading) {
+            if (uiState.isLoading && !uiState.loaded) {
                 Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -124,13 +127,14 @@ fun AdminDashboardScreen(
                 admins = summary.adminAccounts,
                 teachers = summary.teacherAccounts,
                 students = summary.studentAccounts,
-                classes = summary.classes
+                classes = summary.classes,
+                loaded = uiState.loaded
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = summary.students.toString(),
+                        value = shown(summary.students),
                         label = "Students",
                         icon = Icons.Default.Group,
                         tint = MaterialTheme.colorScheme.primary,
@@ -139,7 +143,7 @@ fun AdminDashboardScreen(
                         modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = summary.teachers.toString(),
+                        value = shown(summary.teachers),
                         label = "Teachers",
                         icon = Icons.Default.SupervisorAccount,
                         tint = SgrmsColors.Success,
@@ -150,7 +154,7 @@ fun AdminDashboardScreen(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     SgrmsStatCard(
-                        value = summary.subjects.toString(),
+                        value = shown(summary.subjects),
                         label = "Subjects",
                         icon = Icons.AutoMirrored.Filled.MenuBook,
                         tint = SgrmsColors.Orange,
@@ -159,7 +163,7 @@ fun AdminDashboardScreen(
                         modifier = Modifier.weight(1f)
                     )
                     SgrmsStatCard(
-                        value = summary.classes.toString(),
+                        value = shown(summary.classes),
                         label = "Classes",
                         icon = Icons.Default.School,
                         tint = SgrmsColors.Pink,
@@ -213,7 +217,8 @@ private fun AccountsHeroCard(
     admins: Int,
     teachers: Int,
     students: Int,
-    classes: Int
+    classes: Int,
+    loaded: Boolean
 ) {
     Surface(
         shape = RoundedCornerShape(SgrmsRadius.Hero),
@@ -224,9 +229,9 @@ private fun AccountsHeroCard(
             Row(verticalAlignment = Alignment.Top) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Total accounts", style = MaterialTheme.typography.bodyMedium, color = Color(0xFFE0E7FF))
-                    Text(total.toString(), style = MaterialTheme.typography.displayMedium, color = Color.White)
+                    Text(if (loaded) total.toString() else "–", style = MaterialTheme.typography.displayMedium, color = Color.White)
                 }
-                Text(
+                if (loaded) Text(
                     text = if (classes == 1) "1 class" else "$classes classes",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
@@ -245,7 +250,7 @@ private fun AccountsHeroCard(
                 }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            if (loaded) Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text("$admins Admin", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
                 Text("$teachers Teachers", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))
                 Text("$students Students", style = MaterialTheme.typography.bodySmall, color = Color(0xFFE0E7FF))

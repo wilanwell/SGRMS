@@ -1,5 +1,6 @@
 package com.example.sgrms.viewmodel
 
+import com.example.sgrms.utils.GradeCalculator
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sgrms.data.model.GradeModel
@@ -328,7 +329,8 @@ class GradeFirebaseViewModel @Inject constructor(
 
                         createGradeUpdatedNotification(
                             grade = saved,
-                            subjectName = entry.subjectName
+                            subjectName = entry.subjectName,
+                            isNew = existingGrade == null
                         )
                     }
                 }
@@ -506,7 +508,8 @@ class GradeFirebaseViewModel @Inject constructor(
 
     private suspend fun createGradeUpdatedNotification(
         grade: GradeModel,
-        subjectName: String = ""
+        subjectName: String = "",
+        isNew: Boolean = false
     ) {
         val repository = notificationRepository ?: return
 
@@ -517,8 +520,8 @@ class GradeFirebaseViewModel @Inject constructor(
         repository.addNotification(
             NotificationModel(
                 studentId = grade.studentId,
-                title = "Subject Grade Updated",
-                message = "Your grade for $displaySubjectName has been updated. Marks: ${grade.marks}, Grade: ${grade.gradeLetter}.",
+                title = if (isNew) "New grade" else "Grade updated",
+                message = "Your $displaySubjectName grade is now ${GradeCalculator.formatMarks(grade.marks)} (${grade.gradeLetter}).",
                 type = "GRADE_UPDATED",
                 relatedGradeId = grade.gradeId,
                 relatedSubjectId = grade.subjectId,
