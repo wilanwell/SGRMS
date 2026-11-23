@@ -10,6 +10,7 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/wilanwell/SGRMS/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/wilanwell/SGRMS/actions/workflows/ci.yml/badge.svg"></a>
   <img alt="Kotlin" src="https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white">
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-Material%203-4285F4?logo=jetpackcompose&logoColor=white">
   <img alt="Firebase" src="https://img.shields.io/badge/Firebase-Auth%20%7C%20Firestore-FFCA28?logo=firebase&logoColor=black">
@@ -65,6 +66,7 @@
 | Backend | Firebase Authentication and Cloud Firestore |
 | Background work | WorkManager |
 | Testing | JUnit unit tests; Firestore rules tests with `@firebase/rules-unit-testing` on the emulator |
+| CI | GitHub Actions: unit tests, lint, an R8 release build and the rules tests on every push |
 
 ## Architecture
 
@@ -84,7 +86,7 @@ flowchart LR
 - **ViewModels** hold screen state as `StateFlow` and map exceptions to readable messages (`toUserMessage()`).
 - **Text** lives in `res/values/strings.xml`. Screens use `stringResource`, ViewModels get an injected `Strings` interface, and the data layer throws `UserMessageException(R.string.…)`, so it never needs a `Context`.
 - **Business rules** live in plain Kotlin objects that are unit tested: `GradeCalculator`, `ReportCalculator`, `ValidationUtils`, `bulkGradeRecord`.
-- **Access control** is defined in `firestore.rules`. The emulator test suite covers role-based read and write permissions.
+- **Access control** is defined in `firestore.rules`: every read needs a user profile, a student sees only their own records, and a teacher can write grades only for the subjects assigned to them. The emulator test suite covers these role-based read and write permissions.
 
 ### Design decisions
 
@@ -146,9 +148,8 @@ cd firestore-tests && npm install && npm test
 ## Roadmap
 
 - Bahasa Melayu translation (`values-ms/strings.xml`); all user-facing text is already in `strings.xml`
-- Release build: R8 shrinking and signing configuration
+- Release signing configuration (R8 shrinking is already on)
 - Compose UI tests for the main flows
-- Split `ReportPdfGenerator` into smaller pieces
 - Dark theme
 
 ## Author
