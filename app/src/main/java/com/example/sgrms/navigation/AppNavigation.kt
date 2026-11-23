@@ -73,7 +73,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
-import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.ui.theme.ColorBackground
 
 private val AdminOnly = setOf(UserRole.ADMIN)
 private val TeacherOnly = setOf(UserRole.TEACHER)
@@ -191,7 +191,7 @@ fun AppNavigation() {
         // Keep content clear of the navigation bar / camera cutout at the
         // sides in landscape; top and bottom insets are handled per screen.
         modifier = Modifier
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal)),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
@@ -249,6 +249,8 @@ fun AppNavigation() {
             guardedComposable(allowedRoles = AdminOnly, route = Screen.AdminDashboard.route) {
                 AdminDashboardScreen(
                     adminName = loggedInUser?.fullName.orEmpty(),
+                    adminImageUrl = loggedInUser?.profileImageUrl.orEmpty(),
+                    adminImageBase64 = loggedInUser?.profileImageBase64.orEmpty(),
                     onUserManagementClick = {
                         navController.navigate(Screen.UserManagement.route)
                     },
@@ -272,6 +274,9 @@ fun AppNavigation() {
                     },
                     onProfileClick = {
                         navController.navigate(Screen.AdminProfile.route)
+                    },
+                    onTeacherManagementClick = {
+                        navController.navigate(Screen.TeacherManagement.route)
                     }
                 )
             }
@@ -468,6 +473,11 @@ fun AppNavigation() {
                     onReportClick = {
                         navController.navigate(
                             Screen.StudentReportSummary.createRoute(currentStudentId)
+                        )
+                    },
+                    onNotificationsClick = {
+                        navController.navigate(
+                            Screen.StudentNotifications.createRoute(currentStudentId)
                         )
                     }
                 )

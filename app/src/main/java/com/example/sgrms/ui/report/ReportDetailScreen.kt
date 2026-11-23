@@ -1,56 +1,23 @@
 package com.example.sgrms.ui.report
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.SgrmsColors
 import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
@@ -61,6 +28,23 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.utils.ReportCalculator
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Grade
+import com.example.sgrms.ui.components.SgrmsDetailScreen
+import com.example.sgrms.ui.components.SgrmsDetailHero
+import com.example.sgrms.ui.components.SgrmsInfoSection
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsMarkRow
+import com.example.sgrms.ui.components.SgrmsStatCard
+import com.example.sgrms.ui.components.SgrmsPrimaryButton
+import com.example.sgrms.ui.components.SgrmsSecondaryButton
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import androidx.compose.material.icons.filled.Person
 
 @Composable
 fun ReportDetailScreen(
@@ -158,9 +142,9 @@ fun ReportDetailScreen(
     }
 
     val reportStatusColor = if (isReportOutdated) {
-        WarningOrange
+        SgrmsColors.WarningBar
     } else {
-        SuccessGreen
+        SgrmsColors.Success
     }
 
     val reportStatusIcon = if (isReportOutdated) {
@@ -201,259 +185,95 @@ fun ReportDetailScreen(
         else -> ""
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Report Detail",
-                showBack = true,
-                onBackClick = onBackClick,
-                showIcon = false
+    SgrmsDetailScreen(
+        title = "Report",
+        onBack = onBackClick,
+        isLoading = isLoading && student == null,
+        errorMessage = errorMessage.ifBlank { localErrorMessage },
+        bottomBar = if (student == null) null else {
+            {
+            SgrmsSecondaryButton(text = "Remarks", icon = Icons.Default.EditNote, onClick = onUpdateReportClick, modifier = Modifier.weight(1f))
+            SgrmsPrimaryButton(
+                text = "Save PDF",
+                icon = Icons.Default.PictureAsPdf,
+                enabled = completedGrades.isNotEmpty(),
+                onClick = {
+                    ReportPdfGenerator.saveReportAsPdf(
+                        context = context,
+                        report = report,
+                        student = student,
+                        gradeItems = pdfGradeItems
+                    )
+                    onSaveReportClick()
+                },
+                modifier = Modifier.weight(1f)
+            )
+            }
+        }
+    ) {
+        if (student == null) {
+            SgrmsEmptyState(title = "Report not found", message = "This student or report could not be loaded. It may have been deleted.", icon = Icons.Default.Person)
+            return@SgrmsDetailScreen
+        }
+
+        SgrmsDetailHero(
+            title = student?.studentName ?: "Unknown student",
+            subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),
+            leading = {
+                SgrmsAvatar(
+                    name = student?.studentName ?: "Student",
+                    size = 72.dp,
+                    imageUrl = student?.profileImageUrl.orEmpty(),
+                    legacyImageBase64 = student?.profileImageBase64.orEmpty()
+                )
+            }
+        ) {
+            SgrmsStatusChip(reportStatusText, if (isReportOutdated) ChipTone.Warning else ChipTone.Success)
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            SgrmsStatCard(
+                value = overallGrade,
+                label = "Overall grade",
+                icon = Icons.Default.Grade,
+                tint = MaterialTheme.colorScheme.primary,
+                container = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.weight(1f)
+            )
+            SgrmsStatCard(
+                value = "%.1f%%".format(averageMarks),
+                label = "Average",
+                icon = Icons.Default.Assessment,
+                tint = com.example.sgrms.ui.theme.SgrmsColors.Success,
+                container = com.example.sgrms.ui.theme.SgrmsColors.SuccessContainer,
+                modifier = Modifier.weight(1f)
             )
         }
-    ) { paddingValues ->
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundGrey)
-                .navigationBarsPadding()
-                .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp
-                )
-        ) {
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = PrimaryBlue
-                        )
-                    }
-                }
-
-                reportId.isBlank() || student == null -> {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Assessment,
-                                contentDescription = "Report Not Found",
-                                tint = TextGrey,
-                                modifier = Modifier.size(44.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Text(
-                                text = "Report not found",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = if (errorMessage.isNotBlank()) {
-                                    errorMessage
-                                } else {
-                                    "The selected report may have been deleted."
-                                },
-                                fontSize = 14.sp,
-                                color = TextGrey
-                            )
-                        }
-                    }
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 32.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
-                    ) {
-                        item {
-                            ReportStudentInfoCard(
-                                student = student,
-                                generatedDate = report.generatedDate,
-                                reportStatusText = reportStatusText,
-                                reportStatusColor = reportStatusColor,
-                                reportStatusIcon = reportStatusIcon
-                            )
-                        }
-
-                        item {
-                            ReportPerformanceSummaryCard(
-                                totalMarks = totalMarks,
-                                averageMarks = averageMarks,
-                                overallGrade = overallGrade,
-                                completedSubjectCount = completedGrades.size
-                            )
-                        }
-
-                        item {
-                            ReportStatusCard(
-                                statusText = reportStatusText,
-                                statusColor = reportStatusColor,
-                                statusIcon = reportStatusIcon,
-                                remarks = reportRemarks
-                            )
-                        }
-
-                        item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                OutlinedButton(
-                                    onClick = onUpdateReportClick,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(52.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = PrimaryBlue
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Edit,
-                                        contentDescription = "Update Report",
-                                        tint = PrimaryBlue
-                                    )
-
-                                    Spacer(modifier = Modifier.size(8.dp))
-
-                                    Text(
-                                        text = "Update",
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-
-                                Button(
-                                    onClick = {
-                                        ReportPdfGenerator.saveReportAsPdf(
-                                            context = context,
-                                            report = report,
-                                            student = student,
-                                            gradeItems = pdfGradeItems
-                                        )
-
-                                        onSaveReportClick()
-                                    },
-                                    enabled = completedGrades.isNotEmpty(),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .height(52.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryBlue,
-                                        disabledContainerColor = PrimaryBlue.copy(alpha = 0.45f)
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = "Save Report",
-                                        tint = Color.White
-                                    )
-
-                                    Spacer(modifier = Modifier.size(8.dp))
-
-                                    Text(
-                                        text = "Save",
-                                        color = Color.White,
-                                        fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-
-                        if (errorMessage.isNotBlank()) {
-                            item {
-                                Text(
-                                    text = errorMessage,
-                                    color = Color.Red,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-
-                        item {
-                            Text(
-                                text = "Subject Performance",
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        if (reportGradeList.isEmpty()) {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(14.dp),
-                                    colors = CardDefaults.cardColors(containerColor = CardWhite),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(24.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.MenuBook,
-                                            contentDescription = "No Grade",
-                                            tint = TextGrey,
-                                            modifier = Modifier.size(44.dp)
-                                        )
-
-                                        Spacer(modifier = Modifier.height(8.dp))
-
-                                        Text(
-                                            text = "No grade record found",
-                                            fontSize = 17.sp,
-                                            fontWeight = FontWeight.Bold
-                                        )
-
-                                        Text(
-                                            text = "Grade records will appear here after subject marks are added.",
-                                            fontSize = 14.sp,
-                                            color = TextGrey
-                                        )
-                                    }
-                                }
-                            }
-                        } else {
-                            items(
-                                items = reportGradeList,
-                                key = { item ->
-                                    item.grade.gradeId
-                                }
-                            ) { item ->
-                                ReportGradeCard(
-                                    item = item
-                                )
-                            }
-                        }
-                    }
+        SgrmsInfoSection("Subjects") {
+            if (reportGradeList.isEmpty()) {
+                Text("No grade records yet.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(vertical = 16.dp))
+            } else {
+                reportGradeList.forEachIndexed { index, item ->
+                    if (index > 0) SgrmsRowDivider()
+                    val complete = item.grade.status.equals("Complete", ignoreCase = true)
+                    SgrmsMarkRow(
+                        title = item.subjectName,
+                        subtitle = item.subjectCode,
+                        marks = if (complete) item.grade.marks else null,
+                        grade = if (complete) item.grade.gradeLetter.ifBlank { com.example.sgrms.utils.GradeCalculator.gradeLetter(item.grade.marks) } else "Pending"
+                    )
                 }
             }
+        }
+
+        SgrmsInfoSection("Remarks") {
+            Text(
+                reportRemarks,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(vertical = 14.dp)
+            )
         }
     }
 }

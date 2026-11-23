@@ -44,14 +44,16 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.ProfileImagePicker
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.AdminProfileViewModel
 import com.example.sgrms.data.repository.UserProfileUpdate
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun EditAdminProfileScreen(
@@ -160,7 +162,7 @@ fun EditAdminProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
+            .background(ColorBackground)
             .navigationBarsPadding()
     ) {
         TopBar(
@@ -185,9 +187,9 @@ fun EditAdminProfileScreen(
         ) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                shape = RoundedCornerShape(SgrmsRadius.Card),
+                colors = CardDefaults.cardColors(containerColor = ColorSurface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(18.dp),
@@ -202,20 +204,20 @@ fun EditAdminProfileScreen(
                     Text(
                         text = "Update account, contact, and profile picture",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(18.dp))
 
                     if (isLoading) {
-                        CircularProgressIndicator(color = PrimaryBlue)
+                        CircularProgressIndicator(color = ColorPrimary)
 
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
                             text = "Loading admin profile...",
                             fontSize = 14.sp,
-                            color = TextGrey
+                            color = ColorOnSurfaceVariant
                         )
                     } else {
                         ProfileImagePicker(
@@ -238,9 +240,9 @@ fun EditAdminProfileScreen(
                                     !isSaving &&
                                     !isUploadingImage,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Text(
@@ -255,7 +257,7 @@ fun EditAdminProfileScreen(
                         if (generalError.isNotBlank()) {
                             Text(
                                 text = generalError,
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -398,9 +400,9 @@ fun EditAdminProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             if (isSaving) {
@@ -426,9 +428,9 @@ fun EditAdminProfileScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
+                                contentColor = ColorPrimary
                             )
                         ) {
                             Text(

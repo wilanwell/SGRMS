@@ -32,12 +32,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.GradeCalculator
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
 
 @Composable
 fun QuickGradeStudentCard(
@@ -54,19 +56,19 @@ fun QuickGradeStudentCard(
     }
 
     val gradeColor = when (gradeLetter) {
-        "A+", "A" -> SuccessGreen
-        "B" -> PrimaryBlue
-        "C" -> Color(0xFFFF9800)
-        "D" -> Color(0xFFFF5722)
-        "E" -> Color.Red
-        else -> TextGrey
+        "A+", "A" -> SgrmsColors.Success
+        "B" -> ColorPrimary
+        "C" -> SgrmsColors.WarningBar
+        "D" -> SgrmsColors.Warning
+        "E" -> SgrmsColors.Error
+        else -> ColorOnSurfaceVariant
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Card),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(14.dp)
@@ -80,9 +82,9 @@ fun QuickGradeStudentCard(
                         .clip(CircleShape)
                         .background(
                             if (student.gender == "Female") {
-                                Color(0xFFFF4081)
+                                SgrmsColors.Pink
                             } else {
-                                PrimaryBlue
+                                ColorPrimary
                             }
                         ),
                     contentAlignment = Alignment.Center
@@ -108,7 +110,7 @@ fun QuickGradeStudentCard(
                     Text(
                         text = "Code: ${student.studentCode.ifBlank { "-" }}",
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -122,7 +124,7 @@ fun QuickGradeStudentCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalDivider(color = BackgroundGrey)
+            HorizontalDivider(color = ColorBackground)
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -146,12 +148,8 @@ fun QuickGradeStudentCard(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal
                 ),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
         }
     }

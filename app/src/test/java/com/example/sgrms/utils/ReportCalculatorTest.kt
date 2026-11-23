@@ -12,6 +12,24 @@ class ReportCalculatorTest {
     private val names = mapOf("bm" to "Bahasa Melayu", "math" to "Matematik")
 
     @Test
+    fun readyReportCount_countsStudentsWhoseGradesAreAllComplete() {
+        val grades = listOf(
+            GradeModel(studentId = "a", status = "Complete"),
+            GradeModel(studentId = "a", status = "complete"),
+            GradeModel(studentId = "b", status = "Complete"),
+            GradeModel(studentId = "b", status = "Pending"),
+            GradeModel(studentId = "c", status = "Complete")
+        )
+
+        assertEquals(2, ReportCalculator.readyReportCount(grades))
+    }
+
+    @Test
+    fun readyReportCount_isZeroWithoutGrades() {
+        assertEquals(0, ReportCalculator.readyReportCount(emptyList()))
+    }
+
+    @Test
     fun buildRemarks_listsCompletedRemarksAndPendingCount() {
         val grades = listOf(
             GradeModel(subjectId = "bm", status = "Complete", remarks = "Bagus"),

@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
+import com.google.firebase.firestore.Query
 
 /** Personal fields a user may edit on their own users/{uid} profile. */
 data class UserProfileUpdate(
@@ -32,6 +33,19 @@ class UserFirebaseRepository @Inject constructor(
                 document.toObject(UserModel::class.java)?.copy(userId = document.id)
             }
             .sortedBy { it.fullName.lowercase() }
+    }
+
+    /** The [limit] newest accounts (any role), newest first; one small query. */
+    suspend fun getNewestUsers(limit: Long): List<UserModel> {
+        return usersCollection
+            .orderBy("createdAt", Query.Direction.DESCENDING)
+            .limit(limit)
+            .get()
+            .await()
+            .documents
+            .mapNotNull { document ->
+                document.toObject(UserModel::class.java)?.copy(userId = document.id)
+            }
     }
 
     /** Deletes the profile and related records (see AccountService.deleteAccount). */

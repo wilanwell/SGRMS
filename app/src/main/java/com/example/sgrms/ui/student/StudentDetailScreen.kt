@@ -1,63 +1,43 @@
 package com.example.sgrms.ui.student
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.Class
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Female
-import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.TaskAlt
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.ProfileImageView
-import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.toneForStatus
+import com.example.sgrms.ui.components.toneForGrade
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.FamilyRestroom
+import androidx.compose.material.icons.filled.Home
+import com.example.sgrms.ui.components.SgrmsDetailScreen
+import com.example.sgrms.ui.components.SgrmsDetailHero
+import com.example.sgrms.ui.components.SgrmsInfoSection
+import com.example.sgrms.ui.components.SgrmsInfoRow
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsMarkRow
+import com.example.sgrms.ui.components.SgrmsEmptyState
+import com.example.sgrms.ui.components.SgrmsPrimaryButton
+import com.example.sgrms.ui.components.SgrmsSecondaryButton
 
 @Composable
 fun StudentDetailScreen(
@@ -139,335 +119,85 @@ fun StudentDetailScreen(
         else -> ""
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundGrey)
-            .navigationBarsPadding()
+    SgrmsDetailScreen(
+        title = "Student",
+        onBack = onBackClick,
+        isLoading = isLoading && student == null,
+        errorMessage = if (student != null) errorMessage else "",
+        bottomBar = if (student != null) {
+            {
+                SgrmsSecondaryButton(text = "Edit", icon = Icons.Default.Edit, onClick = onEditClick, modifier = Modifier.weight(1f))
+                SgrmsPrimaryButton(text = "Grades", icon = Icons.Default.Assessment, onClick = onViewGradeClick, modifier = Modifier.weight(1f))
+            }
+        } else {
+            null
+        }
     ) {
-        TopBar(
-            title = "Student Detail",
-            showBack = true,
-            onBackClick = onBackClick,
-            showIcon = false
-        )
+        if (student == null) {
+            SgrmsEmptyState(
+                title = "Student not found",
+                message = errorMessage.ifBlank { "The selected student record could not be loaded." },
+                icon = Icons.Default.Person
+            )
+            return@SgrmsDetailScreen
+        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 32.dp
+        SgrmsDetailHero(
+            title = studentName,
+            subtitle = "$studentCode · $className",
+            leading = {
+                SgrmsAvatar(
+                    name = studentName,
+                    size = 88.dp,
+                    imageUrl = student.profileImageUrl,
+                    legacyImageBase64 = student.profileImageBase64
                 )
+            }
         ) {
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = PrimaryBlue
-                        )
-                    }
+            SgrmsStatusChip(status, toneForStatus(status))
+            SgrmsStatusChip(
+                if (subjectResults.isEmpty()) "No grades" else "Overall $overallGrade",
+                if (subjectResults.isEmpty()) ChipTone.Neutral else toneForGrade(overallGrade)
+            )
+        }
+
+        SgrmsInfoSection("Contact") {
+            SgrmsInfoRow(icon = Icons.Default.Email, label = "Email", value = email)
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = phoneNumber)
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Person, label = "Gender", value = gender)
+        }
+
+        if (student.guardianName.isNotBlank() || student.guardianPhone.isNotBlank() || student.address.isNotBlank() || student.dateOfBirth.isNotBlank()) {
+            SgrmsInfoSection("Personal") {
+                SgrmsInfoRow(icon = Icons.Default.Cake, label = "Date of birth", value = student.dateOfBirth)
+                SgrmsRowDivider()
+                SgrmsInfoRow(icon = Icons.Default.FamilyRestroom, label = "Guardian", value = listOf(student.guardianName, student.guardianPhone).filter { it.isNotBlank() }.joinToString(" · "))
+                SgrmsRowDivider()
+                SgrmsInfoRow(icon = Icons.Default.Home, label = "Address", value = student.address)
+            }
+        }
+
+        SgrmsInfoSection(
+            title = "Subjects",
+            trailing = {
+                if (subjectResults.isNotEmpty()) {
+                    Text("Avg ${"%.1f".format(averageMarks)}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-
-                student == null -> {
-                    SgrmsEmptyStateCard(
-                        icon = Icons.Default.Person,
-                        title = "Student not found",
-                        message = if (errorMessage.isNotBlank()) {
-                            errorMessage
-                        } else {
-                            "The selected student record could not be loaded."
-                        }
-                    )
-                }
-
-                else -> {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(18.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            ProfileImageView(
-                                imageUrl = student.profileImageUrl,
-                                legacyImageBase64 = student.profileImageBase64,
-                                size = 96
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Text(
-                                text = studentName,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "$studentCode • $className",
-                                fontSize = 14.sp,
-                                color = TextGrey
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Text(
-                                text = status,
-                                fontSize = 14.sp,
-                                color = if (status == "Active") {
-                                    SuccessGreen
-                                } else {
-                                    Color.Red
-                                },
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(18.dp)
-                        ) {
-                            Text(
-                                text = "Student Information",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            StudentDetailInfoRow(
-                                icon = Icons.Default.Badge,
-                                title = "Student Code",
-                                value = studentCode
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
-                            )
-
-                            StudentDetailInfoRow(
-                                icon = Icons.Default.Email,
-                                title = "Email",
-                                value = email.ifBlank { "Not specified" }
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
-                            )
-
-                            StudentDetailInfoRow(
-                                icon = Icons.Default.Phone,
-                                title = "Phone Number",
-                                value = phoneNumber.ifBlank { "Not specified" }
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
-                            )
-
-                            StudentDetailInfoRow(
-                                icon = if (gender == "Male") {
-                                    Icons.Default.Male
-                                } else {
-                                    Icons.Default.Female
-                                },
-                                title = "Gender",
-                                value = gender.ifBlank { "Not specified" }
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
-                            )
-
-                            StudentDetailInfoRow(
-                                icon = Icons.Default.Class,
-                                title = "Class",
-                                value = className.ifBlank { "Not assigned" }
-                            )
-
-                            HorizontalDivider(
-                                modifier = Modifier.padding(vertical = 12.dp),
-                                color = BackgroundGrey
-                            )
-
-                            StudentDetailInfoRow(
-                                icon = Icons.Default.TaskAlt,
-                                title = "Status",
-                                value = status.ifBlank { "Active" }
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = PrimaryBlue),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(18.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Average",
-                                    color = Color.White,
-                                    fontSize = 15.sp
-                                )
-
-                                Text(
-                                    text = "%.2f%%".format(averageMarks),
-                                    color = Color.White,
-                                    fontSize = 30.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            Column(
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = "Overall Grade",
-                                    color = Color.White,
-                                    fontSize = 15.sp
-                                )
-
-                                Text(
-                                    text = overallGrade,
-                                    color = Color.White,
-                                    fontSize = 30.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(18.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.School,
-                                    contentDescription = "Academic Performance",
-                                    tint = PrimaryBlue
-                                )
-
-                                Spacer(modifier = Modifier.size(8.dp))
-
-                                Text(
-                                    text = "Academic Performance",
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            if (subjectResults.isEmpty()) {
-                                Text(
-                                    text = "No grade record found for this student.",
-                                    fontSize = 14.sp,
-                                    color = TextGrey
-                                )
-                            } else {
-                                subjectResults.forEach { subject ->
-                                    StudentDetailSubjectRow(subject = subject)
-                                }
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        OutlinedButton(
-                            onClick = onEditClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = PrimaryBlue
-                            )
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Student",
-                                tint = PrimaryBlue
-                            )
-
-                            Spacer(modifier = Modifier.size(8.dp))
-
-                            Text(
-                                text = "Edit",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Button(
-                            onClick = onViewGradeClick,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
-                            )
-                        ) {
-                            Text(
-                                text = "View Grades",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(36.dp))
+            }
+        ) {
+            if (subjectResults.isEmpty()) {
+                Text(
+                    "No grades recorded yet.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            } else {
+                subjectResults.forEachIndexed { index, subject ->
+                    if (index > 0) SgrmsRowDivider()
+                    SgrmsMarkRow(title = subject.subjectName, subtitle = subject.subjectCode, marks = subject.marks, grade = subject.grade)
                 }
             }
         }

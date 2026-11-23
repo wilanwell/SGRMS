@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.sgrms.ui.components.SgrmsButtonRow
@@ -32,14 +31,18 @@ import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
 import com.example.sgrms.viewmodel.GradeFirebaseViewModel
 import com.example.sgrms.viewmodel.ReportRemarksViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
 
 @Composable
 fun UpdateReportScreen(
@@ -133,8 +136,8 @@ fun UpdateReportScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
-            .navigationBarsPadding()
+            .background(ColorBackground)
+            .imePadding()
     ) {
         TopBar(
             title = "Update Report",
@@ -145,7 +148,7 @@ fun UpdateReportScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -163,7 +166,7 @@ fun UpdateReportScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -265,7 +268,7 @@ fun UpdateReportScreen(
 
                             Text(
                                 text = errorMessage,
-                                color = Color.Red,
+                                color = SgrmsColors.Error,
                                 fontWeight = FontWeight.Medium
                             )
                         }
@@ -275,35 +278,41 @@ fun UpdateReportScreen(
 
                             Text(
                                 text = localMessage,
-                                color = PrimaryBlue,
+                                color = ColorPrimary,
                                 fontWeight = FontWeight.Medium
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(24.dp))
 
-                        SgrmsButtonRow(
-                            cancelText = "Cancel",
-                            confirmText = if (isSaving) {
-                                "Saving..."
-                            } else {
-                                "Save"
-                            },
-                            onCancelClick = onBackClick,
-                            onConfirmClick = {
-                                remarksError = remarks.isBlank()
-
-                                if (!remarksError) {
-                                    remarksViewModel.saveRemarks(
-                                        studentId = reportId,
-                                        remarks = remarks
-                                    )
-                                }
-                            }
-                        )
                     }
                 }
             }
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                        cancelText = "Cancel",
+                                        confirmText = if (isSaving) {
+                                            "Saving..."
+                                        } else {
+                                            "Save"
+                                        },
+                                        onCancelClick = onBackClick,
+                                        onConfirmClick = {
+                                            remarksError = remarks.isBlank()
+            
+                                            if (!remarksError) {
+                                                remarksViewModel.saveRemarks(
+                                                    studentId = reportId,
+                                                    remarks = remarks
+                                                )
+                                            }
+                                        }
+                                    )
         }
     }
 }

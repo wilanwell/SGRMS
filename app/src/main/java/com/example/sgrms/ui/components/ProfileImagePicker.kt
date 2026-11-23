@@ -49,10 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextDark
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurface
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.decodeBase64ToImageBytes
 import coil.compose.AsyncImage
 import java.io.File
@@ -142,7 +142,7 @@ fun ProfileImagePicker(
             modifier = Modifier
                 .size(size.dp)
                 .clip(CircleShape)
-                .background(PrimaryBlue)
+                .background(ColorPrimary)
                 .clickable(enabled = enabled && !isUploading) {
                     showOptionDialog = true
                 },
@@ -183,7 +183,7 @@ fun ProfileImagePicker(
                     modifier = Modifier
                         .size(30.dp)
                         .clip(CircleShape)
-                        .background(PrimaryBlue),
+                        .background(ColorPrimary),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -207,7 +207,7 @@ fun ProfileImagePicker(
                     text = "Change Profile Photo",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextDark
+                    color = ColorOnSurface
                 )
             },
             text = {
@@ -242,7 +242,7 @@ fun ProfileImagePicker(
                 ) {
                     Text(
                         text = "Cancel",
-                        color = PrimaryBlue,
+                        color = ColorPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -266,7 +266,7 @@ private fun ProfileImageOptionCard(
             },
         shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp
@@ -282,13 +282,13 @@ private fun ProfileImageOptionCard(
                 modifier = Modifier
                     .size(42.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(PrimaryBlue.copy(alpha = 0.12f)),
+                    .background(ColorPrimary.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.AddAPhoto,
                     contentDescription = title,
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(23.dp)
                 )
             }
@@ -300,13 +300,13 @@ private fun ProfileImageOptionCard(
                     text = title,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextDark
+                    color = ColorOnSurface
                 )
 
                 Text(
                     text = description,
                     fontSize = 12.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         }
@@ -324,7 +324,7 @@ fun ProfileImageView(
         modifier = modifier
             .size(size.dp)
             .clip(CircleShape)
-            .background(PrimaryBlue),
+            .background(ColorPrimary),
         contentAlignment = Alignment.Center
     ) {
         ProfilePhoto(

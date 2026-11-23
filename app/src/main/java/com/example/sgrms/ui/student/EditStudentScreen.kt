@@ -17,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,10 +28,18 @@ import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsFormCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
+import com.example.sgrms.ui.theme.ColorBackground
 import com.example.sgrms.viewmodel.ClassFirebaseViewModel
 import com.example.sgrms.viewmodel.StudentFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Edit
+import com.example.sgrms.ui.components.SgrmsSegmentedField
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun EditStudentScreen(
@@ -134,8 +141,8 @@ fun EditStudentScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BackgroundGrey)
-            .navigationBarsPadding()
+            .background(ColorBackground)
+            .imePadding()
     ) {
         TopBar(
             title = "Edit Student",
@@ -146,7 +153,7 @@ fun EditStudentScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(
                     start = 16.dp,
@@ -242,16 +249,11 @@ fun EditStudentScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    SgrmsDropdownField(
-                        value = selectedGender,
+                    SgrmsSegmentedField(
                         label = "Gender",
-                        placeholder = "Select gender",
-                        expanded = genderExpanded,
-                        onExpandedChange = {
-                            genderExpanded = it
-                        },
-                        items = genderList,
-                        onItemSelected = {
+                        options = genderList,
+                        selected = selectedGender,
+                        onSelect = { it ->
                             selectedGender = it
                             genderError = false
                             clearMessages()
@@ -262,16 +264,11 @@ fun EditStudentScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    SgrmsDropdownField(
-                        value = selectedStatus,
+                    SgrmsSegmentedField(
                         label = "Status",
-                        placeholder = "Select status",
-                        expanded = statusExpanded,
-                        onExpandedChange = {
-                            statusExpanded = it
-                        },
-                        items = statusList,
-                        onItemSelected = {
+                        options = statusList,
+                        selected = selectedStatus,
+                        onSelect = { it ->
                             selectedStatus = it
                             statusError = false
                             clearMessages()
@@ -287,59 +284,65 @@ fun EditStudentScreen(
                             text = uiState.errorMessage.ifBlank {
                                 classLoadError
                             },
-                            color = androidx.compose.ui.graphics.Color.Red
+                            color = SgrmsColors.Error
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
 
-                    SgrmsButtonRow(
-                        cancelText = "Cancel",
-                        confirmText = if (uiState.isLoading) {
-                            "Saving..."
-                        } else {
-                            "Save"
-                        },
-                        onCancelClick = onBackClick,
-                        onConfirmClick = {
-                            emailError = email.isBlank()
-                            phoneNumberError = phoneNumber.isBlank()
-                            classError = selectedClass.isBlank() ||
-                                    selectedClass == "No class available"
-                            genderError = selectedGender.isBlank()
-                            statusError = selectedStatus.isBlank()
-
-                            val isValid = !emailError &&
-                                    !phoneNumberError &&
-                                    !classError &&
-                                    !genderError &&
-                                    !statusError
-
-                            val currentStudent = selectedStudent
-
-                            if (isValid && currentStudent != null) {
-                                // copy() keeps fields this form does not edit
-                                // (photo, guardian details, date of birth, ...).
-                                val updatedStudent = currentStudent.copy(
-                                    email = email.trim(),
-                                    phoneNumber = phoneNumber.trim(),
-                                    classId = selectedClassId.ifBlank {
-                                        currentStudent.classId
-                                    },
-                                    className = selectedClass,
-                                    gender = selectedGender,
-                                    status = selectedStatus
-                                )
-
-                                studentViewModel.updateStudent(
-                                    student = updatedStudent,
-                                    onSuccess = onSaveClick
-                                )
-                            }
-                        }
-                    )
                 }
             }
+        }
+
+        Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+            SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                    cancelText = "Cancel",
+                                    confirmText = if (uiState.isLoading) {
+                                        "Saving..."
+                                    } else {
+                                        "Save"
+                                    },
+                                    onCancelClick = onBackClick,
+                                    onConfirmClick = {
+                                        emailError = email.isBlank()
+                                        phoneNumberError = phoneNumber.isBlank()
+                                        classError = selectedClass.isBlank() ||
+                                                selectedClass == "No class available"
+                                        genderError = selectedGender.isBlank()
+                                        statusError = selectedStatus.isBlank()
+            
+                                        val isValid = !emailError &&
+                                                !phoneNumberError &&
+                                                !classError &&
+                                                !genderError &&
+                                                !statusError
+            
+                                        val currentStudent = selectedStudent
+            
+                                        if (isValid && currentStudent != null) {
+                                            // copy() keeps fields this form does not edit
+                                            // (photo, guardian details, date of birth, ...).
+                                            val updatedStudent = currentStudent.copy(
+                                                email = email.trim(),
+                                                phoneNumber = phoneNumber.trim(),
+                                                classId = selectedClassId.ifBlank {
+                                                    currentStudent.classId
+                                                },
+                                                className = selectedClass,
+                                                gender = selectedGender,
+                                                status = selectedStatus
+                                            )
+            
+                                            studentViewModel.updateStudent(
+                                                student = updatedStudent,
+                                                onSuccess = onSaveClick
+                                            )
+                                        }
+                                    }
+                                )
         }
     }
 }

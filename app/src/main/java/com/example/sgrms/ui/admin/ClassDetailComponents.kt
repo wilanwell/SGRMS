@@ -18,14 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -43,90 +41,12 @@ import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.StudentModel
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsSearchBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-
-@Composable
-fun ClassStudentCard(
-    student: StudentModel,
-    onRemoveClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (student.gender == "Female") {
-                            Color(0xFFFF4081)
-                        } else {
-                            PrimaryBlue
-                        }
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Student",
-                    tint = Color.White
-                )
-            }
-
-            Spacer(modifier = Modifier.size(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = student.studentName,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "Code: ${student.studentCode}",
-                    fontSize = 13.sp,
-                    color = TextGrey
-                )
-
-                Text(
-                    text = "Status: ${student.status}",
-                    fontSize = 13.sp,
-                    color = if (student.status == "Active") {
-                        SuccessGreen
-                    } else {
-                        Color.Red
-                    },
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            OutlinedIconButton(
-                onClick = onRemoveClick
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PersonRemove,
-                    contentDescription = "Remove from class",
-                    tint = Color.Red
-                )
-            }
-        }
-    }
-}
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import androidx.compose.material.icons.filled.Add
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun AddStudentToClassDialog(
@@ -156,7 +76,7 @@ fun AddStudentToClassDialog(
                 Text(
                     text = "Choose an unassigned student to add into $className",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
         },
@@ -207,7 +127,7 @@ fun AddStudentToClassDialog(
             ) {
                 Text(
                     text = "Close",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }
@@ -221,9 +141,9 @@ fun AddStudentSelectionCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = BackgroundGrey),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Field),
+        colors = CardDefaults.cardColors(containerColor = ColorBackground),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -237,9 +157,9 @@ fun AddStudentSelectionCard(
                     .clip(CircleShape)
                     .background(
                         if (student.gender == "Female") {
-                            Color(0xFFFF4081)
+                            SgrmsColors.Pink
                         } else {
-                            PrimaryBlue
+                            ColorPrimary
                         }
                     ),
                 contentAlignment = Alignment.Center
@@ -265,20 +185,20 @@ fun AddStudentSelectionCard(
                 Text(
                     text = "Code: ${student.studentCode}",
                     fontSize = 13.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
 
                 Text(
                     text = "Current Class: ${student.className.ifBlank { "Not assigned" }}",
                     fontSize = 12.sp,
-                    color = TextGrey
+                    color = ColorOnSurfaceVariant
                 )
             }
 
             Button(
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -316,7 +236,7 @@ fun RemoveStudentFromClassDialog(
             Button(
                 onClick = onConfirmRemove,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
+                    containerColor = SgrmsColors.Error
                 )
             ) {
                 Text(
@@ -331,7 +251,7 @@ fun RemoveStudentFromClassDialog(
             ) {
                 Text(
                     text = "Cancel",
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }

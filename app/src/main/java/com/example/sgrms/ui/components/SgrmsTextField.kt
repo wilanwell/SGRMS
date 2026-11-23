@@ -12,7 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.ColorOutline
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorBackground
 
 @Composable
 fun SgrmsTextField(
@@ -56,7 +60,7 @@ fun SgrmsTextField(
             null
         },
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Field),
         singleLine = singleLine,
         minLines = minLines,
         isError = isError,
@@ -69,10 +73,19 @@ fun SgrmsTextField(
                 Text(text = errorMessage)
             }
         },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = PrimaryBlue,
-            focusedLabelColor = PrimaryBlue,
-            cursorColor = PrimaryBlue
-        )
+        colors = sgrmsFieldColors()
     )
 }
+
+/** White fields with a soft outline and an indigo focus ring. */
+@Composable
+fun sgrmsFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = ColorPrimary,
+    unfocusedBorderColor = ColorOutline,
+    focusedLabelColor = ColorPrimary,
+    cursorColor = ColorPrimary,
+    focusedContainerColor = ColorSurface,
+    unfocusedContainerColor = ColorSurface,
+    disabledContainerColor = ColorBackground,
+    errorContainerColor = ColorSurface
+)

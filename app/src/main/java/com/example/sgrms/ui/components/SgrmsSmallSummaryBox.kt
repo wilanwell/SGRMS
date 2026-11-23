@@ -15,8 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.theme.ColorPrimaryContainer
 
 @Composable
 fun SgrmsSmallSummaryBox(
@@ -27,9 +29,9 @@ fun SgrmsSmallSummaryBox(
 ) {
     Card(
         modifier = modifier.height(height),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
-            containerColor = PrimaryBlue.copy(alpha = 0.10f)
+            containerColor = ColorPrimaryContainer
         )
     ) {
         Column(
@@ -42,13 +44,13 @@ fun SgrmsSmallSummaryBox(
                 text = value,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = PrimaryBlue
+                color = ColorPrimary
             )
 
             Text(
                 text = title,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
         }
     }

@@ -10,7 +10,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.sgrms.ui.theme.CardWhite
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun SgrmsCard(
@@ -19,9 +20,9 @@ fun SgrmsCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        shape = RoundedCornerShape(SgrmsRadius.Card),
+        colors = CardDefaults.cardColors(containerColor = ColorSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

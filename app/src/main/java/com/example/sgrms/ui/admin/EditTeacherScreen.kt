@@ -31,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,12 +39,19 @@ import com.example.sgrms.ui.components.SgrmsDropdownField
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.SgrmsTextField
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.theme.SgrmsColors
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Surface
+import androidx.compose.foundation.layout.navigationBarsPadding
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun EditTeacherScreen(
@@ -97,6 +103,54 @@ fun EditTeacherScreen(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        bottomBar = {
+            val currentTeacher = teacher
+            if (currentTeacher != null) {
+                Surface(color = MaterialTheme.colorScheme.surface, shadowElevation = 8.dp) {
+                    SgrmsButtonRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                                cancelText = "Cancel",
+                                confirmText = if (uiState.isLoading) {
+                                    "Saving..."
+                                } else {
+                                    "Save"
+                                },
+                                onCancelClick = onBackClick,
+                                onConfirmClick = {
+                                    staffIdError = staffId.isBlank()
+                                    teacherNameError = teacherName.isBlank()
+                                    emailError = email.isBlank()
+
+                                    val isValid = !staffIdError &&
+                                            !teacherNameError &&
+                                            !emailError
+
+                                    if (isValid) {
+                                        // copy() keeps fields this form does not edit
+                                        // (photo, qualification, office, ...).
+                                        val updatedTeacher = currentTeacher.copy(
+                                            staffId = staffId.trim(),
+                                            teacherName = teacherName.trim(),
+                                            email = email.trim(),
+                                            phoneNumber = phoneNumber.trim(),
+                                            department = department.trim(),
+                                            position = position.trim().ifBlank { "Teacher" }
+                                        )
+
+                                        teacherViewModel.updateTeacher(
+                                            teacher = updatedTeacher,
+                                            onSuccess = onSaveClick
+                                        )
+                                    }
+                                },
+                                confirmEnabled = !uiState.isLoading
+                            )
+                }
+            }
+        },
         topBar = {
             TopBar(
                 title = "Edit Teacher",
@@ -110,7 +164,7 @@ fun EditTeacherScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
                 .padding(
@@ -129,7 +183,7 @@ fun EditTeacherScreen(
                         Spacer(modifier = Modifier.height(40.dp))
 
                         CircularProgressIndicator(
-                            color = PrimaryBlue
+                            color = ColorPrimary
                         )
                     }
                 }
@@ -145,9 +199,9 @@ fun EditTeacherScreen(
                 else -> {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                        shape = RoundedCornerShape(SgrmsRadius.Card),
+                        colors = CardDefaults.cardColors(containerColor = ColorSurface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                     ) {
                         Column(
                             modifier = Modifier.padding(18.dp)
@@ -161,7 +215,7 @@ fun EditTeacherScreen(
                             Text(
                                 text = "Update teacher profile information",
                                 fontSize = 14.sp,
-                                color = TextGrey
+                                color = ColorOnSurfaceVariant
                             )
 
                             Spacer(modifier = Modifier.height(22.dp))
@@ -260,51 +314,13 @@ fun EditTeacherScreen(
 
                                 Text(
                                     text = uiState.errorMessage,
-                                    color = Color.Red,
+                                    color = SgrmsColors.Error,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
 
-                            SgrmsButtonRow(
-                                cancelText = "Cancel",
-                                confirmText = if (uiState.isLoading) {
-                                    "Saving..."
-                                } else {
-                                    "Save"
-                                },
-                                onCancelClick = onBackClick,
-                                onConfirmClick = {
-                                    staffIdError = staffId.isBlank()
-                                    teacherNameError = teacherName.isBlank()
-                                    emailError = email.isBlank()
-
-                                    val isValid = !staffIdError &&
-                                            !teacherNameError &&
-                                            !emailError
-
-                                    if (isValid) {
-                                        // copy() keeps fields this form does not edit
-                                        // (photo, qualification, office, ...).
-                                        val updatedTeacher = teacher.copy(
-                                            staffId = staffId.trim(),
-                                            teacherName = teacherName.trim(),
-                                            email = email.trim(),
-                                            phoneNumber = phoneNumber.trim(),
-                                            department = department.trim(),
-                                            position = position.trim().ifBlank { "Teacher" }
-                                        )
-
-                                        teacherViewModel.updateTeacher(
-                                            teacher = updatedTeacher,
-                                            onSuccess = onSaveClick
-                                        )
-                                    }
-                                },
-                                confirmEnabled = !uiState.isLoading
-                            )
                         }
                     }
                 }

@@ -18,7 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 @Composable
 fun SgrmsFilterButton(
@@ -36,16 +37,16 @@ fun SgrmsFilterButton(
                 onExpandedChange(true)
             },
             modifier = Modifier.height(48.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(SgrmsRadius.Field),
             colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = PrimaryBlue
+                contentColor = ColorPrimary
             )
         ) {
             if (showFilterIcon) {
                 Icon(
                     imageVector = Icons.Default.FilterList,
                     contentDescription = "Filter",
-                    tint = PrimaryBlue,
+                    tint = ColorPrimary,
                     modifier = Modifier.size(18.dp)
                 )
 
@@ -63,7 +64,7 @@ fun SgrmsFilterButton(
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = "Open Filter",
-                tint = PrimaryBlue,
+                tint = ColorPrimary,
                 modifier = Modifier.size(18.dp)
             )
         }

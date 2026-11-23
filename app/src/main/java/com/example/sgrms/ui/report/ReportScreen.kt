@@ -1,40 +1,13 @@
 package com.example.sgrms.ui.report
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,18 +16,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.utils.ReportPdfData
 import com.example.sgrms.utils.ReportPdfGenerator
 import com.example.sgrms.utils.ReportPdfGradeItem
@@ -64,6 +28,28 @@ import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.sgrms.utils.ReportCalculator
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.components.ChipGroup
+import com.example.sgrms.ui.components.EmptyContent
+import com.example.sgrms.ui.components.ListItemPadding
+import com.example.sgrms.ui.components.RowAction
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsListItemCard
+import com.example.sgrms.ui.components.SgrmsListScreen
+import com.example.sgrms.ui.components.SgrmsOverflowMenu
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.toneForGrade
+import com.example.sgrms.ui.components.SgrmsDeleteDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Summarize
+import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material.icons.filled.EditNote
+import com.example.sgrms.ui.components.SgrmsStatCard
 
 @Composable
 fun ReportScreen(
@@ -89,7 +75,6 @@ fun ReportScreen(
     var selectedStatus by remember { mutableStateOf("All") }
     var selectedDate by remember { mutableStateOf("Latest") }
 
-    var showFilterDialog by remember { mutableStateOf(false) }
 
     var selectedReportToDelete by remember { mutableStateOf<ReportDisplayItem?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -263,295 +248,103 @@ fun ReportScreen(
     }
 
     if (showDeleteDialog && selectedReportToDelete != null) {
-        AlertDialog(
-            onDismissRequest = {
+        SgrmsDeleteDialog(
+            title = "Hide this report?",
+            message = "The report is hidden from this list until you refresh. Grade records are not deleted.",
+            confirmText = "Hide",
+            onConfirmClick = {
+                selectedReportToDelete?.let { hiddenReportStudentIds.add(it.student.studentId) }
                 showDeleteDialog = false
                 selectedReportToDelete = null
             },
-            title = {
-                Text(
-                    text = "Remove Report",
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "This will remove the report from the current list only. The grade records in Firebase will not be deleted."
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        selectedReportToDelete?.let { item ->
-                            hiddenReportStudentIds.add(item.student.studentId)
-                        }
-
-                        showDeleteDialog = false
-                        selectedReportToDelete = null
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    )
-                ) {
-                    Text(
-                        text = "Remove",
-                        color = Color.White
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        selectedReportToDelete = null
-                    }
-                ) {
-                    Text(
-                        text = "Cancel",
-                        color = PrimaryBlue
-                    )
-                }
+            onDismissClick = {
+                showDeleteDialog = false
+                selectedReportToDelete = null
             }
         )
     }
 
-    if (showFilterDialog) {
-        ReportFilterDialog(
-            selectedClass = selectedClass,
-            selectedStatus = selectedStatus,
-            selectedDate = selectedDate,
-            classList = classList,
-            statusList = statusList,
-            dateList = dateList,
-            onClassSelected = {
-                selectedClass = it
-            },
-            onStatusSelected = {
-                selectedStatus = it
-            },
-            onDateSelected = {
-                selectedDate = it
-            },
-            onDismiss = {
-                showFilterDialog = false
-            },
-            onClearFilter = {
-                selectedClass = "All Classes"
-                selectedStatus = "All"
-                selectedDate = "Latest"
-                showFilterDialog = false
-            }
-        )
-    }
-
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Report Manager",
-                showBack = false,
-                showIcon = true,
-                icon = Icons.Default.Description
-            )
-        },
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                onClick = {
+    SgrmsListScreen(
+        title = "Reports",
+        subtitle = "${filteredReports.size} of $totalReports students",
+        searchText = searchText,
+        onSearchChange = { searchText = it },
+        searchPlaceholder = "Search student, code or class",
+        isLoading = isLoading && students.isEmpty(),
+        errorMessage = errorMessage,
+        isEmpty = filteredReports.isEmpty(),
+        empty = EmptyContent("No reports yet", "Reports appear once students have completed grades.", Icons.Default.Summarize),
+        chipGroups = listOf(
+            ChipGroup(statusList, selectedStatus) { selectedStatus = it },
+            ChipGroup(classList, selectedClass) { selectedClass = it }
+        ),
+        headerActions = {
+            SgrmsOverflowMenu(
+                contentDescription = "Sort and refresh",
+                actions = dateList.map { option ->
+                    RowAction(if (option == selectedDate) "$option (current)" else option, Icons.AutoMirrored.Filled.Sort) { selectedDate = option }
+                } + RowAction("Refresh list", Icons.Default.Refresh) {
                     hiddenReportStudentIds.clear()
                     studentViewModel.loadStudents()
                     gradeViewModel.loadGrades()
                     subjectViewModel.loadSubjects()
-                },
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Generate Reports"
-                    )
-                },
-                text = {
-                    Text(
-                        text = "Generate",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                modifier = Modifier.padding(end = 4.dp)
+                }
             )
-        }
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundGrey)
-                .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp
-                )
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                ReportSummaryCard(
-                    title = "Reports",
-                    value = totalReports.toString(),
-                    icon = Icons.Default.Description,
+        },
+        summary = {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                SgrmsStatCard(
+                    value = generatedReports.size.toString(),
+                    label = "Reports ready",
+                    icon = Icons.Default.Summarize,
+                    tint = MaterialTheme.colorScheme.primary,
+                    container = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.weight(1f)
                 )
-
-                ReportSummaryCard(
-                    title = "Average",
+                SgrmsStatCard(
                     value = "%.1f%%".format(averageClassMark),
-                    icon = Icons.Default.TrendingUp,
+                    label = "Average mark",
+                    icon = Icons.Default.Assessment,
+                    tint = com.example.sgrms.ui.theme.SgrmsColors.Success,
+                    container = com.example.sgrms.ui.theme.SgrmsColors.SuccessContainer,
                     modifier = Modifier.weight(1f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                },
-                label = {
-                    Text("Search Report")
-                },
-                placeholder = {
-                    Text("Search by student, code, class, or grade")
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = TextGrey
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
-                )
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Report List (${filteredReports.size})",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                OutlinedButton(
-                    onClick = {
-                        showFilterDialog = true
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = PrimaryBlue
-                    )
+        }
+    ) {
+        items(items = filteredReports, key = { it.report.reportId }) { item ->
+            Box(ListItemPadding) {
+                SgrmsListItemCard(
+                    title = item.studentName,
+                    subtitle = "${item.studentCode} · ${item.className} · avg ${"%.1f".format(item.report.averageMarks)}%",
+                    leading = { SgrmsAvatar(name = item.studentName, size = 44.dp, imageUrl = item.student.profileImageUrl, legacyImageBase64 = item.student.profileImageBase64) },
+                    onClick = { onViewReportDetailClick(item.report.reportId) }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter Reports",
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(18.dp)
-                    )
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    Text(
-                        text = "Filter",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (errorMessage.isNotBlank()) {
-                Text(
-                    text = errorMessage,
-                    color = Color.Red,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            when {
-                isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = PrimaryBlue
-                        )
+                    if (item.status == "Generated") {
+                        SgrmsStatusChip(item.report.overallGrade.ifBlank { "-" }, toneForGrade(item.report.overallGrade))
+                    } else {
+                        SgrmsStatusChip(item.status, ChipTone.Warning)
                     }
-                }
-
-                filteredReports.isEmpty() -> {
-                    SgrmsEmptyStateCard(
-                        icon = Icons.Default.Description,
-                        title = "No report found",
-                        message = "Tap Generate to create reports from completed grade records"
-                    )
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = filteredReports,
-                            key = { item ->
-                                item.report.reportId
+                    SgrmsOverflowMenu(
+                        contentDescription = "Actions for ${item.studentName}",
+                        actions = listOf(
+                            RowAction("View report", Icons.Default.Visibility) { onViewReportDetailClick(item.report.reportId) },
+                            RowAction("Download PDF", Icons.Default.PictureAsPdf) {
+                                ReportPdfGenerator.saveReportAsPdf(
+                                    context = context,
+                                    report = item.report,
+                                    student = item.student,
+                                    gradeItems = item.gradeItems
+                                )
+                                onDownloadPdfClick(item.report.reportId)
+                            },
+                            RowAction("Update remarks", Icons.Default.EditNote) { onUpdateReportClick(item.report.reportId) },
+                            RowAction("Hide from list", Icons.Default.Delete, destructive = true) {
+                                selectedReportToDelete = item
+                                showDeleteDialog = true
                             }
-                        ) { item ->
-                            ReportCard(
-                                item = item,
-                                onViewClick = {
-                                    onViewReportDetailClick(item.report.reportId)
-                                },
-                                onDownloadClick = {
-                                    ReportPdfGenerator.saveReportAsPdf(
-                                        context = context,
-                                        report = item.report,
-                                        student = item.student,
-                                        gradeItems = item.gradeItems
-                                    )
-
-                                    onDownloadPdfClick(item.report.reportId)
-                                },
-                                onUpdateClick = {
-                                    onUpdateReportClick(item.report.reportId)
-                                },
-                                onDeleteClick = {
-                                    selectedReportToDelete = item
-                                    showDeleteDialog = true
-                                }
-                            )
-                        }
-                    }
+                        )
+                    )
                 }
             }
         }

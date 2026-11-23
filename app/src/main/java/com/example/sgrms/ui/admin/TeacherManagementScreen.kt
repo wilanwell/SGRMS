@@ -2,42 +2,14 @@ package com.example.sgrms.ui.admin
 
 import android.content.Context
 import android.content.Intent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.SupervisorAccount
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,30 +17,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.example.sgrms.data.model.TeacherModel
-import com.example.sgrms.ui.components.SgrmsActionButtonRow
 import com.example.sgrms.ui.components.SgrmsDeleteDialog
-import com.example.sgrms.ui.components.SgrmsEmptyStateCard
-import com.example.sgrms.ui.components.SgrmsFilterButton
-import com.example.sgrms.ui.components.SgrmsInfoRow
-import com.example.sgrms.ui.components.SgrmsSearchBar
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.TeacherFirebaseViewModel
 import java.io.File
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.components.ChipGroup
+import com.example.sgrms.ui.components.EmptyContent
+import com.example.sgrms.ui.components.ListFab
+import com.example.sgrms.ui.components.ListItemPadding
+import com.example.sgrms.ui.components.RowAction
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsListItemCard
+import com.example.sgrms.ui.components.SgrmsListScreen
+import com.example.sgrms.ui.components.SgrmsOverflowMenu
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Add
 
 @Composable
 fun TeacherManagementScreen(
@@ -86,7 +55,6 @@ fun TeacherManagementScreen(
     var searchText by remember { mutableStateOf("") }
 
     var selectedDepartment by remember { mutableStateOf("All Departments") }
-    var departmentExpanded by remember { mutableStateOf(false) }
 
     var selectedTeacherToDelete by remember { mutableStateOf<TeacherModel?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -141,291 +109,59 @@ fun TeacherManagementScreen(
         )
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Teacher Management",
-                showBack = false
+    SgrmsListScreen(
+        title = "Teachers",
+        subtitle = "${filteredTeachers.size} of ${teachers.size} teachers",
+        searchText = searchText,
+        onSearchChange = { searchText = it },
+        searchPlaceholder = "Search name, staff ID or email",
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
+        isEmpty = filteredTeachers.isEmpty(),
+        empty = EmptyContent("No teachers found", "Add a teacher account or change the filter.", Icons.Default.SupervisorAccount),
+        chipGroups = listOf(ChipGroup(departmentList, selectedDepartment) { selectedDepartment = it }),
+        fab = ListFab("Add teacher", Icons.Default.PersonAdd, onAddTeacherClick),
+        headerActions = {
+            SgrmsOverflowMenu(
+                contentDescription = "Export",
+                actions = listOf(
+                    RowAction("Export CSV", Icons.Default.FileDownload) {
+                        exportTeacherListToCsv(context = context, teachers = filteredTeachers)
+                    }
+                )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTeacherClick,
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                modifier = Modifier
-            ) {
-                Icon(
-                    imageVector = Icons.Default.PersonAdd,
-                    contentDescription = "Add Teacher"
-                )
-            }
         }
-    ) { paddingValues ->
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundGrey)
-                .padding(paddingValues),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = 8.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            item {
-                Text(
-                    text = "Teacher Accounts",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Text(
-                    text = "View and manage teacher profiles and Firebase login accounts",
-                    fontSize = 14.sp,
-                    color = TextGrey
-                )
-            }
-
-            item {
-                SgrmsSearchBar(
-                    value = searchText,
-                    onValueChange = {
-                        searchText = it
-                    },
-                    label = "Search Teacher",
-                    placeholder = "Search by name, staff ID, email, department, or position"
-                )
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SgrmsFilterButton(
-                        selectedValue = selectedDepartment,
-                        expanded = departmentExpanded,
-                        onExpandedChange = {
-                            departmentExpanded = it
-                        },
-                        items = departmentList,
-                        onItemSelected = {
-                            selectedDepartment = it
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    OutlinedButton(
-                        onClick = {
-                            exportTeacherListToCsv(
-                                context = context,
-                                teachers = filteredTeachers
-                            )
-                        },
-                        modifier = Modifier.height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FileDownload,
-                            contentDescription = "Export",
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(6.dp))
-
-                        Text(
-                            text = "Export",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-
-            if (uiState.errorMessage.isNotBlank()) {
-                item {
-                    Text(
-                        text = uiState.errorMessage,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            item {
-                Text(
-                    text = "Teacher List (${filteredTeachers.size})",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            if (uiState.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = PrimaryBlue
-                        )
-                    }
-                }
-            } else if (filteredTeachers.isEmpty()) {
-                item {
-                    SgrmsEmptyStateCard(
-                        icon = Icons.Default.SupervisorAccount,
-                        title = "No teacher found",
-                        message = "Tap Add Teacher to create a teacher account"
-                    )
-                }
-            } else {
-                items(
-                    items = filteredTeachers,
-                    key = { teacher ->
-                        teacher.teacherId
-                    }
-                ) { teacher ->
-                    TeacherAccountCard(
-                        teacher = teacher,
-                        onViewClick = {
-                            onViewTeacherClick(teacher.teacherId)
-                        },
-                        onEditClick = {
-                            onEditTeacherClick(teacher.teacherId)
-                        },
-                        onDeleteClick = {
-                            selectedTeacherToDelete = teacher
-                            showDeleteDialog = true
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun TeacherAccountCard(
-    teacher: TeacherModel,
-    onViewClick: () -> Unit,
-    onEditClick: () -> Unit,
-    onDeleteClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onViewClick()
-            },
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(containerColor = CardWhite),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(52.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryBlue.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
+        items(items = filteredTeachers, key = { it.teacherId }) { teacher ->
+            Box(ListItemPadding) {
+                SgrmsListItemCard(
+                    title = teacher.teacherName.ifBlank { "Unnamed teacher" },
+                    subtitle = listOf(teacher.staffId, teacher.department, teacher.position)
+                        .filter { it.isNotBlank() }
+                        .joinToString(" · "),
+                    leading = {
+                        SgrmsAvatar(
+                            name = teacher.teacherName,
+                            size = 44.dp,
+                            imageUrl = teacher.profileImageUrl,
+                            legacyImageBase64 = teacher.profileImageBase64
+                        )
+                    },
+                    onClick = { onViewTeacherClick(teacher.teacherId) }
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.SupervisorAccount,
-                        contentDescription = "Teacher",
-                        tint = PrimaryBlue,
-                        modifier = Modifier.size(28.dp)
+                    SgrmsOverflowMenu(
+                        contentDescription = "Actions for ${teacher.teacherName}",
+                        actions = listOf(
+                            RowAction("View", Icons.Default.Visibility) { onViewTeacherClick(teacher.teacherId) },
+                            RowAction("Edit", Icons.Default.Edit) { onEditTeacherClick(teacher.teacherId) },
+                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                                selectedTeacherToDelete = teacher
+                                showDeleteDialog = true
+                            }
+                        )
                     )
                 }
-
-                Spacer(modifier = Modifier.size(12.dp))
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = teacher.teacherName.ifBlank { "Unknown Teacher" },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = "${teacher.staffId.ifBlank { "No Staff ID" }} • Teacher",
-                        fontSize = 13.sp,
-                        color = TextGrey
-                    )
-                }
-
-                Text(
-                    text = teacher.position.ifBlank { "Teacher" },
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryBlue
-                )
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            HorizontalDivider(color = BackgroundGrey)
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            SgrmsInfoRow(
-                icon = Icons.Default.Badge,
-                label = "Staff ID",
-                value = teacher.staffId.ifBlank { "Not specified" }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SgrmsInfoRow(
-                icon = Icons.Default.Email,
-                label = "Email",
-                value = teacher.email.ifBlank { "Not specified" }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SgrmsInfoRow(
-                icon = Icons.Default.Badge,
-                label = "Department",
-                value = teacher.department.ifBlank { "Not specified" }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            SgrmsInfoRow(
-                icon = Icons.Default.Badge,
-                label = "Position",
-                value = teacher.position.ifBlank { "Teacher" }
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            SgrmsActionButtonRow(
-                onViewClick = onViewClick,
-                onEditClick = onEditClick,
-                onDeleteClick = onDeleteClick,
-                modifier = Modifier.fillMaxWidth()
-            )
         }
     }
 }

@@ -31,12 +31,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.sgrms.ui.theme.ErrorRed
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.viewmodel.ForgotPasswordViewModel
 import com.example.sgrms.viewmodel.PasswordResetState
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 /**
  * Sends a Firebase password reset link to the entered email.
@@ -70,14 +72,14 @@ fun ForgotPasswordDialog(
                         "has been sent to it. Check your inbox and spam folder, then log in " +
                         "with your new password.",
                     fontSize = 14.sp,
-                    color = SuccessGreen
+                    color = SgrmsColors.Success
                 )
 
                 else -> Column {
                     Text(
                         text = "Enter the email you use to log in. We will send you a link to set a new password.",
                         fontSize = 14.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -100,7 +102,7 @@ fun ForgotPasswordDialog(
                         enabled = !isSending,
                         isError = errorText != null,
                         supportingText = errorText?.let { message ->
-                            { Text(text = message, color = ErrorRed) }
+                            { Text(text = message, color = SgrmsColors.Error) }
                         },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
@@ -109,6 +111,8 @@ fun ForgotPasswordDialog(
                         keyboardActions = KeyboardActions(
                             onSend = { viewModel.sendResetEmail(email) }
                         ),
+                        shape = RoundedCornerShape(SgrmsRadius.Field),
+                        colors = sgrmsFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -117,13 +121,14 @@ fun ForgotPasswordDialog(
         confirmButton = {
             if (state is PasswordResetState.Sent) {
                 TextButton(onClick = { close() }) {
-                    Text(text = "OK", color = PrimaryBlue, fontWeight = FontWeight.Bold)
+                    Text(text = "OK", color = ColorPrimary, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Button(
                     onClick = { viewModel.sendResetEmail(email) },
                     enabled = !isSending,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = ColorPrimary),
+                    shape = RoundedCornerShape(SgrmsRadius.Field)
                 ) {
                     if (isSending) {
                         CircularProgressIndicator(
@@ -140,7 +145,7 @@ fun ForgotPasswordDialog(
         dismissButton = {
             if (state !is PasswordResetState.Sent) {
                 TextButton(onClick = { close() }, enabled = !isSending) {
-                    Text(text = "Cancel", color = TextGrey)
+                    Text(text = "Cancel", color = ColorOnSurfaceVariant)
                 }
             }
         }

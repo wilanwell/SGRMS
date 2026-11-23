@@ -1,33 +1,43 @@
 package com.example.sgrms.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sgrms.navigation.Screen
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 data class BottomNavItem(
     val label: String,
@@ -37,7 +47,7 @@ data class BottomNavItem(
 
 val AdminBottomNavItems = listOf(
     BottomNavItem(
-        label = "Dashboard",
+        label = "Home",
         route = Screen.AdminDashboard.route,
         icon = Icons.Default.Home
     ),
@@ -59,13 +69,13 @@ val AdminBottomNavItems = listOf(
     BottomNavItem(
         label = "Subjects",
         route = Screen.SubjectManagement.route,
-        icon = Icons.Default.MenuBook
+        icon = Icons.AutoMirrored.Filled.MenuBook
     )
 )
 
 val TeacherBottomNavItems = listOf(
     BottomNavItem(
-        label = "Dashboard",
+        label = "Home",
         route = Screen.TeacherDashboard.route,
         icon = Icons.Default.Home
     ),
@@ -77,7 +87,7 @@ val TeacherBottomNavItems = listOf(
     BottomNavItem(
         label = "Subjects",
         route = Screen.SubjectManagement.route,
-        icon = Icons.Default.MenuBook
+        icon = Icons.AutoMirrored.Filled.MenuBook
     ),
     BottomNavItem(
         label = "Grades",
@@ -93,17 +103,17 @@ val TeacherBottomNavItems = listOf(
 
 val StudentBottomNavItems = listOf(
     BottomNavItem(
-        label = "Dashboard",
+        label = "Home",
         route = Screen.StudentDashboard.route,
         icon = Icons.Default.Home
     ),
     BottomNavItem(
-        label = "My Reports",
+        label = "Report",
         route = Screen.StudentReportSummary.route,
         icon = Icons.Default.Summarize
     ),
     BottomNavItem(
-        label = "Notifications",
+        label = "Alerts",
         route = Screen.StudentNotifications.route,
         icon = Icons.Default.Notifications
     ),
@@ -114,122 +124,62 @@ val StudentBottomNavItems = listOf(
     )
 )
 
+/**
+ * Floating "pill" navigation bar: white, rounded, soft shadow. The active
+ * item sits on a primaryContainer pill. Labels never wrap.
+ */
 @Composable
 fun BottomNavigationBar(
     currentRoute: String?,
     items: List<BottomNavItem>,
     onItemClick: (String) -> Unit
 ) {
-    val configuration = LocalConfiguration.current
-    val screenWidthDp = configuration.screenWidthDp
-    val itemCount = items.size
-
-    val isSmallScreen = screenWidthDp < 380
-    val isVerySmallScreen = screenWidthDp < 340
-    val hasManyItems = itemCount >= 5
-
-    val iconSize = when {
-        isVerySmallScreen && hasManyItems -> 18.dp
-        isVerySmallScreen -> 20.dp
-        isSmallScreen && hasManyItems -> 20.dp
-        isSmallScreen -> 22.dp
-        hasManyItems -> 22.dp
-        else -> 24.dp
-    }
-
-    val fontSize = when {
-        isVerySmallScreen && hasManyItems -> 8.sp
-        isVerySmallScreen -> 9.sp
-        isSmallScreen && hasManyItems -> 9.sp
-        isSmallScreen -> 10.sp
-        hasManyItems -> 10.sp
-        else -> 11.sp
-    }
-
-    NavigationBar(
-        containerColor = CardWhite,
-        tonalElevation = 8.dp
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 12.dp),
+        shape = RoundedCornerShape(SgrmsRadius.NavBar),
+        color = MaterialTheme.colorScheme.surface,
+        shadowElevation = 10.dp
     ) {
-        items.forEach { item ->
-            val isSelected = currentRoute == item.route
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .selectableGroup()
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            items.forEach { item ->
+                val isSelected = currentRoute == item.route
+                val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (!isSelected) {
-                        onItemClick(item.route)
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label,
-                        modifier = Modifier.size(iconSize)
-                    )
-                },
-                label = {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 52.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent)
+                        .selectable(
+                            selected = isSelected,
+                            role = Role.Tab,
+                            onClick = { if (!isSelected) onItemClick(item.route) }
+                        )
+                        .padding(vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(item.icon, contentDescription = null, tint = contentColor, modifier = Modifier.size(22.dp))
                     Text(
-                        text = getAdaptiveBottomNavLabel(
-                            label = item.label,
-                            isSmallScreen = isSmallScreen,
-                            isVerySmallScreen = isVerySmallScreen,
-                            hasManyItems = hasManyItems
-                        ),
-                        fontSize = fontSize,
-                        fontWeight = if (isSelected) {
-                            FontWeight.Bold
-                        } else {
-                            FontWeight.Medium
-                        },
+                        text = item.label,
+                        color = contentColor,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                },
-                alwaysShowLabel = true,
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = PrimaryBlue,
-                    selectedTextColor = PrimaryBlue,
-                    unselectedIconColor = TextGrey,
-                    unselectedTextColor = TextGrey,
-                    indicatorColor = PrimaryBlue.copy(alpha = 0.12f)
-                )
-            )
-        }
-    }
-}
-
-private fun getAdaptiveBottomNavLabel(
-    label: String,
-    isSmallScreen: Boolean,
-    isVerySmallScreen: Boolean,
-    hasManyItems: Boolean
-): String {
-    return when {
-        isVerySmallScreen && hasManyItems -> {
-            when (label) {
-                "Dashboard" -> "Home"
-                "Teachers" -> "Teach"
-                "Students" -> "Stud"
-                "Subjects" -> "Subj"
-                "Classes" -> "Class"
-                "Reports" -> "Rpt"
-                "My Reports" -> "Report"
-                "Notifications" -> "Notif"
-                "Profile" -> "Me"
-                "Grades" -> "Grade"
-                else -> label
+                }
             }
         }
-
-        isSmallScreen && hasManyItems -> {
-            when (label) {
-                "Dashboard" -> "Home"
-                "Notifications" -> "Notif"
-                "My Reports" -> "Report"
-                else -> label
-            }
-        }
-
-        else -> label
     }
 }

@@ -47,18 +47,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sgrms.ui.components.SgrmsEmptyStateCard
 import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.SuccessGreen
-import com.example.sgrms.ui.theme.TextGrey
-import com.example.sgrms.ui.theme.WarningOrange
+import com.example.sgrms.ui.theme.ColorBackground
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.ui.theme.markColor
 import com.example.sgrms.utils.GradeCalculator
 import com.example.sgrms.viewmodel.AddStudentGradeSubjectItem
 import com.example.sgrms.viewmodel.AddStudentGradeViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
+import com.example.sgrms.ui.theme.SgrmsRadius
+import com.example.sgrms.ui.components.sgrmsFieldColors
 
 @Composable
 fun AddStudentGradeScreen(
@@ -93,7 +94,7 @@ fun AddStudentGradeScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(BackgroundGrey)
+                .background(ColorBackground)
                 .navigationBarsPadding()
                 .padding(paddingValues),
             contentPadding = PaddingValues(
@@ -114,7 +115,7 @@ fun AddStudentGradeScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = PrimaryBlue
+                                color = ColorPrimary
                             )
                         }
                     }
@@ -144,13 +145,11 @@ fun AddStudentGradeScreen(
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Card),
                             colors = CardDefaults.cardColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = 3.dp
-                            )
+                            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                         ) {
                             Column(
                                 modifier = Modifier.padding(18.dp)
@@ -181,7 +180,7 @@ fun AddStudentGradeScreen(
                         Text(
                             text = "Enter marks for the subjects below.",
                             fontSize = 14.sp,
-                            color = TextGrey
+                            color = ColorOnSurfaceVariant
                         )
                     }
 
@@ -213,9 +212,9 @@ fun AddStudentGradeScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(SgrmsRadius.Field),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryBlue
+                                containerColor = ColorPrimary
                             )
                         ) {
                             Text(
@@ -246,17 +245,15 @@ private fun AddStudentGradeSubjectCard(
         "-"
     }
 
-    val gradeColor = if (marks == null) TextGrey else markColor(marks)
+    val gradeColor = if (marks == null) ColorOnSurfaceVariant else markColor(marks)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
-            containerColor = CardWhite
+            containerColor = ColorSurface
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.padding(18.dp)
@@ -269,15 +266,15 @@ private fun AddStudentGradeSubjectCard(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            color = PrimaryBlue.copy(alpha = 0.12f),
-                            shape = RoundedCornerShape(12.dp)
+                            color = ColorPrimary.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(SgrmsRadius.Field)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.MenuBook,
                         contentDescription = "Subject",
-                        tint = PrimaryBlue,
+                        tint = ColorPrimary,
                         modifier = Modifier.size(27.dp)
                     )
                 }
@@ -296,7 +293,7 @@ private fun AddStudentGradeSubjectCard(
                     Text(
                         text = item.subjectCode.ifBlank { "-" },
                         fontSize = 13.sp,
-                        color = TextGrey
+                        color = ColorOnSurfaceVariant
                     )
                 }
 
@@ -337,12 +334,8 @@ private fun AddStudentGradeSubjectCard(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number
                 ),
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -359,12 +352,8 @@ private fun AddStudentGradeSubjectCard(
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 enabled = !item.isSaving,
-                shape = RoundedCornerShape(12.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
-                )
+                shape = RoundedCornerShape(SgrmsRadius.Field),
+                colors = sgrmsFieldColors()
             )
 
             if (item.message.isNotBlank()) {
@@ -373,9 +362,9 @@ private fun AddStudentGradeSubjectCard(
                 Text(
                     text = item.message,
                     color = if (item.message.contains("success", ignoreCase = true)) {
-                        SuccessGreen
+                        SgrmsColors.Success
                     } else {
-                        Color.Red
+                        SgrmsColors.Error
                     },
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold
@@ -390,9 +379,9 @@ private fun AddStudentGradeSubjectCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(SgrmsRadius.Field),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
+                    containerColor = ColorPrimary
                 )
             ) {
                 if (item.isSaving) {

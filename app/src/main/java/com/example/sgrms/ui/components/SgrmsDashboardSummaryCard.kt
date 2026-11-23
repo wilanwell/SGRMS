@@ -23,9 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorSurface
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
+import com.example.sgrms.ui.theme.SgrmsRadius
 
 enum class SgrmsSummaryCardStyle {
     Primary,
@@ -43,23 +44,23 @@ fun SgrmsDashboardSummaryCard(
     onClick: (() -> Unit)? = null
 ) {
     val containerColor = when (style) {
-        SgrmsSummaryCardStyle.Primary -> PrimaryBlue
-        SgrmsSummaryCardStyle.White -> CardWhite
+        SgrmsSummaryCardStyle.Primary -> ColorPrimary
+        SgrmsSummaryCardStyle.White -> ColorSurface
     }
 
     val iconColor = when (style) {
         SgrmsSummaryCardStyle.Primary -> Color.White
-        SgrmsSummaryCardStyle.White -> PrimaryBlue
+        SgrmsSummaryCardStyle.White -> ColorPrimary
     }
 
     val titleColor = when (style) {
         SgrmsSummaryCardStyle.Primary -> Color.White
-        SgrmsSummaryCardStyle.White -> TextGrey
+        SgrmsSummaryCardStyle.White -> ColorOnSurfaceVariant
     }
 
     val valueColor = when (style) {
         SgrmsSummaryCardStyle.Primary -> Color.White
-        SgrmsSummaryCardStyle.White -> PrimaryBlue
+        SgrmsSummaryCardStyle.White -> ColorPrimary
     }
 
     Card(
@@ -72,13 +73,11 @@ fun SgrmsDashboardSummaryCard(
                     Modifier
                 }
             ),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(if (style == SgrmsSummaryCardStyle.Primary) SgrmsRadius.Hero else SgrmsRadius.Card),
         colors = CardDefaults.cardColors(
             containerColor = containerColor
         ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier

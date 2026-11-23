@@ -1,45 +1,13 @@
 package com.example.sgrms.ui.subject
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,20 +15,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sgrms.data.model.SubjectModel
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
 import com.example.sgrms.viewmodel.SubjectFirebaseViewModel
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.sgrms.ui.components.ChipGroup
+import com.example.sgrms.ui.components.EmptyContent
+import com.example.sgrms.ui.components.ListFab
+import com.example.sgrms.ui.components.ListItemPadding
+import com.example.sgrms.ui.components.RowAction
+import com.example.sgrms.ui.components.SgrmsIconTile
+import com.example.sgrms.ui.components.SgrmsListItemCard
+import com.example.sgrms.ui.components.SgrmsListScreen
+import com.example.sgrms.ui.components.SgrmsOverflowMenu
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.SgrmsDeleteDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Visibility
 
 @Composable
 fun SubjectManagementScreen(
@@ -77,8 +52,6 @@ fun SubjectManagementScreen(
     var selectedCategory by remember { mutableStateOf("All Categories") }
     var selectedSort by remember { mutableStateOf("Name") }
 
-    var categoryExpanded by remember { mutableStateOf(false) }
-    var sortExpanded by remember { mutableStateOf(false) }
 
     var selectedSubjectToDelete by remember { mutableStateOf<SubjectModel?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -131,348 +104,78 @@ fun SubjectManagementScreen(
     }
 
     if (showDeleteDialog && selectedSubjectToDelete != null) {
-        AlertDialog(
-            onDismissRequest = {
+        SgrmsDeleteDialog(
+            title = "Delete subject?",
+            message = "${selectedSubjectToDelete?.subjectName} will be removed from the subject list.",
+            onConfirmClick = {
+                selectedSubjectToDelete?.let { subject ->
+                    subjectViewModel.deleteSubject(
+                        subjectId = subject.subjectId,
+                        onSuccess = { subjectViewModel.loadSubjects() }
+                    )
+                }
                 showDeleteDialog = false
                 selectedSubjectToDelete = null
             },
-            title = {
-                Text(
-                    text = "Delete Subject",
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to delete ${selectedSubjectToDelete?.subjectName}? This subject will be removed from the list."
-                )
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        val subjectToDelete = selectedSubjectToDelete
-
-                        if (subjectToDelete != null) {
-                            subjectViewModel.deleteSubject(
-                                subjectId = subjectToDelete.subjectId,
-                                onSuccess = {
-                                    subjectViewModel.loadSubjects()
-                                }
-                            )
-                        }
-
-                        showDeleteDialog = false
-                        selectedSubjectToDelete = null
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red
-                    )
-                ) {
-                    Text(
-                        text = "Delete",
-                        color = Color.White
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        selectedSubjectToDelete = null
-                    }
-                ) {
-                    Text(
-                        text = "Cancel",
-                        color = PrimaryBlue
-                    )
-                }
+            onDismissClick = {
+                showDeleteDialog = false
+                selectedSubjectToDelete = null
             }
         )
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        topBar = {
-            TopBar(
-                title = "Subject Manager",
-                showBack = false,
-                showIcon = true
+    SgrmsListScreen(
+        title = "Subjects",
+        subtitle = "${filteredSubjects.size} of ${subjects.size} subjects",
+        searchText = searchText,
+        onSearchChange = { searchText = it },
+        searchPlaceholder = "Search subject name, code or teacher",
+        isLoading = uiState.isLoading,
+        errorMessage = uiState.errorMessage,
+        isEmpty = filteredSubjects.isEmpty(),
+        empty = EmptyContent("No subjects found", "Add a subject or change the filter.", Icons.AutoMirrored.Filled.MenuBook),
+        chipGroups = listOf(ChipGroup(categoryList, selectedCategory) { selectedCategory = it }),
+        fab = ListFab("Add subject", Icons.Default.Add, onAddSubjectClick),
+        headerActions = {
+            SgrmsOverflowMenu(
+                contentDescription = "Sort",
+                actions = sortList.map { option ->
+                    RowAction(if (option == selectedSort) "Sort by $option (current)" else "Sort by $option", Icons.AutoMirrored.Filled.Sort) {
+                        selectedSort = option
+                    }
+                }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddSubjectClick,
-                containerColor = PrimaryBlue,
-                contentColor = Color.White,
-                modifier = Modifier.padding(end = 4.dp),
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 6.dp,
-                    pressedElevation = 6.dp,
-                    focusedElevation = 6.dp,
-                    hoveredElevation = 6.dp
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Subject",
-                    modifier = Modifier.size(28.dp)
-                )
-            }
         }
-    ) { paddingValues ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(BackgroundGrey)
-                .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp
-                )
-        ) {
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = {
-                    searchText = it
-                },
-                label = {
-                    Text("Search Subject")
-                },
-                placeholder = {
-                    Text("Search by name, code, teacher, or category")
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = TextGrey
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryBlue,
-                    focusedLabelColor = PrimaryBlue,
-                    cursorColor = PrimaryBlue
-                )
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    OutlinedButton(
-                        onClick = {
-                            categoryExpanded = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
+    ) {
+        items(items = filteredSubjects, key = { it.subjectId }) { subject ->
+            Box(ListItemPadding) {
+                SgrmsListItemCard(
+                    title = subject.subjectName.ifBlank { "Unnamed subject" },
+                    subtitle = listOf(subject.subjectCode, subject.teacherName.ifBlank { "No teacher" })
+                        .filter { it.isNotBlank() }
+                        .joinToString(" · "),
+                    leading = {
+                        SgrmsIconTile(
+                            icon = Icons.AutoMirrored.Filled.MenuBook,
+                            tint = MaterialTheme.colorScheme.primary,
+                            container = MaterialTheme.colorScheme.primaryContainer,
+                            size = 44.dp
                         )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = "Category Filter",
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(18.dp)
-                        )
-
-                        Spacer(modifier = Modifier.size(6.dp))
-
-                        Text(
-                            text = selectedCategory,
-                            fontSize = 13.sp,
-                            maxLines = 1
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Select Category",
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = categoryExpanded,
-                        onDismissRequest = {
-                            categoryExpanded = false
-                        }
-                    ) {
-                        categoryList.forEach { category ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(category)
-                                },
-                                onClick = {
-                                    selectedCategory = category
-                                    categoryExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                Box(modifier = Modifier.weight(1f)) {
-                    OutlinedButton(
-                        onClick = {
-                            sortExpanded = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = PrimaryBlue
-                        )
-                    ) {
-                        Text(
-                            text = "Sort: $selectedSort",
-                            fontSize = 13.sp,
-                            maxLines = 1
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Sort Subject",
-                            tint = PrimaryBlue,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = sortExpanded,
-                        onDismissRequest = {
-                            sortExpanded = false
-                        }
-                    ) {
-                        sortList.forEach { sort ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(sort)
-                                },
-                                onClick = {
-                                    selectedSort = sort
-                                    sortExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            if (uiState.errorMessage.isNotBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = uiState.errorMessage,
-                    color = Color.Red,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Text(
-                text = "Subject List (${filteredSubjects.size})",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            when {
-                uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = PrimaryBlue
-                        )
-                    }
-                }
-
-                filteredSubjects.isEmpty() -> {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = CardDefaults.cardColors(containerColor = CardWhite),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.MenuBook,
-                                contentDescription = "No Subjects",
-                                tint = TextGrey,
-                                modifier = Modifier.size(42.dp)
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "No subject found",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-
-                            Text(
-                                text = "Tap the add button to create a subject",
-                                fontSize = 14.sp,
-                                color = TextGrey
-                            )
-                        }
-                    }
-                }
-
-                else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        items(
-                            items = filteredSubjects,
-                            key = { subject ->
-                                subject.subjectId
+                    },
+                    onClick = { onSubjectDetailClick(subject.subjectId) }
+                ) {
+                    if (subject.category.isNotBlank()) SgrmsStatusChip(subject.category, ChipTone.Neutral)
+                    SgrmsOverflowMenu(
+                        contentDescription = "Actions for ${subject.subjectName}",
+                        actions = listOf(
+                            RowAction("View", Icons.Default.Visibility) { onSubjectDetailClick(subject.subjectId) },
+                            RowAction("Edit", Icons.Default.Edit) { onEditSubjectClick(subject.subjectId) },
+                            RowAction("Delete", Icons.Default.Delete, destructive = true) {
+                                selectedSubjectToDelete = subject
+                                showDeleteDialog = true
                             }
-                        ) { subject ->
-                            SubjectCard(
-                                subject = subject,
-                                onViewClick = {
-                                    onSubjectDetailClick(subject.subjectId)
-                                },
-                                onEditClick = {
-                                    onEditSubjectClick(subject.subjectId)
-                                },
-                                onDeleteClick = {
-                                    selectedSubjectToDelete = subject
-                                    showDeleteDialog = true
-                                }
-                            )
-                        }
-                    }
+                        )
+                    )
                 }
             }
         }

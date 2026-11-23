@@ -8,7 +8,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import com.example.sgrms.ui.theme.PrimaryBlue
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.SgrmsColors
 
 @Composable
 fun SgrmsDeleteDialog(
@@ -34,7 +35,7 @@ fun SgrmsDeleteDialog(
             Button(
                 onClick = onConfirmClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
+                    containerColor = SgrmsColors.Error
                 )
             ) {
                 Text(
@@ -49,7 +50,7 @@ fun SgrmsDeleteDialog(
             ) {
                 Text(
                     text = dismissText,
-                    color = PrimaryBlue
+                    color = ColorPrimary
                 )
             }
         }

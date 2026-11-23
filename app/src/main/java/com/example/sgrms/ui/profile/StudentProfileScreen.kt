@@ -1,57 +1,48 @@
 package com.example.sgrms.ui.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.sgrms.ui.components.ProfileImageView
-import com.example.sgrms.ui.components.TopBar
-import com.example.sgrms.ui.theme.BackgroundGrey
-import com.example.sgrms.ui.theme.CardWhite
-import com.example.sgrms.ui.theme.PrimaryBlue
-import com.example.sgrms.ui.theme.TextGrey
+import com.example.sgrms.ui.theme.ColorPrimary
+import com.example.sgrms.ui.theme.ColorOnSurfaceVariant
 import com.example.sgrms.utils.GradeCalculator
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.sgrms.viewmodel.StudentProfileViewModel
-import com.example.sgrms.data.model.UserRole
+import com.example.sgrms.ui.components.SgrmsAvatar
+import com.example.sgrms.ui.components.SgrmsStatusChip
+import com.example.sgrms.ui.components.ChipTone
+import com.example.sgrms.ui.components.toneForGrade
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.filled.FamilyRestroom
+import androidx.compose.material.icons.filled.Cake
+import com.example.sgrms.ui.components.SgrmsDetailScreen
+import com.example.sgrms.ui.components.SgrmsDetailHero
+import com.example.sgrms.ui.components.SgrmsInfoSection
+import com.example.sgrms.ui.components.SgrmsInfoRow
+import com.example.sgrms.ui.components.SgrmsRowDivider
+import com.example.sgrms.ui.components.SgrmsSettingsRow
+import com.example.sgrms.ui.components.SgrmsGroupedCard
 
 @Composable
 fun StudentProfileScreen(
@@ -93,380 +84,55 @@ fun StudentProfileScreen(
         "-"
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BackgroundGrey)
+    SgrmsDetailScreen(
+        title = "Profile",
+        onBack = null,
+        isLoading = uiState.isLoading && student == null,
+        errorMessage = uiState.errorMessage
     ) {
-        TopBar(
-            title = "Student Profile",
-            showBack = false
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 16.dp,
-                    bottom = 8.dp
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+        val name = student?.studentName?.ifBlank { null } ?: userFullName.ifBlank { "Student" }
+        SgrmsDetailHero(
+            title = name,
+            subtitle = listOfNotNull(student?.studentCode, student?.className).filter { it.isNotBlank() }.joinToString(" · "),
+            leading = {
+                SgrmsAvatar(name = name, size = 88.dp, imageUrl = student?.profileImageUrl.orEmpty(), legacyImageBase64 = student?.profileImageBase64.orEmpty())
+            }
         ) {
-            ProfileImageView(
-                imageUrl = student?.profileImageUrl.orEmpty(),
-                legacyImageBase64 = student?.profileImageBase64.orEmpty(),
-                size = 90
+            SgrmsStatusChip(
+                if (totalSubjects == 0) "No grades" else "Overall $overallGrade",
+                if (totalSubjects == 0) ChipTone.Neutral else toneForGrade(overallGrade)
             )
+            SgrmsStatusChip("$totalSubjects subjects", ChipTone.Primary)
+        }
 
-            Spacer(modifier = Modifier.height(12.dp))
+        SgrmsInfoSection("Contact") {
+            SgrmsInfoRow(icon = Icons.Default.Email, label = "Email", value = userEmail)
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Phone", value = student?.phoneNumber.orEmpty())
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Home, label = "Address", value = student?.address.orEmpty())
+        }
 
-            Text(
-                text = student?.studentName ?: userFullName.ifBlank { "Student Account" },
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+        SgrmsInfoSection("Family") {
+            SgrmsInfoRow(icon = Icons.Default.Cake, label = "Date of birth", value = student?.dateOfBirth.orEmpty())
+            SgrmsRowDivider()
+            SgrmsInfoRow(
+                icon = Icons.Default.FamilyRestroom,
+                label = "Guardian",
+                value = listOfNotNull(student?.guardianName, student?.guardianPhone).filter { it.isNotBlank() }.joinToString(" · ")
             )
+            SgrmsRowDivider()
+            SgrmsInfoRow(icon = Icons.Default.Phone, label = "Emergency contact", value = student?.emergencyContact.orEmpty())
+        }
 
-            Text(
-                text = "View student account information",
-                fontSize = 14.sp,
-                color = TextGrey
-            )
+        SgrmsGroupedCard {
+            SgrmsSettingsRow("Edit profile", Icons.Default.Edit, onEditProfileClick)
+            SgrmsRowDivider()
+            SgrmsSettingsRow("Change password", Icons.Default.Lock, onChangePasswordClick)
+        }
 
-            Spacer(modifier = Modifier.height(22.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = "Account Information",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Person,
-                        title = "Student Name",
-                        value = student?.studentName ?: userFullName.ifBlank { "Not linked" }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Student ID",
-                        value = student?.studentCode ?: "Not linked"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Person,
-                        title = "Username",
-                        value = username.ifBlank { "-" }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Email,
-                        title = "Email",
-                        value = student?.email ?: userEmail.ifBlank { "-" }
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Role",
-                        value = account?.role?.ifBlank { null } ?: UserRole.STUDENT.value
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.School,
-                        title = "Class",
-                        value = student?.className ?: "Not linked"
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = "Personal Information",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Date of Birth",
-                        value = student?.dateOfBirth ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Person,
-                        title = "Gender",
-                        value = student?.gender ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Phone Number",
-                        value = student?.phoneNumber ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.School,
-                        title = "Address",
-                        value = student?.address ?: "-"
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = "Guardian Information",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Person,
-                        title = "Guardian Name",
-                        value = student?.guardianName ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Guardian Phone",
-                        value = student?.guardianPhone ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Emergency Contact",
-                        value = student?.emergencyContact ?: "-"
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.MenuBook,
-                        title = "Profile Note",
-                        value = student?.profileNote ?: "-"
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = CardWhite),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(18.dp)
-                ) {
-                    Text(
-                        text = "Academic Summary",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.MenuBook,
-                        title = "Total Subjects",
-                        value = totalSubjects.toString()
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.TrendingUp,
-                        title = "Average Marks",
-                        value = "%.2f%%".format(averageMarks)
-                    )
-
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 12.dp),
-                        color = BackgroundGrey
-                    )
-
-                    StudentProfileInfoRow(
-                        icon = Icons.Default.Badge,
-                        title = "Overall Grade",
-                        value = overallGrade
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(22.dp))
-
-            OutlinedButton(
-                onClick = onEditProfileClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBlue
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Edit Profile",
-                    tint = PrimaryBlue
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Edit Profile",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedButton(
-                onClick = onChangePasswordClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = PrimaryBlue
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = "Change Password",
-                    tint = PrimaryBlue
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Change Password",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Button(
-                onClick = onLogoutClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryBlue
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Logout,
-                    contentDescription = "Logout",
-                    tint = Color.White
-                )
-
-                Spacer(modifier = Modifier.size(8.dp))
-
-                Text(
-                    text = "Logout",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        SgrmsGroupedCard {
+            SgrmsSettingsRow("Log out", Icons.AutoMirrored.Filled.Logout, onLogoutClick, destructive = true)
         }
     }
 }
@@ -484,7 +150,7 @@ fun StudentProfileInfoRow(
         Icon(
             imageVector = icon,
             contentDescription = title,
-            tint = PrimaryBlue,
+            tint = ColorPrimary,
             modifier = Modifier.size(24.dp)
         )
 
@@ -494,7 +160,7 @@ fun StudentProfileInfoRow(
             Text(
                 text = title,
                 fontSize = 13.sp,
-                color = TextGrey
+                color = ColorOnSurfaceVariant
             )
 
             Text(
